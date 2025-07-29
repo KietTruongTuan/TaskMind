@@ -9,15 +9,19 @@
     "build": "next build FE/web-ui",
     "start": "next start FE/web-ui",
     "lint": "next lint FE/web-ui",
-    "test": "jest --coverage"
+    "test:unit": "jest --coverage",
+    "test:e2e": "next e2e test FE/web-ui"
   },
   "dependencies": {
     "next": "15.4.1",
+    "pnpn": "^0.0.1",
     "react": "19.1.0",
     "react-dom": "19.1.0"
   },
   "devDependencies": {
+    "@cucumber/cucumber": "^12.1.0",
     "@eslint/eslintrc": "3",
+    "@playwright/test": "^1.54.1",
     "@radix-ui/themes": "^3.2.1",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
@@ -26,13 +30,13 @@
     "@types/node": "20",
     "@types/react": "19",
     "@types/react-dom": "19",
+    "concurrently": "^9.2.0",
     "eslint": "9",
     "eslint-config-next": "15.4.1",
     "jest": "^30.0.4",
     "jest-environment-jsdom": "^30.0.4",
     "ts-jest": "^29.4.0",
     "ts-node": "^10.9.2",
-    "typescript": "5",
-    "concurrently": "^9.2.0"
+    "typescript": "5"
   }
 }

@@ -1,0 +1,44 @@
+[
+  {
+    "description": "    As a user\n    I want to see the homepage\n    So that I can access the main features of the application",
+    "elements": [
+      {
+        "description": "",
+        "id": "homepage-starts;user-visits-the-homepage",
+        "keyword": "Scenario",
+        "line": 6,
+        "name": "User visits the homepage",
+        "steps": [
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 7,
+            "name": "I am on the homepage",
+            "result": {
+              "status": "undefined",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 8,
+            "name": "I should see \"Get started editing\"",
+            "result": {
+              "status": "undefined",
+              "duration": 0
+            }
+          }
+        ],
+        "tags": [],
+        "type": "scenario"
+      }
+    ],
+    "id": "homepage-starts",
+    "line": 1,
+    "keyword": "Feature",
+    "name": "Homepage Starts",
+    "tags": [],
+    "uri": "e2e\\features\\home.feature"
+  }
+]
