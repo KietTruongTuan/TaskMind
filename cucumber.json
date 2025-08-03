@@ -1,12 +1,16 @@
-// cucumber.js
-const common = `
-  --require-module ts-node/register
-  --require e2e/step-definitions/**/*.ts
-  --format progress
-  --format html:reports/cucumber-report.html
-  --format json:reports/cucumber-report.json
-`;
-
-module.exports = {
-  default: `${common} e2e/features/**/*.feature`,
-};
+{
+  "default": {
+    "require": ["e2e/steps/**/*.ts"],
+    "paths": ["e2e/features/**/*.feature"],
+    "formatOptions": {
+      "snippetInterface": "synchronous"
+    },
+    "requireModule": ["ts-node/register"],
+    "publishQuiet": true,
+    "dryRun": false,
+    "format": [
+      "progress-bar",
+      "json:reports/cucumber-report.json"
+    ]
+  }
+}

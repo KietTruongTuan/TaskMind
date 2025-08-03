@@ -5,4 +5,4 @@ Feature: Homepage Starts
     
     Scenario: User visits the homepage
         Given I am on the homepage
-        Then I should see "Get started editing"
+        Then I should see "Read our docs"
