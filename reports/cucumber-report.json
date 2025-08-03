@@ -14,19 +14,33 @@
             "keyword": "Given ",
             "line": 7,
             "name": "I am on the homepage",
+            "match": {
+              "location": "file:\\D:\\DACN\\TaskMind\\e2e\\steps\\shared.steps.ts:7"
+            },
             "result": {
-              "status": "undefined",
-              "duration": 0
+              "status": "passed",
+              "duration": 650351999
             }
           },
           {
             "arguments": [],
             "keyword": "Then ",
             "line": 8,
-            "name": "I should see \"Get started editing\"",
+            "name": "I should see \"Read our docs\"",
+            "match": {
+              "location": "file:\\D:\\DACN\\TaskMind\\e2e\\steps\\shared.steps.ts:14"
+            },
             "result": {
-              "status": "undefined",
-              "duration": 0
+              "status": "passed",
+              "duration": 54522899
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 57669599
             }
           }
         ],
