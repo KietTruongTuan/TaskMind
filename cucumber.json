@@ -1,6 +1,6 @@
 {
   "default": {
-    "require": ["e2e/steps/**/*.ts"],
+    "require": ["e2e/steps/**/*.ts", "e2e/hooks/**/*.ts"],
     "paths": ["e2e/features/**/*.feature"],
     "formatOptions": {
       "snippetInterface": "synchronous"

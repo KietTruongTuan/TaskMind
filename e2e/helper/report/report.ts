@@ -1,4 +1,7 @@
 const report = require("multiple-cucumber-html-reporter");
+const fs = require("fs-extra");
+
+fs.removeSync("./reports/features");
 
 report.generate({
   jsonDir: "reports",
