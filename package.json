@@ -16,6 +16,7 @@
   "dependencies": {
     "next": "15.4.1",
     "pnpm": "10.14.0",
+
     "react": "19.1.0",
     "react-dom": "19.1.0"
   },
@@ -47,5 +48,6 @@
     "tsx": "4.20.3",
     "typescript": "5",
     "typescript-eslint": "8.39.0"
+
   }
 }
