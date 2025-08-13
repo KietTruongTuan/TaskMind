@@ -1,0 +1,16 @@
+{
+  "default": {
+    "require": ["e2e/steps/**/*.ts", "e2e/hooks/**/*.ts"],
+    "paths": ["e2e/features/**/*.feature"],
+    "formatOptions": {
+      "snippetInterface": "synchronous"
+    },
+    "requireModule": ["ts-node/register"],
+    "publishQuiet": true,
+    "dryRun": false,
+    "format": [
+      "progress-bar",
+      "json:reports/cucumber-report.json"
+    ]
+  }
+}
