@@ -1,0 +1,28 @@
+{
+  "color": {
+    "background": { "value": "#ffffff", "type": "color" },
+    "foreground": { "value": "#171717", "type": "color" },
+    "gray-rgb": { "value": "0, 0, 0", "type": "color" },
+    "gray-alpha-200": { "value": "rgba(0, 0, 0, 0.08)", "type": "color" },
+    "gray-alpha-100": { "value": "rgba(0, 0, 0, 0.05)", "type": "color" },
+    "button-primary-hover": { "value": "#383838", "type": "color" },
+    "button-secondary-hover": { "value": "#f2f2f2", "type": "color" }
+  },
+  "typography": {
+    "font-family-sans": { "value": "var(--font-geist-sans)", "type": "fontFamilies" },
+    "font-family-mono": { "value": "var(--font-geist-mono)", "type": "fontFamilies" },
+    "font-size-base": { "value": "14px", "type": "fontSizes" },
+    "line-height-base": { "value": "24px", "type": "lineHeights" }
+  },
+  "spacing": {
+    "small": { "value": "8px", "type": "spacing" },
+    "medium": { "value": "16px", "type": "spacing" },
+    "large": { "value": "32px", "type": "spacing" },
+    "xlarge": { "value": "64px", "type": "spacing" }
+  },
+  "border": {
+    "radius-pill": { "value": "128px", "type": "borderRadius" },
+    "radius-small": { "value": "4px", "type": "borderRadius" },
+    "width-default": { "value": "1px", "type": "borderWidth" }
+  }
+}

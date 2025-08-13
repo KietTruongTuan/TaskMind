@@ -1,10 +1,11 @@
-.page {
-  --gray-rgb: 0, 0, 0;
-  --gray-alpha-200: rgba(var(--gray-rgb), 0.08);
-  --gray-alpha-100: rgba(var(--gray-rgb), 0.05);
+@import '../assets/dist/_tokens-dark.scss';
 
-  --button-primary-hover: #383838;
-  --button-secondary-hover: #f2f2f2;
+.page {
+  --gray-rgb: $color-gray-rgb;
+  --gray-alpha-200: $color-gray-alpha-200;
+  --gray-alpha-100: $color-gray-alpha-100;
+  --button-primary-hover: $color-button-primary-hover;
+  --button-secondary-hover: $color-button-secondary-hover;
 
   display: grid;
   grid-template-rows: 20px 1fr 20px;
@@ -18,19 +19,29 @@
 
 @media (prefers-color-scheme: dark) {
   .page {
-    --gray-rgb: 255, 255, 255;
-    --gray-alpha-200: rgba(var(--gray-rgb), 0.145);
-    --gray-alpha-100: rgba(var(--gray-rgb), 0.06);
+    --gray-rgb: $color-gray-rgb;
+    --gray-alpha-200: $color-gray-alpha-200;
+    --gray-alpha-100: $color-gray-alpha-100;
+    --button-primary-hover: $color-button-primary-hover;
+    --button-secondary-hover: $color-button-secondary-hover;
 
-    --button-primary-hover: #ccc;
-    --button-secondary-hover: #1a1a1a;
+    background: $color-background;
+
+    display: grid;
+    grid-template-rows: 20px 1fr 20px;
+    align-items: center;
+    justify-items: center;
+    min-height: 100svh;
+    padding: 80px;
+    gap: 64px;
+    font-family: var(--font-geist-sans);
   }
 }
 
 .main {
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: $spacing-large;
   grid-row-start: 2;
 }
 
@@ -38,14 +49,14 @@
   font-family: var(--font-geist-mono);
   padding-left: 0;
   margin: 0;
-  font-size: 14px;
-  line-height: 24px;
+  font-size: $typography-font-size-base;
+  line-height: $typography-line-height-base;
   letter-spacing: -0.01em;
   list-style-position: inside;
 }
 
 .main li:not(:last-of-type) {
-  margin-bottom: 8px;
+  margin-bottom: $spacing-small;
 }
 
 .main code {
@@ -58,12 +69,12 @@
 
 .ctas {
   display: flex;
-  gap: 16px;
+  gap: $spacing-medium;
 }
 
 .ctas a {
   appearance: none;
-  border-radius: 128px;
+  border-radius: $border-radius-pill;
   height: 48px;
   padding: 0 20px;
   border: 1px solid transparent;
@@ -75,7 +86,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
+  font-size: $typography-font-size-base;
   line-height: 20px;
   font-weight: 500;
 }
@@ -83,7 +94,7 @@
 a.primary {
   background: var(--foreground);
   color: var(--background);
-  gap: 8px;
+  gap: $spacing-small;
 }
 
 a.secondary {
@@ -100,7 +111,7 @@ a.secondary {
 .footer a {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: $spacing-small;
 }
 
 .footer img {
@@ -144,7 +155,7 @@ a.secondary {
   }
 
   .ctas a {
-    font-size: 14px;
+    font-size: $typography-font-size-base;
     height: 40px;
     padding: 0 16px;
   }
@@ -162,6 +173,6 @@ a.secondary {
 
 @media (prefers-color-scheme: dark) {
   .logo {
-    filter: invert();
+    filter: invert($color-foreground);
   }
 }
