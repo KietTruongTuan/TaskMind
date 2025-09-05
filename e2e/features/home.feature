@@ -5,9 +5,9 @@ Feature: Homepage Starts
 
     Scenario: User visits the homepage
         Given I am on the homepage
-        Then I should see "Read our docs"
+        Then I should see "Read our dos"
 
     Scenario: I should visit NextJs Docs Page
         Given I am on the homepage
         When I clicks the button "Read our docs"
-        Then I should see the url "http://localhost:3000/demo"
+        Then I should see the url "http://localhost:3000/dmo"
