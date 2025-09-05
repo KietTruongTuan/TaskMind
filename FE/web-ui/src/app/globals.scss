@@ -1,34 +1,70 @@
-@import '../assets/dist/tokens-dark';
+@import '../assets/dist/tokens';
 
 :root {
-  --background: $color-background;
-  --foreground: $color-foreground;
-  --gray-rgb: $color-gray-rgb;
-  --gray-alpha-200: $color-gray-alpha-200;
-  --gray-alpha-100: $color-gray-alpha-100;
-  --button-primary-hover: $color-button-primary-hover;
-  --button-secondary-hover: $color-button-secondary-hover;
-  --font-family-sans: $typography-font-family-sans;
-  --font-family-mono: $typography-font-family-mono;
-  --font-size-base: $typography-font-size-base;
-  --line-height-base: $typography-line-height-base;
-  --spacing-small: $spacing-small;
-  --spacing-medium: $spacing-medium;
-  --spacing-large: $spacing-large;
-  --spacing-xlarge: $spacing-xlarge;
-  --border-radius-pill: $border-radius-pill;
-  --border-radius-small: $border-radius-small;
-  --border-width-default: $border-width-default;
+  /* Light theme variables (default) */
+  --background: #{$color-background};
+  --foreground: #{$color-foreground};
+  --gray-rgb: #{$color-gray-rgb};
+  --gray-alpha-200: #{$color-gray-alpha-200};
+  --gray-alpha-100: #{$color-gray-alpha-100};
+  --button-primary-hover: #{$color-button-primary-hover};
+  --button-secondary-hover: #{$color-button-secondary-hover};
+  --font-family-sans: #{$typography-font-family-sans};
+  --font-family-mono: #{$typography-font-family-mono};
+  --font-size-base: #{$typography-font-size-base};
+  --line-height-base: #{$typography-line-height-base};
+  --spacing-small: #{$spacing-small};
+  --spacing-medium: #{$spacing-medium};
+  --spacing-large: #{$spacing-large};
+  --spacing-xlarge: #{$spacing-xlarge};
+  --border-radius-pill: #{$border-radius-pill};
+  --border-radius-small: #{$border-radius-small};
+  --border-width-default: #{$border-width-default};
 }
 
 .dark {
-  --background: $color-background;
-  --foreground: $color-foreground;
-  --gray-rgb: $color-gray-rgb;
-  --gray-alpha-200: $color-gray-alpha-200;
-  --gray-alpha-100: $color-gray-alpha-100;
-  --button-primary-hover: $color-button-primary-hover;
-  --button-secondary-hover: $color-button-secondary-hover;
+  /* Dark theme variables */
+  --background: #{$dark-color-background};
+  --foreground: #{$dark-color-foreground};
+  --gray-rgb: #{$dark-color-gray-rgb};
+  --gray-alpha-200: #{$dark-color-gray-alpha-200};
+  --gray-alpha-100: #{$dark-color-gray-alpha-100};
+  --button-primary-hover: #{$dark-color-button-primary-hover};
+  --button-secondary-hover: #{$dark-color-button-secondary-hover};
+  --font-family-sans: #{$dark-typography-font-family-sans};
+  --font-family-mono: #{$dark-typography-font-family-mono};
+  --font-size-base: #{$dark-typography-font-size-base};
+  --line-height-base: #{$dark-typography-line-height-base};
+  --spacing-small: #{$dark-spacing-small};
+  --spacing-medium: #{$dark-spacing-medium};
+  --spacing-large: #{$dark-spacing-large};
+  --spacing-xlarge: #{$dark-spacing-xlarge};
+  --border-radius-pill: #{$dark-border-radius-pill};
+  --border-radius-small: #{$dark-border-radius-small};
+  --border-width-default: #{$dark-border-width-default};
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #{$dark-color-background};
+    --foreground: #{$dark-color-foreground};
+    --gray-rgb: #{$dark-color-gray-rgb};
+    --gray-alpha-200: #{$dark-color-gray-alpha-200};
+    --gray-alpha-100: #{$dark-color-gray-alpha-100};
+    --button-primary-hover: #{$dark-color-button-primary-hover};
+    --button-secondary-hover: #{$dark-color-button-secondary-hover};
+    --font-family-sans: #{$dark-typography-font-family-sans};
+    --font-family-mono: #{$dark-typography-font-family-mono};
+    --font-size-base: #{$dark-typography-font-size-base};
+    --line-height-base: #{$dark-typography-line-height-base};
+    --spacing-small: #{$dark-spacing-small};
+    --spacing-medium: #{$dark-spacing-medium};
+    --spacing-large: #{$dark-spacing-large};
+    --spacing-xlarge: #{$dark-spacing-xlarge};
+    --border-radius-pill: #{$dark-border-radius-pill};
+    --border-radius-small: #{$dark-border-radius-small};
+    --border-width-default: #{$dark-border-width-default};
+  }
 }
 
 html,
@@ -54,34 +90,6 @@ body {
 a {
   color: inherit;
   text-decoration: none;
-}
-
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
-  body {
-    :root {
-      --background: $color-background;
-      --foreground: $color-foreground;
-      --gray-rgb: $color-gray-rgb;
-      --gray-alpha-200: $color-gray-alpha-200;
-      --gray-alpha-100: $color-gray-alpha-100;
-      --button-primary-hover: $color-button-primary-hover;
-      --button-secondary-hover: $color-button-secondary-hover;
-      --font-family-sans: $typography-font-family-sans;
-      --font-family-mono: $typography-font-family-mono;
-      --font-size-base: $typography-font-size-base;
-      --line-height-base: $typography-line-height-base;
-      --spacing-small: $spacing-small;
-      --spacing-medium: $spacing-medium;
-      --spacing-large: $spacing-large;
-      --spacing-xlarge: $spacing-xlarge;
-      --border-radius-pill: $border-radius-pill;
-      --border-radius-small: $border-radius-small;
-      --border-width-default: $border-width-default;
-    }
-  }
 }
 
 @media (prefers-color-scheme: dark) {

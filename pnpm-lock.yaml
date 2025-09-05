@@ -8,9 +8,15 @@ importers:
 
   .:
     dependencies:
+      geist:
+        specifier: ^1.4.2
+        version: 1.4.2(next@15.4.1(@babel/core@7.28.0)(@playwright/test@1.54.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(sass@1.90.0))
       next:
         specifier: 15.4.1
         version: 15.4.1(@babel/core@7.28.0)(@playwright/test@1.54.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(sass@1.90.0)
+      non.geist:
+        specifier: ^1.0.4
+        version: 1.0.4
       pnpm:
         specifier: 10.14.0
         version: 10.14.0
@@ -91,8 +97,8 @@ importers:
         specifier: ^1.90.0
         version: 1.90.0
       style-dictionary:
-        specifier: ^5.0.1
-        version: 5.0.1
+        specifier: ^5.0.2
+        version: 5.0.2
       ts-jest:
         specifier: 29.4.0
         version: 29.4.0(@babel/core@7.28.0)(@jest/transform@30.0.4)(@jest/types@30.0.1)(babel-jest@30.0.4(@babel/core@7.28.0))(jest-util@30.0.2)(jest@30.0.4(@types/node@20.19.9)(ts-node@10.9.2(@types/node@20.19.9)(typescript@5.8.3)))(typescript@5.8.3)
@@ -2954,6 +2960,11 @@ packages:
   functions-have-names@1.2.3:
     resolution: {integrity: sha512-xckBUXyTIqT97tq2x2AMb+g163b5JFysYk0x4qxNFwbfQkmNZoiRHb6sPzI9/QV33WeuvVYBUIiD4NzNIyqaRQ==}
 
+  geist@1.4.2:
+    resolution: {integrity: sha512-OQUga/KUc8ueijck6EbtT07L4tZ5+TZgjw8PyWfxo16sL5FWk7gNViPNU8hgCFjy6bJi9yuTP+CRpywzaGN8zw==}
+    peerDependencies:
+      next: '>=13.2.0'
+
   gensync@1.0.0-beta.2:
     resolution: {integrity: sha512-3hN7NaskYvMDLQY55gnW3NQ+mesEAepTqlg+VEbj7zzqEMBVNhzcGYYeqFo/TlYz6eQiFcp1HcsCZO+nGgS8zg==}
     engines: {node: '>=6.9.0'}
@@ -3750,6 +3761,9 @@ packages:
   node-releases@2.0.19:
     resolution: {integrity: sha512-xxOWJsBKtzAq7DY0J+DTzuz58K8e7sJbdgwkbMWQe8UYB6ekmsQ45q0M/tJDsGaZmbC+l7n57UV8Hl5tHxO9uw==}
 
+  non.geist@1.0.4:
+    resolution: {integrity: sha512-2spmLTgz5ipZrFGLiI1YkiHb8Yit0yFySPvWzal3wCwCFilMFQQ/Jwwz4lcEatwIKUpOeMYwyFwP8MJ8EVKqGA==}
+
   normalize-package-data@6.0.2:
     resolution: {integrity: sha512-V6gygoYb/5EmNI+MEGrWkC+e6+Rr7mTmfHrxDbLzxQogBkgzo76rkok0Am6thgSF7Mv2nLOajAJj5vDJZEFn7g==}
     engines: {node: ^16.14.0 || >=18.0.0}
@@ -4367,8 +4381,8 @@ packages:
     resolution: {integrity: sha512-6fPc+R4ihwqP6N/aIv2f1gMH8lOVtWQHoqC4yK6oSDVVocumAsfCqjkXnqiYMhmMwS/mEHLp7Vehlt3ql6lEig==}
     engines: {node: '>=8'}
 
-  style-dictionary@5.0.1:
-    resolution: {integrity: sha512-j+yQ4hM7a52iUQg5LVC8bnRkem4sU+unIY2qsyjoikPVzaxjkHd4ER7bnK+znW/Rhha69t4Fi5O46UHg6w8jFQ==}
+  style-dictionary@5.0.2:
+    resolution: {integrity: sha512-AlDpc9pvxz9EDSp2qduiQRDbI+I6IQ/bmKg+//JKD/xX3SEQGawAGUcKdbPsIkE2Po6eecUOg84uT026zbJCPQ==}
     engines: {node: '>=22.0.0'}
     hasBin: true
 
@@ -7951,6 +7965,10 @@ snapshots:
 
   functions-have-names@1.2.3: {}
 
+  geist@1.4.2(next@15.4.1(@babel/core@7.28.0)(@playwright/test@1.54.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(sass@1.90.0)):
+    dependencies:
+      next: 15.4.1(@babel/core@7.28.0)(@playwright/test@1.54.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(sass@1.90.0)
+
   gensync@1.0.0-beta.2: {}
 
   get-caller-file@2.0.5: {}
@@ -8946,6 +8964,8 @@ snapshots:
 
   node-releases@2.0.19: {}
 
+  non.geist@1.0.4: {}
+
   normalize-package-data@6.0.2:
     dependencies:
       hosted-git-info: 7.0.2
@@ -9683,7 +9703,7 @@ snapshots:
 
   strip-json-comments@3.1.1: {}
 
-  style-dictionary@5.0.1:
+  style-dictionary@5.0.2:
     dependencies:
       '@bundled-es-modules/deepmerge': 4.3.1
       '@bundled-es-modules/glob': 10.4.2

@@ -1,83 +1,54 @@
-@import '../assets/dist/_tokens-dark.scss';
-
 .page {
-  --gray-rgb: $color-gray-rgb;
-  --gray-alpha-200: $color-gray-alpha-200;
-  --gray-alpha-100: $color-gray-alpha-100;
-  --button-primary-hover: $color-button-primary-hover;
-  --button-secondary-hover: $color-button-secondary-hover;
-
   display: grid;
   grid-template-rows: 20px 1fr 20px;
   align-items: center;
   justify-items: center;
   min-height: 100svh;
   padding: 80px;
-  gap: 64px;
-  font-family: var(--font-geist-sans);
-}
-
-@media (prefers-color-scheme: dark) {
-  .page {
-    --gray-rgb: $color-gray-rgb;
-    --gray-alpha-200: $color-gray-alpha-200;
-    --gray-alpha-100: $color-gray-alpha-100;
-    --button-primary-hover: $color-button-primary-hover;
-    --button-secondary-hover: $color-button-secondary-hover;
-
-    background: $color-background;
-
-    display: grid;
-    grid-template-rows: 20px 1fr 20px;
-    align-items: center;
-    justify-items: center;
-    min-height: 100svh;
-    padding: 80px;
-    gap: 64px;
-    font-family: var(--font-geist-sans);
-  }
+  gap: var(--spacing-xlarge);
+  font-family: var(--font-family-sans);
 }
 
 .main {
   display: flex;
   flex-direction: column;
-  gap: $spacing-large;
+  gap: var(--spacing-large);
   grid-row-start: 2;
 }
 
 .main ol {
-  font-family: var(--font-geist-mono);
+  font-family: var(--font-family-mono);
   padding-left: 0;
   margin: 0;
-  font-size: $typography-font-size-base;
-  line-height: $typography-line-height-base;
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
   letter-spacing: -0.01em;
   list-style-position: inside;
 }
 
 .main li:not(:last-of-type) {
-  margin-bottom: $spacing-small;
+  margin-bottom: var(--spacing-small);
 }
 
 .main code {
   font-family: inherit;
   background: var(--gray-alpha-100);
   padding: 2px 4px;
-  border-radius: 4px;
+  border-radius: var(--border-radius-small);
   font-weight: 600;
 }
 
 .ctas {
   display: flex;
-  gap: $spacing-medium;
+  gap: var(--spacing-medium);
 }
 
 .ctas a {
   appearance: none;
-  border-radius: $border-radius-pill;
+  border-radius: var(--border-radius-pill);
   height: 48px;
   padding: 0 20px;
-  border: 1px solid transparent;
+  border: var(--border-width-default) solid transparent;
   transition:
     background 0.2s,
     color 0.2s,
@@ -86,7 +57,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: $typography-font-size-base;
+  font-size: var(--font-size-base);
   line-height: 20px;
   font-weight: 500;
 }
@@ -94,7 +65,7 @@
 a.primary {
   background: var(--foreground);
   color: var(--background);
-  gap: $spacing-small;
+  gap: var(--spacing-small);
 }
 
 a.secondary {
@@ -111,7 +82,7 @@ a.secondary {
 .footer a {
   display: flex;
   align-items: center;
-  gap: $spacing-small;
+  gap: var(--spacing-small);
 }
 
 .footer img {
@@ -138,7 +109,7 @@ a.secondary {
 
 @media (max-width: 600px) {
   .page {
-    padding: 32px;
+    padding: var(--spacing-large);
     padding-bottom: 80px;
   }
 
@@ -155,9 +126,9 @@ a.secondary {
   }
 
   .ctas a {
-    font-size: $typography-font-size-base;
+    font-size: var(--font-size-base);
     height: 40px;
-    padding: 0 16px;
+    padding: 0 var(--spacing-medium);
   }
 
   a.secondary {
@@ -171,8 +142,11 @@ a.secondary {
   }
 }
 
-@media (prefers-color-scheme: dark) {
-  .logo {
-    filter: invert($color-foreground);
-  }
+// page.module.scss (update .logo rule)
+.logo {
+  filter: none; /* Default for light theme */
+}
+
+.dark .logo {
+  filter: invert(100%); /* Invert for dark theme */
 }

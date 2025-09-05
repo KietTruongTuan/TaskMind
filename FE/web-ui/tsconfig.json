@@ -24,6 +24,6 @@
     },
     "types": ["@testing-library/jest-dom"],
   },
-  "include": ["next-env.d.ts", ".next/types/**/*.ts", "**/*.ts", "**/*.tsx", "../../eslint.config.ts"],
+  "include": ["next-env.d.ts", ".next/types/**/*.ts", "**/*.ts", "**/*.tsx", "../../eslint.config.ts", "style-dictionary.config.js"],
   "exclude": ["node_modules"]
 }

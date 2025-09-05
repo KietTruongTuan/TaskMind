@@ -1,7 +1,12 @@
-import Image from "next/image";
-import styles from "./page.module.scss";
+'use client';
+
+import Image from 'next/image';
+import styles from './page.module.scss';
+import { useTheme } from './ThemeProvider';
 
 export default function Home() {
+  const { theme, toggleTheme } = useTheme();
+
   return (
     <div className={styles.page}>
       <main className={styles.main}>
@@ -19,7 +24,9 @@ export default function Home() {
           </li>
           <li>Save and see your changes instantly.</li>
         </ol>
-
+        <button onClick={toggleTheme}>
+          Toggle Theme (Current: {theme})
+        </button>
         <div className={styles.ctas}>
           <a
             className={styles.primary}

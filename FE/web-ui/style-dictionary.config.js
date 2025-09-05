@@ -1,23 +1,16 @@
 module.exports = {
-  source: ['./src/assets/tokens/dark.json'],
+  source: ['./src/assets/tokens/tokens.json'],
   platforms: {
     scss: {
       transformGroup: 'scss',
-      buildPath: './src/assets/dist',
+      buildPath: './src/assets/dist/',
       files: [
         {
-          destination: '_tokens-dark.scss',
+          destination: '_tokens.scss',
           format: 'scss/variables',
         },
-        // {
-        //   destination: '_tokens-dark.scss',
-        //   format: 'scss/variables',
-        //   filter: {
-        //     theme: 'dark'
-        //   }
-        // }
       ],
-      // transforms: ['attribute/cti', 'name/cti/kebab']
-    }
-  }
+      transforms: ['attribute/cti', 'size/px'],
+    },
+  },
 };
