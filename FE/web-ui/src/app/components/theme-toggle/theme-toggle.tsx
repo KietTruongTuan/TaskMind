@@ -18,6 +18,7 @@ export function ThemeToggle() {
       onClick={() =>
         setTheme(theme === ThemeMode.Dark ? ThemeMode.Light : ThemeMode.Dark)
       }
+      data-testid="theme-toggle"
     >
       <AnimatePresence mode="wait" initial={false}>
         {theme === ThemeMode.Dark ? (
@@ -28,7 +29,7 @@ export function ThemeToggle() {
             exit={{ y: 20, opacity: 0, rotate: 45 }}
             transition={{ duration: 0.3 }}
           >
-            <Sun display="block"/>
+            <Sun data-testid="light-icon" display="block" />
           </motion.span>
         ) : (
           <motion.span
@@ -38,7 +39,7 @@ export function ThemeToggle() {
             exit={{ y: -20, opacity: 0, rotate: -45 }}
             transition={{ duration: 0.3 }}
           >
-            <Moon display="block"/>
+            <Moon data-testid="dark-icon" display="block" />
           </motion.span>
         )}
       </AnimatePresence>

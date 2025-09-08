@@ -1,4 +1,5 @@
 import { InputField } from "@/app/components/input-field/input-field";
+import { Box } from "@radix-ui/themes";
 import { FieldError, useFormContext } from "react-hook-form";
 
 export function RegistrationForm() {
@@ -7,7 +8,7 @@ export function RegistrationForm() {
   } = useFormContext();
 
   return (
-    <>
+    <Box data-testid="registration-form">
       <InputField
         name="username"
         type="text"
@@ -48,6 +49,6 @@ export function RegistrationForm() {
         }}
         errors={errors.password as FieldError}
       />
-    </>
+    </Box>
   );
 }

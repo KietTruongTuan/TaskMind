@@ -8,7 +8,7 @@ const ThemeContext = createContext<{
   setTheme: (mode: ThemeMode) => void;
 } | null>(null);
 
-export function ThemeSwitcher({ children }: { children: React.ReactNode }) {
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<ThemeMode>(ThemeMode.Dark);
 
   useEffect(() => {
@@ -28,6 +28,7 @@ export function ThemeSwitcher({ children }: { children: React.ReactNode }) {
           backgroundColor: "var(--background)",
           color: "var(--foreground)",
           fontSize: "var(--font-size-base)",
+          height: "100%"
         }}
       >
         {children}

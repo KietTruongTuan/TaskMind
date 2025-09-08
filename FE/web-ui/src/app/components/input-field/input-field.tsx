@@ -29,7 +29,7 @@ export function InputField({
   const inputType = isPassword && showPassword ? "text" : type;
 
   return (
-    <Form.Field name={name}>
+    <Form.Field name={name} data-testid={`${name}-input-field`}>
       <Flex direction="column" width="100%" gap="2" position="relative">
         <Form.Label asChild>
           <Label.Root>
@@ -49,6 +49,7 @@ export function InputField({
           position="absolute"
           right="3%"
           top={errors ? "43%":"60%"}
+          data-testid="toggle-password-button"
         >
           {isPassword &&
             (showPassword ? <EyeIcon size={18} /> : <EyeOffIcon size={18} />)}

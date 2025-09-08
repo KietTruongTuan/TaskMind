@@ -87,8 +87,11 @@ export function AuthenticationForm() {
                   <Text
                     className={styles.textButton}
                     onClick={formContents[activeForm].gotoAction}
+                    data-testid="goto-button"
                   >
-                    {formContents[activeForm].header}
+                    {formContents[activeForm].header == "Sign Up"
+                      ? "Sign In"
+                      : "Sign Up"}
                   </Text>
                 </Flex>
               </Flex>

@@ -13,7 +13,8 @@ export default function AuthenticationPage() {
         md: "30% 40% 30%",
         lg: "35% 30% 35%",
       }}
-      rows="1fr 4fr 1fr"
+      rows="1fr auto 1fr"
+      height="100%"
     >
       <Box
         position="fixed"
@@ -22,7 +23,6 @@ export default function AuthenticationPage() {
       >
         <ThemeToggle />
       </Box>
-
       <Flex
         gridColumn="2"
         gridRow="2"
@@ -39,7 +39,7 @@ export default function AuthenticationPage() {
             align="center"
             p="2"
           >
-            <Target />
+            <Target color="white" />
           </Flex>
           <Heading weight="medium" size="5">
             AI Goal Manager
