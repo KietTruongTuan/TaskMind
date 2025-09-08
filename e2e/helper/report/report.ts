@@ -1,5 +1,5 @@
-const report = require("multiple-cucumber-html-reporter");
-const fs = require("fs-extra");
+import report from "multiple-cucumber-html-reporter";
+import fs from "fs-extra";
 
 fs.removeSync("./reports/features");
 
