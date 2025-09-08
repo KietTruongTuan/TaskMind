@@ -1,0 +1,11 @@
+.fieldInput {
+  padding: var(--spacing-small);
+  border: 1px solid #374151;
+  border-radius: var(--spacing-small);
+}
+
+.validateMessage{
+  color: rgb(239, 79, 79);
+  font-size: 12px;
+  font-weight: light;
+}
