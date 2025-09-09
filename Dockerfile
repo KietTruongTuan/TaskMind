@@ -16,13 +16,9 @@ WORKDIR /app
 COPY package.json pnpm-lock.yaml ./
 RUN npm install -g pnpm && pnpm install --frozen-lockfile
 
-# Create and activate virtual environment for Python
-RUN python3 -m venv /app/venv
-ENV PATH="/app/venv/bin:$PATH"
-
-# Copy backend requirements and install Python dependencies in virtual env
+# Install Python dependencies globally (override the system protection)
 COPY BE/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip3 install --break-system-packages --no-cache-dir -r requirements.txt
 
 # Copy the entire project
 COPY . .
@@ -30,5 +26,5 @@ COPY . .
 # Expose both ports
 EXPOSE 3000 8000
 
-# Start both services using your existing pnpm script
-CMD ["sh", "-c", "cd FE/web-ui && pnpm dev & /app/venv/bin/python BE/manage.py runserver 0.0.0.0:8000"]
+# Start both services with correct working directories
+CMD ["pnpm", "dev"]
