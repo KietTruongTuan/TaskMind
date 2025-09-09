@@ -1,6 +1,6 @@
 "use client";
 import { ThemeMode } from "@/app/enum/theme-mode.enum";
-import { Box, Theme } from "@radix-ui/themes";
+import { Theme } from "@radix-ui/themes";
 import { useState, useEffect, createContext, useContext } from "react";
 
 const ThemeContext = createContext<{

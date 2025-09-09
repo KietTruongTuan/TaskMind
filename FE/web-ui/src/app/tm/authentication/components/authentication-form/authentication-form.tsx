@@ -1,6 +1,5 @@
 "use client";
 import { CustomButton } from "@/app/components/custom-button/custom-button";
-import { InputField } from "@/app/components/input-field/input-field";
 import { Flex, Checkbox, Text, Heading, Box } from "@radix-ui/themes";
 import * as Form from "@radix-ui/react-form";
 import { FormProvider, useForm } from "react-hook-form";
@@ -24,6 +23,7 @@ export function AuthenticationForm() {
     defaultValues: {},
   });
 
+  const { reset } = methods;
   const [activeForm, SetActiveForm] = useState<AuthenticationModule>(
     AuthenticationModule.Login
   );
@@ -47,8 +47,8 @@ export function AuthenticationForm() {
   };
 
   useEffect(() => {
-    methods.reset();
-  }, [activeForm]);
+    reset();
+  }, [activeForm, reset]);
   return (
     <Box width="100%">
       <AnimatePresence mode="wait">

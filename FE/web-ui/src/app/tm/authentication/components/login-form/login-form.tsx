@@ -1,5 +1,5 @@
 import { InputField } from "@/app/components/input-field/input-field";
-import { Box } from "@radix-ui/themes";
+import { Flex } from "@radix-ui/themes";
 import { FieldError, useFormContext } from "react-hook-form";
 
 export function LoginForm() {
@@ -8,7 +8,7 @@ export function LoginForm() {
   } = useFormContext();
 
   return (
-    <Box data-testid="login-form">
+    <Flex direction="column" gap="4" data-testid="login-form">
       <InputField
         name="email"
         type="email"
@@ -40,6 +40,6 @@ export function LoginForm() {
         }}
         errors={errors.password as FieldError}
       />
-    </Box>
+    </Flex>
   );
 }

@@ -1,7 +1,7 @@
 import { Box } from "@radix-ui/themes";
 import { render, screen } from "@testing-library/react";
 import AuthenticationPage from "./page";
-import { ThemeProvider } from "../contexts/theme-context/theme-context";
+import { ThemeProvider } from "@/app/contexts/theme-context/theme-context";
 
 jest.mock("./components/authentication-form/authentication-form", () => ({
   AuthenticationForm: () => <Box>Mocked Component</Box>,
