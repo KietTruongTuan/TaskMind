@@ -5,3 +5,5 @@ package-lock.json
 
 .pytest_cache/
 venv/
+
+FE/web-ui/src/assets/tokens/.obsidian/
