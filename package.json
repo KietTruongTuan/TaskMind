@@ -11,12 +11,8 @@
     "start": "next start FE/web-ui",
     "lint": "next lint FE/web-ui",
     "eslint --fix": "eslint FE/web-ui --fix",
-    
     "test:unit": "jest --coverage",
-    "test:e2e": "(cucumber-js e2e/features  || true) && tsx e2e/helper/report/report.ts",
-
-    "docker:dev": "docker-compose up --build",
-    "docker:down": "docker-compose down"
+    "test:e2e": "(cucumber-js e2e/features  || true) && tsx e2e/helper/report/report.ts"
   },
   "dependencies": {
     "geist": "^1.4.2",
