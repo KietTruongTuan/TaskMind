@@ -2,7 +2,7 @@ import { Box, Flex, Grid, Heading, Text } from "@radix-ui/themes";
 import styles from "./page.module.scss";
 import { Target } from "lucide-react";
 import { AuthenticationForm } from "./components/authentication-form/authentication-form";
-import { ThemeToggle } from "../components/theme-toggle/theme-toggle";
+import { ThemeToggle } from "../../components/theme-toggle/theme-toggle";
 
 export default function AuthenticationPage() {
   return (

@@ -1,6 +1,6 @@
 import * as Form from "@radix-ui/react-form";
 import * as Label from "@radix-ui/react-label";
-import { Box, Button, Flex } from "@radix-ui/themes";
+import { Box, Flex } from "@radix-ui/themes";
 import { FieldError, RegisterOptions, useFormContext } from "react-hook-form";
 import styles from "./input-field.module.scss";
 import { useState } from "react";
