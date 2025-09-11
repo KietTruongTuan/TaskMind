@@ -29,7 +29,7 @@ export function ThemeToggle() {
             exit={{ y: 20, opacity: 0, rotate: 45 }}
             transition={{ duration: 0.3 }}
           >
-            <Sun data-testid="light-icon" display="block" />
+            <Moon data-testid="light-icon" display="block" />
           </motion.span>
         ) : (
           <motion.span
@@ -39,7 +39,7 @@ export function ThemeToggle() {
             exit={{ y: -20, opacity: 0, rotate: -45 }}
             transition={{ duration: 0.3 }}
           >
-            <Moon data-testid="dark-icon" display="block" />
+            <Sun data-testid="dark-icon" display="block" />
           </motion.span>
         )}
       </AnimatePresence>

@@ -6,6 +6,7 @@ import { CustomButton } from "../custom-button/custom-button";
 import styles from "./navigation-bar.module.scss";
 import { WebUrl } from "@/app/enum/web-url.enum";
 import { usePathname, useRouter } from "next/navigation";
+import { ThemeToggle } from "../theme-toggle/theme-toggle";
 
 interface navBarItem {
   icon: React.ElementType;
@@ -75,12 +76,15 @@ export function NavigationBar({ userAvatar }: { userAvatar?: string }) {
             );
           })}
         </Flex>
-        <Avatar
-          mr={{ initial: "3", md: "0" }}
-          className={styles.avatarBox}
-          src={userAvatar}
-          fallback="N"
-        />
+        <Flex gap="3">
+          <ThemeToggle />
+          <Avatar
+            mr={{ initial: "3", md: "0" }}
+            className={styles.avatarBox}
+            src={userAvatar}
+            fallback="N"
+          />
+        </Flex>
       </Flex>
     </Flex>
   );
