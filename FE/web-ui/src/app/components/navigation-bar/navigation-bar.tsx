@@ -46,7 +46,7 @@ export function NavigationBar({ userAvatar }: { userAvatar?: string }) {
           </Box>
           <Flex direction="column">
             <Text>AI Goal Manager</Text>
-            <Text size="1">Hệ thống quản lý mục tiêu thông minh</Text>
+            <Text size="1">Smart Goal Management System</Text>
           </Flex>
         </Flex>
         <Flex
