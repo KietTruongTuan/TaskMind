@@ -2,15 +2,20 @@
   background: linear-gradient(to right, #a855f7, #3b82f6);
 }
 
-  .ghostButton {
-    background: none;
-    color: var(--foreground);
-    &:hover {
-      background-color: var(--button-primary-hover);
-      color: var(--background);
-    }
-
-    &.active {
-      background-color: var(--gray-alpha-200);
-    }
+.ghostButton {
+  background: none;
+  color: var(--foreground);
+  &:hover {
+    background-color: var(--button-primary-hover);
+    color: var(--background);
   }
+
+  &.active {
+    background-color: var(--gray-alpha-200);
+  }
+  
+  &:disabled {
+    cursor: default;
+    pointer-events: none;
+  }
+}

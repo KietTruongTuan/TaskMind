@@ -36,55 +36,53 @@ export function NavigationBar({ userAvatar }: { userAvatar?: string }) {
     <Flex
       width="100%"
       className={styles.navBar}
-      py="3"
-      justify="center"
+      p="3"
+      justify="between"
       data-testid="navbar"
     >
-      <Flex width={{ initial: "100%", md: "70%" }} justify="between">
-        <Flex gap="2" align="center" ml={{ initial: "3", md: "0" }}>
-          <Box>
-            <LogoIcon size="20" />
-          </Box>
-          <Flex direction="column">
-            <Text>AI Goal Manager</Text>
-            <Text size="1">Smart Goal Management System</Text>
-          </Flex>
+      <Flex gap="2" align="center" ml={{ initial: "3", md: "0" }}>
+        <Box>
+          <LogoIcon size="20" />
+        </Box>
+        <Flex direction="column">
+          <Text>AI Goal Manager</Text>
+          <Text size="1">Smart Goal Management System</Text>
         </Flex>
-        <Flex
-          align="center"
-          gap="6"
-          display={{ initial: "none", md: "flex" }}
-          data-testid="navbar-items"
-        >
-          {navBarItems.map((value, index) => {
-            const isActive = currentUrl === value.url;
-            const Icon = value.icon;
+      </Flex>
+      <Flex
+        align="center"
+        gap="7"
+        display={{ initial: "none", md: "flex" }}
+        data-testid="navbar-items"
+      >
+        {navBarItems.map((value, index) => {
+          const isActive = currentUrl === value.url;
+          const Icon = value.icon;
 
-            return (
-              <CustomButton
-                key={index}
-                variant="ghost"
-                onClick={() => route.push(value.url)}
-                isActive={isActive}
-                data-testid={`${value.testId}-tab`}
-              >
-                <Flex align="center" gap="2">
-                  <Icon size={16} />
-                  <Text weight="medium">{value.label}</Text>
-                </Flex>
-              </CustomButton>
-            );
-          })}
-        </Flex>
-        <Flex gap="3">
-          <ThemeToggle />
-          <Avatar
-            mr={{ initial: "3", md: "0" }}
-            className={styles.avatarBox}
-            src={userAvatar}
-            fallback="N"
-          />
-        </Flex>
+          return (
+            <CustomButton
+              key={index}
+              variant="ghost"
+              onClick={() => route.push(value.url)}
+              isActive={isActive}
+              data-testid={`${value.testId}-tab`}
+            >
+              <Flex align="center" gap="2">
+                <Icon size={16} />
+                <Text weight="medium">{value.label}</Text>
+              </Flex>
+            </CustomButton>
+          );
+        })}
+      </Flex>
+      <Flex gap="3">
+        <ThemeToggle />
+        <Avatar
+          mr={{ initial: "3", md: "0" }}
+          className={styles.avatarBox}
+          src={userAvatar}
+          fallback="N"
+        />
       </Flex>
     </Flex>
   );

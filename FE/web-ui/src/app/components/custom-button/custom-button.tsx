@@ -14,6 +14,7 @@ export function CustomButton({
   return (
     <Button
       radius="large"
+      disabled={isActive}
       className={`${
         props.variant === "ghost" ? styles.ghostButton : styles.button
       } ${isActive ? styles.active : ""}`}
