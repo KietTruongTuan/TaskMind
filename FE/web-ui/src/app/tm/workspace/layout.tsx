@@ -1,6 +1,4 @@
 import { NavigationBar } from "@/app/components/navigation-bar/navigation-bar";
-import { ThemeToggle } from "@/app/components/theme-toggle/theme-toggle";
-import { Box } from "@radix-ui/themes";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
