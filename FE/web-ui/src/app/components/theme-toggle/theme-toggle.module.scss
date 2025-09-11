@@ -1,7 +1,8 @@
 .toggleButton {
   border-radius: var(--border-radius-pill);
-  background-color: var(--foreground);
-  color: var(--background);
+  background-color: var(--background);
+  border: 2px solid var(--gray-alpha-200);
+  color: var(--foreground);
   cursor: pointer;
   transition: all 0.3s ease-in-out;
   &:active {

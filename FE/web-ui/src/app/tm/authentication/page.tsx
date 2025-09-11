@@ -1,8 +1,8 @@
 import { Box, Flex, Grid, Heading, Text } from "@radix-ui/themes";
 import styles from "./page.module.scss";
-import { Target } from "lucide-react";
 import { AuthenticationForm } from "./components/authentication-form/authentication-form";
 import { ThemeToggle } from "../../components/theme-toggle/theme-toggle";
+import { LogoIcon } from "./components/logo-icon/logo-icon";
 
 export default function AuthenticationPage() {
   return (
@@ -16,11 +16,7 @@ export default function AuthenticationPage() {
       rows="1fr auto 1fr"
       height="100%"
     >
-      <Box
-        position="fixed"
-        top="1rem"
-        right="1rem"
-      >
+      <Box position="fixed" top="1rem" right="1rem">
         <ThemeToggle />
       </Box>
       <Flex
@@ -33,14 +29,7 @@ export default function AuthenticationPage() {
         gap="5"
       >
         <Flex direction="column" gap="3" align="center">
-          <Flex
-            className={styles.gradientBox}
-            justify="center"
-            align="center"
-            p="2"
-          >
-            <Target color="white" />
-          </Flex>
+          <LogoIcon size="30"/>
           <Heading weight="medium" size="5">
             AI Goal Manager
           </Heading>
