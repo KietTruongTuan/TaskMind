@@ -42,13 +42,46 @@ Make sure you have installed:
 
 ### 2. Run Development Server using Docker
 
-The easiest way to build + test a development server is uisng On main directory, run 
+The easiest way to build + test a development server is using Docker. On main directory, run 
 
-```
-pnpm dev:docker
+```sh
+docker compose up --build
 ```
 
-This will 
+This will build an image for a development server. Then run the created image with 
+
+```sh
+docker compose up -d
+```
+
+The started container should support live updating of code. So no need to restart the container for code changes to takes effect. But in case you really need to stop the container
+
+```sh 
+docker compose down
+```
+
+This command gracefully shut down the container with the development server in it. Preserving the updates to physical memory (if any)
+
+### 2. Alternative: Run Development Server from Source
+
+- Clone the code repository from **Github**
+
+- Prepare FE environment: In the main directory, run `pnpm install` (Make sure you have `pnpm` installed)
+
+- Prepare BE environment: The BE is implemented in Django, it is highly recommended to install it with a python virtual environment
+	- Create a Python virtual environment `python -m venv <your_enviroment_name>`
+	- Activate it with
+		- `.\venv\Scripts\activate` (Windows)
+		- `source venv/bin/activate` (macOS/Linux)
+	- Then install the required packages: `pip install -r requirements.txt`
+
+- Run the application with
+	- `pnpm dev:fe` -> run the front end
+	- `pnpm dev:be` -> run the back end
+	  Or
+	- `pnpm dev` -> run both
+
+
 
 ---
 
@@ -66,14 +99,11 @@ From the root (`package.json`):
 - `pnpm test:unit` → run unit tests with Jest
 - `pnpm test:e2e` → run end-to-end tests with Cucumber
 
-**Docker**
-- `pnpm docker:dev` → build & run with Docker Compose
-
 ---
 
-## 🧪 Testing
+## 🧪 E2E Testing
 
-## TODO: adds a description of how to run tests, get test results
+## TODO: adds a description of how to run e2e tests, get test results
 
 ---
 
@@ -85,17 +115,3 @@ From the root (`package.json`):
 - **Styling & Tokens:** Style Dictionary
 - **Containerization:** Docker, Docker Compose
 - **Package Manager:** pnpm
-
----
-
-## 📝 Environment Variables
-
-Create a `.env.docker` file for Docker builds and `.env` files for local development if needed.
-
-Example:
-
-```
-DJANGO_SECRET_KEY=your-secret-key
-DJANGO_DEBUG=True
-DATABASE_URL=postgres://user:pass@db:5432/taskmind
-```

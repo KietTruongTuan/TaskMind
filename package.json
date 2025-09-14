@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "concurrently -k -n FRONT,BACK -c blue,green \"pnpm dev:fe\" \"pnpm dev:be\"",
     "dev:fe": "next dev FE/web-ui",
-    "dev:be": "cd BE && python manage.py runserver",
+    "dev:be": "cd BE && python manage.py runserver 0.0.0.0:8000",
     "build": "next build FE/web-ui",
     "build:tokens": "cd ./FE/web-ui/ && style-dictionary build --config ./style-dictionary.config.js --verbose   # build .scss styles from .json tokens",
     "start": "next start FE/web-ui",

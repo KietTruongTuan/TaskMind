@@ -1,27 +1,28 @@
-FROM node:18-alpine
+FROM python:3.11-slim
 
-# Install Python and system dependencies
-RUN apk add --no-cache \
-    python3 \
-    py3-pip \
-    gcc \
-    musl-dev \
-    python3-dev \
-    postgresql-dev
+# Install Node.js
+RUN apt-get update && apt-get install -y \
+    curl \
+    && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt-get install -y nodejs \
+    && rm -rf /var/lib/apt/lists/*
 
 # Set up working directory
 WORKDIR /app
 
 # Copy package files and install Node.js dependencies
 COPY package.json pnpm-lock.yaml ./
-RUN npm install -g pnpm && pnpm install --frozen-lockfile
+RUN npm install -g pnpm && pnpm install
 
 # Install Python dependencies globally (override the system protection)
-COPY BE/requirements.txt .
+COPY requirements.txt .
 RUN pip3 install --break-system-packages --no-cache-dir -r requirements.txt
 
 # Copy the entire project
 COPY . .
+
+# apply migration for BE app
+# RUN cd ./BE && python manage.py migrate
 
 # Expose both ports
 EXPOSE 3000 8000
