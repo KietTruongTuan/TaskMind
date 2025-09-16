@@ -14,6 +14,7 @@ from pathlib import Path
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+# Current BASE_DIR: BE/
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Which database to apply, SQLite3 (default) or PostgreSQL
