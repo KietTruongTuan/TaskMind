@@ -23,16 +23,16 @@ class GoalBreakdownView(APIView):
         due_date = request.data.get('due_date')
 
         if not name:
-            return Response({"error": "Please provide a goal's name "}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "Please provide a goal's name"}, status=status.HTTP_400_BAD_REQUEST)
         
         if not description:
-            return Response({"error": "Please provide a goal's description "}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "Please provide a goal's description"}, status=status.HTTP_400_BAD_REQUEST)
         
         if not due_date:
-            return Response({"error": "Please provide a goal's due date "}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "Please provide a goal's due date"}, status=status.HTTP_400_BAD_REQUEST)
 
         if not category:
-            return Response({"error": "Please provide a goal's category "}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "Please provide a goal's category"}, status=status.HTTP_400_BAD_REQUEST)
 
         api_key = self.get_api_key()
         if not api_key:
