@@ -22,7 +22,7 @@ RUN pip3 install --break-system-packages --no-cache-dir -r requirements.txt
 COPY . .
 
 # apply migration for BE app
-# RUN cd ./BE && python manage.py migrate
+RUN cd ./BE && python manage.py migrate
 
 # Expose both ports
 EXPOSE 3000 8000
