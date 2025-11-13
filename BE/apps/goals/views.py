@@ -60,9 +60,14 @@ class GoalBreakdownView(APIView):
             Due_date: '{due_date}'
             Please help me break down this goal name and description into specific, actionable steps.
             Each step should be a clear, achievable task within due date.
-            Please return the list of tasks as a JSON array of strings.
+            
+            Must return the list of tasks as a JSON array of strings.
+            
+            The return language should match the name and description language.
+            
             Example:
             If the name is "Complete a graduation project on Fanpage Management" and description is "A project to manage a fanpage for a product" and due_date is "2023-12-31", return the result in the following format:
+            
             ["Step 1: Design Database", "Step 2: Build API Login", "Step 3: Integrate Facebook API", "Step 4: Build management interface", "Step 5: Test and fix bugs", "Step 6: Write report and prepare presentation"]
             """
         )
