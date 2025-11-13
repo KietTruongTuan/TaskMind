@@ -99,7 +99,7 @@ class RefreshTokenView(APIView):
                     status=status.HTTP_401_UNAUTHORIZED
                 )
 
-            # Black list the old refresh token (if rotation is enabled)
+            # Blacklist the old refresh token (if rotation is enabled)
             try: 
                 refresh.blacklist()
             except AttributeError:
