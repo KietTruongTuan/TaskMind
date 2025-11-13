@@ -1,6 +1,8 @@
 from django.contrib.auth import authenticate
 from rest_framework import serializers
 from .models import User
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.tokens import RefreshToken
 
 class RegisterSerializer(serializers.ModelSerializer):
     """Serializer for user registration
@@ -36,4 +38,15 @@ class LoginSerializer(serializers.Serializer):
             raise serializers.ValidationError("Invalid credentials")
         data['user'] = user
         return data
-    
+
+class CustomTokenSerializer(serializers.Serializer):
+    """Serializer for handling custom token data if needed in future."""
+    @classmethod
+    def get_token(cls, user):
+        token = RefreshToken.for_user(user)
+        
+        # Add custom claims
+        token['username'] = user.username
+        token['email'] = user.email
+        
+        return token

@@ -1,9 +1,11 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import RegisterSerializer, LoginSerializer
+from .serializers import RegisterSerializer, LoginSerializer, CustomTokenSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
+from django.conf import settings
+from .models import User
 
 # Create your views here.
 
@@ -33,7 +35,11 @@ class LoginView(APIView):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.validated_data['user']
-            refresh = RefreshToken.for_user(user)
+            
+            # Generate tokens with custom claims
+            refresh = CustomTokenSerializer.get_token(user)
+            
+            
             response = Response({
                 'message': 'Login successful',
                 'access': str(refresh.access_token)
@@ -46,7 +52,7 @@ class LoginView(APIView):
                 httponly=True,  # Cannot be accessed by JavaScript
                 secure=False,  # Set to True in production with HTTPS
                 samesite='Lax',  # CSRF protection ('Strict' or 'Lax')
-                max_age=1*24*60*60,  # 1 day
+                max_age=settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME'].total_seconds(),
                 path='/'
             )
 
@@ -72,14 +78,56 @@ class RefreshTokenView(APIView):
             )
 
         try:
-            # Verify refresh token and generate new access token
+            # Verify refresh token
             refresh = RefreshToken(refresh_token)
-            access_token = str(refresh.access_token)
+            
+            # Get user ID from the token payload
+            user_id = refresh.get('user_id')  # or refresh['user_id']
+            
+            if not user_id:
+                return Response(
+                    {'error': 'Invalid token payload'}, 
+                    status=status.HTTP_401_UNAUTHORIZED
+                )
+                
+            # Fetch the user from database
+            try:
+                user = User.objects.get(id=user_id)
+            except User.DoesNotExist:
+                return Response(
+                    {'error': 'User not found'}, 
+                    status=status.HTTP_401_UNAUTHORIZED
+                )
 
-            return Response({
+            # Black list the old refresh token (if rotation is enabled)
+            try: 
+                refresh.blacklist()
+            except AttributeError:
+                pass  # Blacklisting not enabled
+            except Exception:
+                pass  # Handle other exceptions silently
+            
+            # Create new refresh token
+            new_refresh = CustomTokenSerializer.get_token(user)
+            access_token = str(new_refresh.access_token)
+
+            response = Response({
                 'access': access_token
             }, status=status.HTTP_200_OK)
-
+            
+            # Set new refresh token as HttpOnly cookie
+            response.set_cookie(
+                key='refresh_token',
+                value=str(new_refresh),
+                httponly=True,
+                secure=False, # Set to True in production
+                samesite='Lax',
+                max_age=settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME'].total_seconds(),
+                path='/'
+            )
+            return response
+            
+            
         except TokenError as e:
             return Response(
                 {'error': 'Invalid or expired refresh token'},
@@ -90,7 +138,7 @@ class RefreshTokenView(APIView):
 class LogoutView(APIView):
     """View for user logout
 
-    Blacklists are refresh token and clears the HttpOnly cookie.
+    Blacklists the refresh token and clears the HttpOnly cookie.
     """
 
     def post(self, request):
