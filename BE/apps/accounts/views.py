@@ -6,6 +6,9 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
 from django.conf import settings
 from .models import User
+import logging
+
+logger = logging.getLogger(__name__)
 
 # Create your views here.
 
@@ -104,8 +107,8 @@ class RefreshTokenView(APIView):
                 refresh.blacklist()
             except AttributeError:
                 pass  # Blacklisting not enabled
-            except Exception:
-                pass  # Handle other exceptions silently
+            except (TokenError, Exception) as e:
+                logger.warning(f"Failed to blacklist token: {e}")
             
             # Create new refresh token
             new_refresh = CustomTokenSerializer.get_token(user)
