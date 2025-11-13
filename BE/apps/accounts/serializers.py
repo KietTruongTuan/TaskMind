@@ -39,8 +39,8 @@ class LoginSerializer(serializers.Serializer):
         data['user'] = user
         return data
 
-class CustomTokenSerializer(serializers.Serializer):
-    """Serializer for handling custom token data if needed in future."""
+class CustomTokenSerializer:
+    """Utility class for handling custom token data if needed in future."""
     @classmethod
     def get_token(cls, user):
         token = RefreshToken.for_user(user)
