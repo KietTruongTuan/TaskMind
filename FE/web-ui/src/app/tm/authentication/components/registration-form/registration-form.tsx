@@ -1,11 +1,18 @@
 import { InputField } from "@/app/components/input-field/input-field";
 import { Flex } from "@radix-ui/themes";
+import { useEffect, useRef } from "react";
 import { FieldError, useFormContext } from "react-hook-form";
 
 export function RegistrationForm() {
   const {
     formState: { errors },
+    watch,
+    unregister,
+    trigger,
   } = useFormContext();
+
+  const password = watch("password");
+  const confirmPassword = watch("confirmPassword");
 
   return (
     <Flex direction="column" gap="4" data-testid="registration-form">
@@ -48,6 +55,22 @@ export function RegistrationForm() {
           },
         }}
         errors={errors.password as FieldError}
+      />
+      <InputField
+        name="confirmPassword"
+        type="password"
+        placeholder="Confirm your password"
+        rules={{
+          required: "Confirm password is required",
+          validate: (value: string) => {
+            const matches = value === password;
+            // if (matches) {
+            //   unregister("confirmPassword", { keepError: false });
+            // }
+            return matches || "Passwords do not match";
+          },
+        }}
+        errors={errors.confirmPassword as FieldError}
       />
     </Flex>
   );

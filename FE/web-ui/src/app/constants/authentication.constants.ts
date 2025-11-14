@@ -9,10 +9,15 @@ export interface RegistrationRequestBody {
   password: string;
 }
 
-export interface AuthResponseBody {
-  token: string;
-  user: {
-    name: string;
-    email: string;
-  };
+export interface RegistrationResponseBody {
+  message: string;
+}
+
+export interface LoginResponseBody {
+  message: string;
+  access: string;
+}
+
+export interface RefreshTokenResponseBody {
+  access: string;
 }

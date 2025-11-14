@@ -1,7 +1,12 @@
 .textButton {
-  color: #a855f7;
   cursor: pointer;
+  font-weight: 600;
 }
+
 .formWrapper {
   width: 100%;
+}
+
+.subText{
+  color: var(--text-secondary);
 }

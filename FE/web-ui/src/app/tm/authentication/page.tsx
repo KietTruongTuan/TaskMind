@@ -2,7 +2,8 @@ import { Box, Flex, Grid, Heading, Text } from "@radix-ui/themes";
 import styles from "./page.module.scss";
 import { AuthenticationForm } from "./components/authentication-form/authentication-form";
 import { ThemeToggle } from "../../components/theme-toggle/theme-toggle";
-import { LogoIcon } from "./components/logo-icon/logo-icon";
+import { LogoIcon } from "../../components/logo-icon/logo-icon";
+import { Header } from "@/app/components/header/header";
 
 export default function AuthenticationPage() {
   return (
@@ -29,11 +30,15 @@ export default function AuthenticationPage() {
         gap="5"
       >
         <Flex direction="column" gap="3" align="center">
-          <LogoIcon size="30"/>
-          <Heading weight="medium" size="5">
-            AI Goal Manager
-          </Heading>
-          <Text weight="light">Smart goal management system</Text>
+          <LogoIcon size="30" />
+          <Flex direction="column" gap="2" align="center">
+            <Header
+              text="AI Goal Manager"
+              subText="Smart goal management system"
+              textSize="5"
+              subTextSize="3"
+            ></Header>
+          </Flex>
         </Flex>
 
         <Flex

@@ -1,17 +1,24 @@
-.button {
-  background: linear-gradient(to right, #a855f7, #3b82f6);
+.primaryButton {
+  background: var(--button-primary);
+  color: var(--button-secondary);
 }
 
-.ghostButton {
+.secondaryButton {
+  background: var(--button-secondary);
+  color: var(--button-primary);
+}
+
+.tabButton {
   background: none;
-  color: var(--foreground);
+  color: var(--navbar-text-secondary);
   &:hover {
-    background-color: var(--button-primary-hover);
-    color: var(--background);
+    background-color: var(--button-hover);
+    color: var(--text-primary);
   }
 
   &.active {
-    background-color: var(--gray-alpha-200);
+    background-color: var(--card-secondary);
+    color: var(--text-primary);
   }
   
   &:disabled {

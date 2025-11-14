@@ -1,12 +1,13 @@
 "use client";
-import { LogoIcon } from "@/app/tm/authentication/components/logo-icon/logo-icon";
-import { Box, Flex, Avatar, Text } from "@radix-ui/themes";
+import { LogoIcon } from "@/app/components/logo-icon/logo-icon";
+import { Box, Flex, Avatar, Text, Button } from "@radix-ui/themes";
 import { Home, Plus, List } from "lucide-react";
 import { CustomButton } from "../custom-button/custom-button";
 import styles from "./navigation-bar.module.scss";
 import { WebUrl } from "@/app/enum/web-url.enum";
 import { usePathname, useRouter } from "next/navigation";
 import { ThemeToggle } from "../theme-toggle/theme-toggle";
+import { ButtonType } from "@/app/enum/button-type.enum";
 
 interface navBarItem {
   icon: React.ElementType;
@@ -27,8 +28,14 @@ export function NavigationBar({ userAvatar }: { userAvatar?: string }) {
     { icon: Plus, label: "New Goal", url: WebUrl.GoalAdd, testId: "add-goal" },
     {
       icon: List,
-      label: "Goal management",
-      url: WebUrl.GoalManage,
+      label: "My Goals",
+      url: WebUrl.GoalBoard,
+      testId: "manage-goal",
+    },
+    {
+      icon: List,
+      label: "All Tasks",
+      url: WebUrl.TaskBoard,
       testId: "manage-goal",
     },
   ];
@@ -46,7 +53,9 @@ export function NavigationBar({ userAvatar }: { userAvatar?: string }) {
         </Box>
         <Flex direction="column">
           <Text>AI Goal Manager</Text>
-          <Text size="1">Smart Goal Management System</Text>
+          <Text size="1" className={styles.subText}>
+            Smart Goal Management System
+          </Text>
         </Flex>
       </Flex>
       <Flex
@@ -64,6 +73,7 @@ export function NavigationBar({ userAvatar }: { userAvatar?: string }) {
               key={index}
               variant="ghost"
               onClick={() => route.push(value.url)}
+              buttonType={ButtonType.Tab}
               isActive={isActive}
               data-testid={`${value.testId}-tab`}
             >
