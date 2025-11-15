@@ -1,7 +1,7 @@
 import { Flex, AlertDialog } from "@radix-ui/themes";
 import { CustomButton } from "../custom-button/custom-button";
 import { ButtonType } from "@/app/enum/button-type.enum";
-import styles from "./alert-dialog-pop-up.module.scss"
+import styles from "./alert-dialog-pop-up.module.scss";
 interface AlertDialogProps {
   title: string;
   description: string;
@@ -19,7 +19,10 @@ export function AlertDialogPopUp({
   return (
     <AlertDialog.Root>
       <AlertDialog.Trigger>{children}</AlertDialog.Trigger>
-      <AlertDialog.Content maxWidth="40%" className={styles.dialogContent}>
+      <AlertDialog.Content
+        maxWidth={{ initial: "90%", sm: "60%", md: "40%"}}
+        className={styles.dialogContent}
+      >
         <AlertDialog.Title size="5">{title}</AlertDialog.Title>
         <AlertDialog.Description size="2" className={styles.dialogDescription}>
           {description}
@@ -27,10 +30,12 @@ export function AlertDialogPopUp({
 
         <Flex gap="3" mt="4" justify="end">
           <AlertDialog.Cancel>
-            <CustomButton buttonType={ButtonType.Secondary}>Cancel</CustomButton>
+            <CustomButton buttonType={ButtonType.Secondary}>
+              Cancel
+            </CustomButton>
           </AlertDialog.Cancel>
           <AlertDialog.Action onClick={action}>
-            <CustomButton buttonType={ButtonType.Warning} >
+            <CustomButton buttonType={ButtonType.Warning}>
               {actionText}
             </CustomButton>
           </AlertDialog.Action>

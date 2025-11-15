@@ -133,26 +133,28 @@ export function AuthenticationForm() {
                     <Text className={styles.textButton}>Forgot password?</Text>
                   </Flex>
                 )}
-                <CustomButton
-                  type="submit"
-                  disabled={!isValid || isSubmitting}
-                  buttonType={ButtonType.Primary}
-                >
-                  {formContents[activeForm].header}
-                </CustomButton>
-                <Flex justify="center" gap="1" mt="4">
-                  <Text className={styles.subText}>
-                    {formContents[activeForm].gotoText}
-                  </Text>
-                  <Text
-                    className={styles.textButton}
-                    onClick={formContents[activeForm].gotoAction}
-                    data-testid="goto-button"
+                <Flex direction="column" >
+                  <CustomButton
+                    type="submit"
+                    disabled={!isValid || isSubmitting}
+                    buttonType={ButtonType.Primary}
                   >
-                    {formContents[activeForm].header == "Sign Up"
-                      ? "Sign In"
-                      : "Sign Up"}
-                  </Text>
+                    {formContents[activeForm].header}
+                  </CustomButton>
+                  <Flex justify="center" gap="1" mt="4">
+                    <Text className={styles.subText}>
+                      {formContents[activeForm].gotoText}
+                    </Text>
+                    <Text
+                      className={styles.textButton}
+                      onClick={formContents[activeForm].gotoAction}
+                      data-testid="goto-button"
+                    >
+                      {formContents[activeForm].header == "Sign Up"
+                        ? "Sign In"
+                        : "Sign Up"}
+                    </Text>
+                  </Flex>
                 </Flex>
               </Flex>
             </Form.Root>
