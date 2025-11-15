@@ -40,7 +40,6 @@ class LoginView(APIView):
         if serializer.is_valid():
             user = serializer.validated_data['user']
             
-            # Generate tokens with custom claims
             refresh = CustomTokenSerializer.get_token(user)
             
             
@@ -75,14 +74,13 @@ class RefreshTokenView(APIView):
         # Get refresh token from HttpOnly cookie
         
         refresh_token = request.COOKIES.get('refresh_token')
-        
+        print(refresh_token)
+
         if not refresh_token:
-            
             return Response(
                 {'error': 'Refresh token not found'},
                 status=status.HTTP_401_UNAUTHORIZED
             )
-
         try:
             # Verify refresh token
             refresh = RefreshToken(refresh_token)
@@ -96,7 +94,8 @@ class RefreshTokenView(APIView):
                     {'error': 'Invalid token payload'}, 
                     status=status.HTTP_401_UNAUTHORIZED
                 )
-                
+            
+            
             # Fetch the user from database
             try:
                 user = User.objects.get(id=user_id)
@@ -151,7 +150,7 @@ class LogoutView(APIView):
 
     def post(self, request):
         refresh_token = request.COOKIES.get('refresh_token')
-
+        
         if refresh_token:
             try:
                 # Blacklist the refresh token (requires token blacklist app)

@@ -1,20 +1,22 @@
 import { NextResponse, NextRequest } from "next/server";
-import { authenticationService } from "./app/constants";
 
 // This function can be marked `async` if using `await` inside
 export async function middleware(request: NextRequest) {
-  const response = NextResponse.next();
-  try {
-    // Call backend to refresh access token
-    console.log(request.cookies.get("refresh_token")?.value);
-    await authenticationService.refresh(request.cookies.get("refresh_token")?.value);
-    return response;
-  } catch (error) {
-    authenticationService.logout();
+  const refreshToken = request.cookies.get("refresh_token")?.value;
+
+  if (!refreshToken) {
     return NextResponse.redirect(new URL("/tm/authentication", request.url));
   }
+
+  return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/tm/workspace/dashboard"],
+  matcher: [
+    "/",
+    "/tm",
+    "/tm/workspace",
+    "/tm/workspace/dashboard",
+    "/tm/workspace/goal/add",
+  ],
 };

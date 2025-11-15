@@ -1,0 +1,28 @@
+.toastSuccess {
+  background: var(--message-success-light);
+  color: var(--message-success);
+  border-radius: var(--spacing-small);
+  border: 2px solid var(--message-success);
+  padding: 0;
+  overflow: hidden;
+}
+
+.toastError {
+  background: var(--message-error-light);
+  color: var(--message-error);
+  border-radius: var(--spacing-small);
+  border: 2px solid var(--message-error);
+  padding: 0;
+  overflow: hidden;
+}
+
+.toastViewport {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 360px;
+  z-index: 1000;
+}

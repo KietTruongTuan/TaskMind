@@ -1,3 +1,8 @@
+import {
+  authenticationService,
+  RefreshTokenResponseBody,
+} from "@/app/constants";
+import { ApiUrl } from "@/app/enum/api-url.enum";
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from "axios";
 
 interface ApiError {
@@ -7,6 +12,7 @@ interface ApiError {
 
 export class HttpService {
   private instance: AxiosInstance;
+  protected refreshInstance: AxiosInstance;
   private accessToken: string | null = null;
 
   constructor(baseURL?: string) {
@@ -18,6 +24,14 @@ export class HttpService {
       },
       withCredentials: true,
     });
+
+    this.refreshInstance = axios.create({
+      baseURL,
+      timeout: 10000,
+      headers: { "Content-Type": "application/json" },
+      withCredentials: true,
+    });
+
     this.setUpInterceptor();
   }
 
@@ -56,25 +70,26 @@ export class HttpService {
       (response) => response,
       async (error) => {
         const originalRequest = error.config;
-
+        
         // If 401 and we haven't retried yet
-        if (error.response?.status === 401 && !originalRequest._retry) {
+        if (
+          error.response?.status === 401 &&
+          !originalRequest._retry &&
+          !originalRequest._isRefresh
+        ) {
           originalRequest._retry = true;
-
-          // try {
-          //   const refreshResponse = await authenticationService.refresh();
-
-          //   if (refreshResponse.access) {
-          //     originalRequest.headers[
-          //       "Authorization"
-          //     ] = `Bearer ${refreshResponse.access}`;
-          //     return this.instance(originalRequest);
-          //   }
-          // } catch (refreshError) {
-          //   authenticationService.logout();
-          //   redirect("/tm");
-          //   return Promise.reject(refreshError);
-          // }
+          try {
+            const refreshResponse = await authenticationService.refresh();
+            const access = refreshResponse.data.access;
+            if (access) {
+              this.setAccessToken(access);
+              originalRequest.headers["Authorization"] = `Bearer ${access}`;
+              return this.instance(originalRequest);
+            }
+          } catch (refreshError) {
+            await authenticationService.logout()
+            return Promise.reject(refreshError);
+          }
         }
 
         return Promise.reject(this.handleError(error));

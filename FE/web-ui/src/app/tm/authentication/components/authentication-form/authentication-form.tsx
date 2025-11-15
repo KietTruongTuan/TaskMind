@@ -18,6 +18,7 @@ import { useRouter } from "next/navigation";
 import { WebUrl } from "@/app/enum/web-url.enum";
 import { Header } from "@/app/components/header/header";
 import { ButtonType } from "@/app/enum/button-type.enum";
+import { useToast } from "@/app/contexts/toast-context/toast-context";
 
 interface formContentsProps {
   header: string;
@@ -28,12 +29,12 @@ interface formContentsProps {
 }
 export function AuthenticationForm() {
   const methods = useForm<LoginRequestBody | RegistrationRequestBody>({
-    mode: "onChange",
+    mode: "onTouched",
     defaultValues: {},
   });
 
   const route = useRouter();
-
+  const { showToast, setIsSuccess } = useToast();
   const {
     reset,
     handleSubmit,
@@ -68,20 +69,22 @@ export function AuthenticationForm() {
       setErrorMessage(null);
       const data = getValues();
       if (activeForm === AuthenticationModule.Login) {
-        // await authenticationService.refresh();
-        const res = await authenticationService.login(data as LoginRequestBody);
+        await authenticationService.login(data as LoginRequestBody);
         route.push(WebUrl.Dashboard);
       } else {
         const res = await authenticationService.register(
           data as RegistrationRequestBody
         );
         SetActiveForm(AuthenticationModule.Login);
+        setIsSuccess(true);
+        showToast(res.message);
       }
     } catch (err) {
+      setIsSuccess(false);
       if (activeForm === AuthenticationModule.Login) {
-        setErrorMessage("Invalid username or password. Please try again.");
+        showToast("Invalid username or password. Please try again.");
       } else {
-        setErrorMessage("Email is already existed.");
+        showToast("Email is already existed.");
       }
     }
   };

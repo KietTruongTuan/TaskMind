@@ -2,7 +2,7 @@ node_modules/
 coverage/
 reports/
 package-lock.json
-
+pnpm-lock.yaml
 .pytest_cache/
 venv/
 

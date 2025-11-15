@@ -1,3 +1,10 @@
-export default function AddGoalPage() {
-  return <>Add Page</>;
+import { TokenRefresher } from "@/app/components/token-refresher/token-refresher";
+
+export default async function AddGoalPage() {
+  return (
+    <>
+      <TokenRefresher />
+      Add Page
+    </>
+  );
 }

@@ -7,6 +7,11 @@ import {
 } from "@/app/constants";
 import { HttpService } from "../http-service/http-service";
 import { ApiUrl } from "@/app/enum/api-url.enum";
+import { AxiosRequestConfig } from "axios";
+
+interface CustomAxiosRequestConfig extends AxiosRequestConfig {
+  _isRefresh?: boolean;
+}
 
 export class AuthenticationService extends HttpService {
   constructor() {
@@ -31,27 +36,20 @@ export class AuthenticationService extends HttpService {
     );
   }
 
-  async refresh(refreshToken?: string) {
-    const headers: Record<string, string> = {};
-    if (refreshToken) {
-      headers["Cookie"] = `refresh_token=${refreshToken}`;
-    }
-    const res = await this.post<RefreshTokenResponseBody>(
+  async refresh() {
+    const res = await this.refreshInstance.post<RefreshTokenResponseBody>(
       ApiUrl.RefreshToken,
       undefined,
       {
-        headers,
-        withCredentials: !refreshToken,
-      }
+        withCredentials: true,
+        _isRefresh: true,
+      } as CustomAxiosRequestConfig
     );
-    if (res.access) {
-      this.setAccessToken(res.access);
-    }
     return res;
   }
 
   async logout() {
     this.clearAccessToken();
-    return this.post<undefined>(ApiUrl.LogOut);
+    return this.post<RegistrationResponseBody>(ApiUrl.LogOut);
   }
 }

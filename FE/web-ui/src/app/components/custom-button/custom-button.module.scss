@@ -6,6 +6,12 @@
 .secondaryButton {
   background: var(--button-secondary);
   color: var(--button-primary);
+  border: 1px solid var(--card-border);
+}
+
+.warningButton {
+  background: var(--status-cancel);
+  color: var(--button-secondary);
 }
 
 .tabButton {

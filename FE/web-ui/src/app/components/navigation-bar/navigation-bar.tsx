@@ -1,13 +1,22 @@
 "use client";
 import { LogoIcon } from "@/app/components/logo-icon/logo-icon";
-import { Box, Flex, Avatar, Text, Button } from "@radix-ui/themes";
-import { Home, Plus, List } from "lucide-react";
+import {
+  Box,
+  Flex,
+  Avatar,
+  Text,
+  Button,
+  DropdownMenu,
+} from "@radix-ui/themes";
+import { Home, Plus, List, LogOut } from "lucide-react";
 import { CustomButton } from "../custom-button/custom-button";
 import styles from "./navigation-bar.module.scss";
 import { WebUrl } from "@/app/enum/web-url.enum";
 import { usePathname, useRouter } from "next/navigation";
 import { ThemeToggle } from "../theme-toggle/theme-toggle";
 import { ButtonType } from "@/app/enum/button-type.enum";
+import { authenticationService } from "@/app/constants";
+import { AlertDialogPopUp } from "../alert-dialog-pop-up/alert-dialog-pop-up";
 
 interface navBarItem {
   icon: React.ElementType;
@@ -39,6 +48,11 @@ export function NavigationBar({ userAvatar }: { userAvatar?: string }) {
       testId: "manage-goal",
     },
   ];
+
+  const onLogOut = async () => {
+    await authenticationService.logout();
+    route.push("/tm");
+  };
   return (
     <Flex
       width="100%"
@@ -87,12 +101,32 @@ export function NavigationBar({ userAvatar }: { userAvatar?: string }) {
       </Flex>
       <Flex gap="3">
         <ThemeToggle />
-        <Avatar
-          mr={{ initial: "3", md: "0" }}
-          className={styles.avatarBox}
-          src={userAvatar}
-          fallback="N"
-        />
+
+        <DropdownMenu.Root>
+          <DropdownMenu.Trigger>
+            <Avatar
+              mr={{ initial: "3", md: "0" }}
+              className={styles.avatarBox}
+              src={userAvatar}
+              fallback="N"
+            />
+          </DropdownMenu.Trigger>
+          <DropdownMenu.Content variant="soft">
+            <AlertDialogPopUp
+              title="Are you sure"
+              description="This action will log out your account"
+              actionText="Log Out"
+              action={onLogOut}
+            >
+              <DropdownMenu.Item onSelect={(e) => e.preventDefault()}>
+                <Flex align="center" gap="3">
+                  <Text>Log Out</Text>
+                  <LogOut size={15} />
+                </Flex>
+              </DropdownMenu.Item>
+            </AlertDialogPopUp>
+          </DropdownMenu.Content>
+        </DropdownMenu.Root>
       </Flex>
     </Flex>
   );
