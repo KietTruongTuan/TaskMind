@@ -9,6 +9,16 @@ import { LoginForm } from "../login-form/login-form";
 import { RegistrationForm } from "../registration-form/registration-form";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import {
+  authenticationService,
+  LoginRequestBody,
+  RegistrationRequestBody,
+} from "@/app/constants";
+import { useRouter } from "next/navigation";
+import { WebUrl } from "@/app/enum/web-url.enum";
+import { Header } from "@/app/components/header/header";
+import { ButtonType } from "@/app/enum/button-type.enum";
+import { useToast } from "@/app/contexts/toast-context/toast-context";
 
 interface formContentsProps {
   header: string;
@@ -18,15 +28,24 @@ interface formContentsProps {
   gotoAction: () => void;
 }
 export function AuthenticationForm() {
-  const methods = useForm({
-    mode: "onChange",
+  const methods = useForm<LoginRequestBody | RegistrationRequestBody>({
+    mode: "onTouched",
     defaultValues: {},
   });
 
-  const { reset } = methods;
+  const route = useRouter();
+  const { showToast, setIsSuccess } = useToast();
+  const {
+    reset,
+    handleSubmit,
+    formState: { isValid, isSubmitting },
+    getValues,
+  } = methods;
+
   const [activeForm, SetActiveForm] = useState<AuthenticationModule>(
     AuthenticationModule.Login
   );
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const formContents: Record<AuthenticationModule, formContentsProps> = {
     [AuthenticationModule.Login]: {
@@ -45,9 +64,33 @@ export function AuthenticationForm() {
       gotoAction: () => SetActiveForm(AuthenticationModule.Login),
     },
   };
-
+  const onSubmit = async () => {
+    try {
+      setErrorMessage(null);
+      const data = getValues();
+      if (activeForm === AuthenticationModule.Login) {
+        await authenticationService.login(data as LoginRequestBody);
+        route.push(WebUrl.Dashboard);
+      } else {
+        const res = await authenticationService.register(
+          data as RegistrationRequestBody
+        );
+        SetActiveForm(AuthenticationModule.Login);
+        setIsSuccess(true);
+        showToast(res.message);
+      }
+    } catch (err) {
+      setIsSuccess(false);
+      if (activeForm === AuthenticationModule.Login) {
+        showToast("Invalid username or password. Please try again.");
+      } else {
+        showToast("Email is already existed.");
+      }
+    }
+  };
   useEffect(() => {
     reset();
+    setErrorMessage(null);
   }, [activeForm, reset]);
   return (
     <Box width="100%">
@@ -59,14 +102,26 @@ export function AuthenticationForm() {
           exit={{ opacity: 0, y: -20 }}
           transition={{ duration: 0.3 }}
         >
-          <Flex direction="column" gap="4" align="center">
-            <Heading weight="medium">{formContents[activeForm].header}</Heading>
-            <Text weight="light">{formContents[activeForm].subHeader}</Text>
+          <Flex direction="column" gap="2" align="center" mb="4">
+            <Header
+              text={formContents[activeForm].header}
+              subText={formContents[activeForm].subHeader}
+              textSize="5"
+              subTextSize="2"
+            />
           </Flex>
           <FormProvider {...methods}>
-            <Form.Root className={styles.formWrapper}>
+            <Form.Root
+              className={styles.formWrapper}
+              onSubmit={handleSubmit(onSubmit)}
+            >
               <Flex direction="column" gap="4">
                 {formContents[activeForm].formComponents}
+                {errorMessage && (
+                  <Text color="red" weight="medium">
+                    {errorMessage}
+                  </Text>
+                )}
                 {activeForm === AuthenticationModule.Login && (
                   <Flex justify="between">
                     <Text as="label">
@@ -78,21 +133,28 @@ export function AuthenticationForm() {
                     <Text className={styles.textButton}>Forgot password?</Text>
                   </Flex>
                 )}
-                <CustomButton type="submit">
-                  {formContents[activeForm].header}
-                </CustomButton>
-
-                <Flex justify="center" gap="1" mt="4">
-                  <Text>{formContents[activeForm].gotoText}</Text>
-                  <Text
-                    className={styles.textButton}
-                    onClick={formContents[activeForm].gotoAction}
-                    data-testid="goto-button"
+                <Flex direction="column" >
+                  <CustomButton
+                    type="submit"
+                    disabled={!isValid || isSubmitting}
+                    buttonType={ButtonType.Primary}
                   >
-                    {formContents[activeForm].header == "Sign Up"
-                      ? "Sign In"
-                      : "Sign Up"}
-                  </Text>
+                    {formContents[activeForm].header}
+                  </CustomButton>
+                  <Flex justify="center" gap="1" mt="4">
+                    <Text className={styles.subText}>
+                      {formContents[activeForm].gotoText}
+                    </Text>
+                    <Text
+                      className={styles.textButton}
+                      onClick={formContents[activeForm].gotoAction}
+                      data-testid="goto-button"
+                    >
+                      {formContents[activeForm].header == "Sign Up"
+                        ? "Sign In"
+                        : "Sign Up"}
+                    </Text>
+                  </Flex>
                 </Flex>
               </Flex>
             </Form.Root>

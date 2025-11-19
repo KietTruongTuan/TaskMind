@@ -1,14 +1,31 @@
 @import '../../assets/dist/tokens';
 
 :root {
+  /* Constants variable */
+  --button-primary: #000000;
+  --button-secondary: #FFFFFF;
+  --navbar-text-primary: #FFFFFF;
+  --navbar-text-secondary: #BFDBFE;
+  --status-to-do: #9CA3AF;
+  --status-in-progress: #3B82F6;
+  --status-on-hold: #F59E0B;
+  --status-completed: #10B981;
+  --status-cancel: #EF4444;
+  --status-overdue: #B91C1C;
+  --message-error-light:#f8d1d1;
+  --message-error:#d60000;
+  --message-success-light:#d1fadc;
+  --message-success:#00d739;
+
   /* Light theme variables (default) */
-  --background: #{$light-color-background};
-  --foreground: #{$light-color-foreground};
-  --gray-rgb: #{$light-color-gray-rgb};
-  --gray-alpha-200: #{$light-color-gray-alpha-200};
-  --gray-alpha-100: #{$light-color-gray-alpha-100};
-  --button-primary-hover: #{$light-color-button-primary-hover};
-  --button-secondary-hover: #{$light-color-button-secondary-hover};
+  --background: #F8FAFC;
+  --text-primary: #0F172A;
+  --text-secondary: #64748B;
+  --navbar: #475569;  
+  --card-primary: #FFFFFF;
+  --card-secondary: #F1F5F9;
+  --card-border: #E2E8F0;
+  --button-hover: #f1f5f982;
   --font-family-sans: #{$typography-font-family-sans};
   --font-family-mono: #{$typography-font-family-mono};
   --font-size-base: #{$typography-font-size-base};
@@ -24,13 +41,14 @@
 
 .dark {
   /* Dark theme variables */
-  --background: #{$dark-color-background};
-  --foreground: #{$dark-color-foreground};
-  --gray-rgb: #{$dark-color-gray-rgb};
-  --gray-alpha-200: #{$dark-color-gray-alpha-200};
-  --gray-alpha-100: #{$dark-color-gray-alpha-100};
-  --button-primary-hover: #{$dark-color-button-primary-hover};
-  --button-secondary-hover: #{$dark-color-button-secondary-hover};
+  --background: #0F172A;
+  --text-primary: #FFFFFF;
+  --text-secondary: #94A3B8;
+  --navbar: #2B384B;
+  --card-primary: #1F2937;
+  --card-secondary: #374151;
+  --card-border: #334155;
+  --button-hover: #374151dd;
   --font-family-sans: #{$typography-font-family-sans};
   --font-family-mono: #{$typography-font-family-mono};
   --font-size-base: #{$typography-font-size-base};
@@ -80,4 +98,3 @@ body {
   margin: 0;
   padding: 0;
 }
-

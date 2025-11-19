@@ -1,8 +1,8 @@
 .toggleButton {
   border-radius: var(--border-radius-pill);
   background-color: var(--background);
-  border: 2px solid var(--gray-alpha-200);
-  color: var(--foreground);
+  border: 1px solid var(--card-border);
+  color: var(--text-primary);
   cursor: pointer;
   transition: all 0.3s ease-in-out;
   &:active {

@@ -1,9 +1,9 @@
-import axios, {
-  AxiosError,
-  AxiosInstance,
-  AxiosRequestConfig,
-  AxiosResponse,
-} from "axios";
+import {
+  authenticationService,
+  RefreshTokenResponseBody,
+} from "@/app/constants";
+import { ApiUrl } from "@/app/enum/api-url.enum";
+import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from "axios";
 
 interface ApiError {
   message: string;
@@ -12,6 +12,8 @@ interface ApiError {
 
 export class HttpService {
   private instance: AxiosInstance;
+  protected refreshInstance: AxiosInstance;
+  private accessToken: string | null = null;
 
   constructor(baseURL?: string) {
     this.instance = axios.create({
@@ -20,14 +22,40 @@ export class HttpService {
       headers: {
         "Content-Type": "application/json",
       },
+      withCredentials: true,
+    });
+
+    this.refreshInstance = axios.create({
+      baseURL,
+      timeout: 10000,
+      headers: { "Content-Type": "application/json" },
+      withCredentials: true,
     });
 
     this.setUpInterceptor();
   }
 
+  setAccessToken(token: string) {
+    this.accessToken = token;
+  }
+
+  // Get access token from cookie
+  getAccessToken(): string | null {
+    return this.accessToken;
+  }
+
+  // Clear access token cookie
+  clearAccessToken() {
+    this.accessToken = null;
+  }
+
   private setUpInterceptor() {
     this.instance.interceptors.request.use(
       (request) => {
+        const token = this.getAccessToken();
+        if (token && request.headers) {
+          request.headers.Authorization = `Bearer ${token}`;
+        }
         if (process.env.NODE_ENV === "development") {
           // console.log(request);
         }
@@ -39,14 +67,31 @@ export class HttpService {
     );
 
     this.instance.interceptors.response.use(
-      (response: AxiosResponse) => {
-        if (process.env.NODE_ENV === "development") {
-          // console.log(response);
+      (response) => response,
+      async (error) => {
+        const originalRequest = error.config;
+        
+        // If 401 and we haven't retried yet
+        if (
+          error.response?.status === 401 &&
+          !originalRequest._retry &&
+          !originalRequest._isRefresh
+        ) {
+          originalRequest._retry = true;
+          try {
+            const refreshResponse = await authenticationService.refresh();
+            const access = refreshResponse.data.access;
+            if (access) {
+              this.setAccessToken(access);
+              originalRequest.headers["Authorization"] = `Bearer ${access}`;
+              return this.instance(originalRequest);
+            }
+          } catch (refreshError) {
+            await authenticationService.logout()
+            return Promise.reject(refreshError);
+          }
         }
-        const { data } = response;
-        return data;
-      },
-      (error) => {
+
         return Promise.reject(this.handleError(error));
       }
     );
@@ -72,22 +117,19 @@ export class HttpService {
   }
 
   // GET request
-  async get<Res>(
-    url: string,
-    request?: AxiosRequestConfig
-  ): Promise<AxiosResponse<Res>> {
+  async get<Res>(url: string, request?: AxiosRequestConfig): Promise<Res> {
     const response = await this.instance.get<Res>(url, request);
-    return response;
+    return response.data;
   }
 
   // POST request
-  async post<Res, Req>(
+  async post<Res, Req = undefined>(
     url: string,
     data?: Req,
     request?: AxiosRequestConfig
-  ): Promise<AxiosResponse<Res>> {
+  ): Promise<Res> {
     const response = await this.instance.post<Res>(url, data, request);
-    return response;
+    return response.data;
   }
 
   // PUT request
@@ -95,9 +137,9 @@ export class HttpService {
     url: string,
     data?: Req,
     request?: AxiosRequestConfig
-  ): Promise<AxiosResponse<Res>> {
+  ): Promise<Res> {
     const response = await this.instance.put<Res>(url, data, request);
-    return response;
+    return response.data;
   }
 
   // PATCH request
@@ -105,14 +147,14 @@ export class HttpService {
     url: string,
     data?: Req,
     request?: AxiosRequestConfig
-  ): Promise<AxiosResponse<Res>> {
+  ): Promise<Res> {
     const response = await this.instance.patch<Res>(url, data, request);
-    return response;
+    return response.data;
   }
 
   // DELETE request
-  async delete<Res>(url: string, request?: AxiosRequestConfig): Promise<AxiosResponse<Res>> {
+  async delete<Res>(url: string, request?: AxiosRequestConfig): Promise<Res> {
     const response = await this.instance.delete<Res>(url, request);
-    return response;
+    return response.data;
   }
 }

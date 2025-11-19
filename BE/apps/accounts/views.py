@@ -10,6 +10,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 # Create your views here.
 
 
@@ -39,7 +40,6 @@ class LoginView(APIView):
         if serializer.is_valid():
             user = serializer.validated_data['user']
             
-            # Generate tokens with custom claims
             refresh = CustomTokenSerializer.get_token(user)
             
             
@@ -56,7 +56,7 @@ class LoginView(APIView):
                 secure=False,  # Set to True in production with HTTPS
                 samesite='Lax',  # CSRF protection ('Strict' or 'Lax')
                 max_age=settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME'].total_seconds(),
-                path='/'
+                path='/',
             )
 
             return response
@@ -72,14 +72,15 @@ class RefreshTokenView(APIView):
 
     def post(self, request):
         # Get refresh token from HttpOnly cookie
+        
         refresh_token = request.COOKIES.get('refresh_token')
+        print(refresh_token)
 
         if not refresh_token:
             return Response(
                 {'error': 'Refresh token not found'},
                 status=status.HTTP_401_UNAUTHORIZED
             )
-
         try:
             # Verify refresh token
             refresh = RefreshToken(refresh_token)
@@ -88,11 +89,13 @@ class RefreshTokenView(APIView):
             user_id = refresh.get('user_id')  # or refresh['user_id']
             
             if not user_id:
+                
                 return Response(
                     {'error': 'Invalid token payload'}, 
                     status=status.HTTP_401_UNAUTHORIZED
                 )
-                
+            
+            
             # Fetch the user from database
             try:
                 user = User.objects.get(id=user_id)
@@ -126,8 +129,9 @@ class RefreshTokenView(APIView):
                 secure=False, # Set to True in production
                 samesite='Lax',
                 max_age=settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME'].total_seconds(),
-                path='/'
+                path='/',
             )
+            print(response)
             return response
             
             
@@ -146,7 +150,7 @@ class LogoutView(APIView):
 
     def post(self, request):
         refresh_token = request.COOKIES.get('refresh_token')
-
+        
         if refresh_token:
             try:
                 # Blacklist the refresh token (requires token blacklist app)
@@ -165,7 +169,7 @@ class LogoutView(APIView):
         response.delete_cookie(
             key='refresh_token',
             path='/',
-            samesite='Lax'
+            samesite='Lax',
         )
 
         return response

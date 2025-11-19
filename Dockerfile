@@ -21,11 +21,8 @@ RUN pip3 install --break-system-packages --no-cache-dir -r requirements.txt
 # Copy the entire project
 COPY . .
 
-# apply migration for BE app
-# RUN cd ./BE && python manage.py migrate
-
 # Expose both ports
-EXPOSE 3000 8000
+EXPOSE 8000
 
 # Start both services with correct working directories
-CMD ["pnpm", "dev"]
+CMD ["sh", "-c", "cd BE && python manage.py migrate && cd .. && pnpm dev:be"]

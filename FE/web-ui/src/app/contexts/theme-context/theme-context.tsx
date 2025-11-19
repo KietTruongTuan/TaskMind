@@ -9,7 +9,7 @@ const ThemeContext = createContext<{
 } | null>(null);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<ThemeMode>(ThemeMode.Dark);
+  const [theme, setTheme] = useState<ThemeMode>(ThemeMode.Light);
 
   useEffect(() => {
     const savedMode = localStorage.getItem("theme") as ThemeMode;
@@ -26,7 +26,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         appearance={theme}
         style={{
           backgroundColor: "var(--background)",
-          color: "var(--foreground)",
+          color: "var(--text-primary)",
           fontSize: "var(--font-size-base)",
           height: "100%"
         }}

@@ -1,6 +1,7 @@
 import "./layout.scss";
 import "@radix-ui/themes/styles.css";
 import { ThemeProvider } from "../contexts/theme-context/theme-context";
+import { ToastProvider } from "../contexts/toast-context/toast-context";
 export const metadata = {
   title: "TaskMind",
 };
@@ -13,7 +14,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body suppressHydrationWarning={true}>
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <ToastProvider>{children}</ToastProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -50,3 +50,4 @@ typing_extensions==4.15.0
 uritemplate==4.2.0
 urllib3==2.5.0
 yarl==1.20.1
+django-cors-headers==4.6.0
