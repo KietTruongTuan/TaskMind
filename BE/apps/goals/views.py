@@ -7,6 +7,8 @@ from together import Together
 import dotenv
 from pathlib import Path
 import re
+from openai import OpenAI
+from django.utils import timezone
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 dotenv.load_dotenv(os.path.join(BASE_DIR, '.env'))
@@ -14,13 +16,13 @@ dotenv.load_dotenv(os.path.join(BASE_DIR, '.env'))
 # Create your views here.
 class GoalBreakdownView(APIView):
     """
-    API endpoint that takes a goal's name, description, category, and due date,
+    API endpoint that takes a goal's name, description, tag, and deadline,
     and returns a list of actionable tasks to achieve that goal using Together AI."""
     def post(self, request):
         name = request.data.get('name')
         description = request.data.get('description')
-        category = request.data.get('category')
-        due_date = request.data.get('due_date')
+        tag = request.data.get('tag')
+        deadline = request.data.get('deadline')
 
         if not name:
             return Response({"error": "Please provide a goal's name"}, status=status.HTTP_400_BAD_REQUEST)
@@ -28,61 +30,53 @@ class GoalBreakdownView(APIView):
         if not description:
             return Response({"error": "Please provide a goal's description"}, status=status.HTTP_400_BAD_REQUEST)
         
-        if not due_date:
-            return Response({"error": "Please provide a goal's due date"}, status=status.HTTP_400_BAD_REQUEST)
+        if not deadline:
+            return Response({"error": "Please provide a goal's deadline"}, status=status.HTTP_400_BAD_REQUEST)
 
-        if not category:
-            return Response({"error": "Please provide a goal's category"}, status=status.HTTP_400_BAD_REQUEST)
+        if deadline < timezone.now().date().isoformat():
+            return Response({"error": "Deadline must be a future date"}, status=status.HTTP_400_BAD_REQUEST)
+        # if not tag:
+        #     return Response({"error": "Please provide a goal's tag"}, status=status.HTTP_400_BAD_REQUEST)
 
         api_key = self.get_api_key()
         if not api_key:
             return Response({"error": "Together AI API Key is not configured."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        prompt = self.build_prompt(name, description, due_date)
+        task_prompt = self.build_prompt_for_task(name, description, deadline)
+        description_prompt = self.build_prompt_for_description(name, description, deadline)
+        task_list = self.get_ai_response(task_prompt, api_key)
         try:
             result = {}
             result["name"] = name
-            result["task"] = self.get_tasks_from_ai(prompt, api_key)
-            result["category"] = category
-            result["due_date"] = due_date
+            result["description"] = self.get_ai_response(description_prompt, api_key)
+            result["status"] = "ToDo"
+            result["deadline"] = deadline
+            result["tag"] = tag
+            result["completeCount"] = 0
+            result["taskCount"] = len(task_list)
+            result["tasks"] = task_list
             return Response(result, status=status.HTTP_200_OK)
         except ValueError as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def get_api_key(self):
-        return os.getenv("TOGETHER_API_KEY")
+        return os.getenv("API_KEY")
 
-    def build_prompt(self, name, description, due_date):
-        return (
-            f"""You are an excellent project management assistant.
-            Here is a new goal:
-            Name: '{name}'
-            Description: '{description}'
-            Due_date: '{due_date}'
-            Please help me break down this goal name and description into specific, actionable steps.
-            Each step should be a clear, achievable task within due date.
-            
-            Must return the list of tasks as a JSON array of strings.
-            
-            The return language should match the name and description language.
-            
-            Example:
-            If the name is "Complete a graduation project on Fanpage Management" and description is "A project to manage a fanpage for a product" and due_date is "2023-12-31", return the result in the following format:
-            
-            ["Step 1: Design Database", "Step 2: Build API Login", "Step 3: Integrate Facebook API", "Step 4: Build management interface", "Step 5: Test and fix bugs", "Step 6: Write report and prepare presentation"]
-            """
+    def get_ai_response(self, prompt, api_key):
+        # TOGETHER_AI_MODEL = "deepseek-ai/DeepSeek-R1-Distill-Llama-70B-free"
+        GROQ_MODEL = "groq/compound"
+        client = OpenAI(
+            api_key=api_key,
+            base_url="https://api.groq.com/openai/v1"    
         )
-
-    def get_tasks_from_ai(self, prompt, api_key):
-        TOGETHER_AI_MODEL = "deepseek-ai/DeepSeek-R1-Distill-Llama-70B-free"
-        client = Together(api_key=api_key)
         response_stream = client.chat.completions.create(
-            model=TOGETHER_AI_MODEL,
+            model=GROQ_MODEL,
             messages=[
                 {"role": "system",
                     "content": "You are a helpful project management assistant."},
                 {"role": "user", "content": prompt}
             ],
-            stream=True
+            stream=True,
+            temperature=0.7 # Adjust temperature for creativity if needed
         )
         full_content = ""
         for chunk in response_stream:
@@ -110,3 +104,70 @@ class GoalBreakdownView(APIView):
         else:
             raise ValueError(
                 f"Could not find a JSON array in AI response. Content: {text}")
+            
+    def build_prompt_for_task(self, name, description, deadline):
+        return (
+            f"""You are an excellent project management assistant.
+            Here is a new goal:
+            Name: '{name}'
+            Description: '{description}'
+            Deadline: '{deadline}'
+            Please help me break down this goal name and description into specific, actionable steps from {timezone.now().date().isoformat()} to "{deadline}".
+            Each step should be a clear, achievable task within deadline.
+            
+            Must return the list of tasks as a JSON array of strings.
+            
+            The return language should match the name and description language.
+            
+            Example:
+            If the name is "Complete a graduation project on Fanpage Management" and description is "A project to manage a fanpage for a product" and deadline is "2023-12-31" and start date is "2023-09-29", return the result in the following format:
+            
+            [
+                {{
+                    "name": "Design Database",
+                    "status": "ToDo",
+                    "deadline": "2023-10-01",
+                }}, 
+                {{
+                    "name": "Build API Login",
+                    "status": "ToDo",
+                    "deadline": "2023-10-15",
+                }}, 
+                {{  
+                    "name": "Integrate Facebook API",
+                    "status": "ToDo",
+                    "deadline": "2023-11-01",
+                }},
+                {{
+                    "name": "Build management interface",
+                    "status": "ToDo",
+                    "deadline": "2023-11-15",
+                }},
+                {{
+                    "name": "Test and fix bugs",
+                    "status": "ToDo",
+                    "deadline": "2023-12-15",
+                }},
+                {{
+                    "name": "Write report and prepare presentation",
+                    "status": "ToDo",
+                    "deadline": "2023-12-31",
+                }}
+            ]
+            """
+        )
+    
+    def build_prompt_for_description(self, name, description, deadline):
+        return (
+            f"""You are an excellent project management assistant.
+            Here is a new goal:
+            Name: '{name}'
+            Description: '{description}'
+            Deadline: '{deadline}'
+            Please help me rewrite the goal description in a summary to just understand the context with expected outcomes not so detailed.
+            
+            Must return the rewritten description as a string inside a JSON array.
+            
+            The return language should match the name and description language.
+            """
+        )
