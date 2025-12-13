@@ -1,0 +1,28 @@
+.status {
+    color: var(--button-secondary);
+    border-radius: var(--spacing-medium);
+}
+
+.ToDo {
+    background-color: var(--status-to-do);
+}
+
+.InProgress {
+    background-color: var(--status-in-progress);
+}
+
+.OnHold {
+    background-color: var(--status-on-hold);
+}
+
+.Completed {
+    background-color: var(--status-completed);
+}
+
+.Cancel {
+    background-color: var(--status-cancel);
+}
+
+.Overdue {
+    background-color: var(--status-overdue);
+}

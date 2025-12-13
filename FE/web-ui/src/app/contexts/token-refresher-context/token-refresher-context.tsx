@@ -1,9 +1,10 @@
 "use client";
-import { authenticationService } from "@/app/constants";
+import { authenticationService, UserPayload } from "@/app/constants";
+import { jwtDecode } from "jwt-decode";
 import { createContext, useContext, useEffect, useState } from "react";
 
 const TokenRefresherContext = createContext<{
-  accessToken: string | null;
+  user?: UserPayload;
   loading: boolean;
 } | null>(null);
 
@@ -12,7 +13,7 @@ export function TokenRefresherProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [user, setUser] = useState<UserPayload>();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -22,7 +23,8 @@ export function TokenRefresherProvider({
         const access = res.data.access;
         if (access) {
           authenticationService.setAccessToken(access);
-          setAccessToken(access);
+          const user = jwtDecode<UserPayload>(access);
+          setUser(user);
         }
       } catch {
         authenticationService.logout();
@@ -34,7 +36,7 @@ export function TokenRefresherProvider({
   }, []);
 
   return (
-    <TokenRefresherContext.Provider value={{ accessToken, loading }}>
+    <TokenRefresherContext.Provider value={{ user, loading }}>
       {children}
     </TokenRefresherContext.Provider>
   );
