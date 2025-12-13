@@ -17,7 +17,7 @@ dotenv.load_dotenv(os.path.join(BASE_DIR, '.env'))
 class GoalBreakdownView(APIView):
     """
     API endpoint that takes a goal's name, description, tag, and deadline,
-    and returns a list of actionable tasks to achieve that goal using Together AI."""
+    and returns a list of actionable tasks to achieve that goal using the Groq API."""
     def post(self, request):
         name = request.data.get('name')
         description = request.data.get('description')
