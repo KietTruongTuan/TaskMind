@@ -44,10 +44,34 @@ class GoalBreakdownView(APIView):
         task_prompt = self.build_prompt_for_task(name, description, deadline)
         description_prompt = self.build_prompt_for_description(name, description, deadline)
         task_list = self.get_ai_response(task_prompt, api_key)
+
+        description_response = self.get_ai_response(description_prompt, api_key)
+        
+        # FIX: Check if it is ALREADY a list before trying to parse
+        if isinstance(description_response, list):
+            # It's already a list, just take the first item
+            if description_response:
+                description = description_response[0]
+            else:
+                description = "" # Handle empty list case
+        else:
+            # It is a string, so NOW we try to parse it
+            try:
+                parsed_description = json.loads(description_response)
+                
+                if isinstance(parsed_description, list) and parsed_description:
+                    description = parsed_description[0]
+                else:
+                    description = str(parsed_description)
+                    
+            except (json.JSONDecodeError, TypeError):
+                # Fallback: It was just a plain string all along
+                description = description_response
+
         try:
             result = {}
             result["name"] = name
-            result["description"] = self.get_ai_response(description_prompt, api_key)
+            result["description"] = description
             result["status"] = "ToDo"
             result["deadline"] = deadline
             result["tag"] = tag

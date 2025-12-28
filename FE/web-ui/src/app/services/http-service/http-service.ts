@@ -18,7 +18,7 @@ export class HttpService {
   constructor(baseURL?: string) {
     this.instance = axios.create({
       baseURL,
-      timeout: 10000,
+      timeout: 60000,
       headers: {
         "Content-Type": "application/json",
       },
@@ -27,7 +27,7 @@ export class HttpService {
 
     this.refreshInstance = axios.create({
       baseURL,
-      timeout: 10000,
+      timeout: 30000,
       headers: { "Content-Type": "application/json" },
       withCredentials: true,
     });

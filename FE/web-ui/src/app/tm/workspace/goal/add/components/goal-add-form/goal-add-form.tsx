@@ -10,13 +10,13 @@ export function GoalAddForm() {
   return (
     <Flex direction="column" gap="4">
       <InputField
-        name="title"
+        name="name"
         type="text"
         placeholder="Learn React, Visit Vietnam,..."
         rules={{
-          required: "Title is required",
+          required: "Name is required",
         }}
-        errors={errors.title as FieldError}
+        errors={errors.name as FieldError}
       />
       <InputField
         name="description"
@@ -33,9 +33,6 @@ export function GoalAddForm() {
           name="tag"
           type=""
           placeholder="Study, Health, Work,..."
-          rules={{
-            required: "Tag is required",
-          }}
           errors={errors.tag as FieldError}
           isMultiInput
         />

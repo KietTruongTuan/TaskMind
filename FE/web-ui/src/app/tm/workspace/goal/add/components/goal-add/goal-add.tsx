@@ -2,7 +2,7 @@
 import { FormProvider, useForm } from "react-hook-form";
 import * as Form from "@radix-ui/react-form";
 import { Flex, Text } from "@radix-ui/themes";
-import { GoalRequestBody } from "@/app/constants/goal.constants";
+import { CreateGoalRequestBody, CreateGoalResponseBody } from "@/app/constants/goal.constants";
 import { Header } from "@/app/components/header/header";
 import { Sparkles } from "lucide-react";
 import styles from "./goal-add.module.scss";
@@ -14,25 +14,28 @@ import { AddStep } from "@/app/enum/step.enum";
 import { Dispatch, SetStateAction } from "react";
 import { set } from "date-fns";
 import { LoadingOverlay } from "@/app/components/loading-overlay/loading-overlay";
+import { aiService } from "@/app/constants";
 
 export function GoalAdd({
   setStep,
 }: {
   setStep: Dispatch<SetStateAction<AddStep>>;
 }) {
-  const methods = useForm<GoalRequestBody>({
+  const methods = useForm<CreateGoalRequestBody>({
     mode: "onTouched",
     defaultValues: {},
   });
 
   const {
-    reset,
     handleSubmit,
     formState: { isValid, isSubmitting },
     getValues,
   } = methods;
-
-  const onSubmit = () => {
+  
+  const onSubmit = async () => {
+    const data = getValues();
+    const draftGoalData: CreateGoalResponseBody =  await aiService.createGoal(data);
+    localStorage.setItem("draftGoal", JSON.stringify(draftGoalData));
     setStep(AddStep.ReviewDetail);
   };
 

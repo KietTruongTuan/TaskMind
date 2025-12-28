@@ -15,11 +15,11 @@ export function GoalCard({
   completedCount,
   taskCount,
   deadline,
-  progress,
   isDetailCard = false,
   isPrimary = false,
 }: GoalCardPropsData) {
   const currentDate: Date = new Date();
+  const progress: number = taskCount === 0 ? 0 : (completedCount * 100) / taskCount;
   const cardContent: StatusCardProps[] = [
     {
       label: "Progress",

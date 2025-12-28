@@ -7,14 +7,13 @@ import { ElementType } from "react";
 
 export interface GoalCardPropsData {
   name: string;
-  status?: Status;
+  status: Status;
   description?: string;
   tag: string[];
   deadline: Date;
-  progress: number;
   completedDate?: Date;
-  completedCount?: number;
-  taskCount?: number;
+  completedCount: number;
+  taskCount: number;
   isDetailCard? :boolean;
   isPrimary?: boolean;
 }

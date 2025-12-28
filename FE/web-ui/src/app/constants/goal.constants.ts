@@ -1,28 +1,22 @@
-import { Goal } from "lucide-react";
-import { GoalCategory } from "../enum/goal.enum";
 import { Status } from "../enum/status.enum";
-import { Task } from "./task.constants";
+import { DraftTask } from "./task.constants";
 
-export interface GoalRequestBody {
+export interface CreateGoalRequestBody {
   name: string;
   description: string;
-  category: string[];
-  due_date: Date;
+  tag?: string[];
+  deadline: Date;
 }
 
 export interface CreateGoalResponseBody {
-  id: number;
   name: string;
   description: string;
+  status: Status;
+  deadline: string;
+  tag?: string[];
+  completeCount: number;
+  taskCount: number;
+  tasks: DraftTask[];
+  completedDate?: Date;
 }
 
-export interface Goal {
-  id: number;
-  name: string;
-  description: string;
-  category: GoalCategory | string[];
-  deadline: Date;
-  completedDate?: Date;
-  status: Status;
-  tasks: Task[];
-}

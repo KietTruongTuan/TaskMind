@@ -1,9 +1,9 @@
 import { Flex } from "@radix-ui/themes";
 import { CardNoPadding } from "../card-no-padding/card-no-padding";
-import { Task } from "@/app/constants/task.constants";
 import { TaskListItem } from "../task-list-item/task-list-item";
+import { DraftTask } from "@/app/constants/task.constants";
 
-export function TaskList({tasks}: {tasks:Task[]}) {
+export function TaskList({ tasks }: { tasks: DraftTask[] }) {
   return (
     <CardNoPadding p="5" isPrimary>
       <Flex direction="column" width="100%" height="100%" gap="3">
@@ -11,7 +11,7 @@ export function TaskList({tasks}: {tasks:Task[]}) {
           <TaskListItem
             name={value.name}
             status={value.status}
-            deadline={value.deadline}
+            deadline={new Date(value.deadline)}
             key={index}
           />
         ))}

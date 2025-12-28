@@ -2,7 +2,7 @@ import { CreateGoalRequestBody, CreateGoalResponseBody } from "@/app/constants/g
 import { HttpService } from "../http-service/http-service";
 import { ApiUrl } from "@/app/enum/api-url.enum";
 
-export class GoalService extends HttpService {
+export class AIService extends HttpService {
   constructor() {
     super(process.env.NEXT_PUBLIC_API_BASE_URL);
   }
