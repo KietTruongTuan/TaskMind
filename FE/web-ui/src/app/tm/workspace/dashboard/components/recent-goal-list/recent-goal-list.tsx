@@ -1,8 +1,7 @@
 import { CardNoPadding } from "@/app/components/card-no-padding/card-no-padding";
 import { Header } from "@/app/components/header/header";
-import { GoalCategory } from "@/app/enum/goal.enum";
 import { Status } from "@/app/enum/status.enum";
-import { Flex, Text } from "@radix-ui/themes";
+import { Flex } from "@radix-ui/themes";
 import { ElementType } from "react";
 
 export interface GoalCardPropsData {
@@ -14,7 +13,7 @@ export interface GoalCardPropsData {
   completedDate?: Date;
   completedCount: number;
   taskCount: number;
-  isDetailCard? :boolean;
+  isDetailCard?: boolean;
   isPrimary?: boolean;
 }
 

@@ -1,4 +1,4 @@
-import { Box, Flex, Grid, Heading, Text } from "@radix-ui/themes";
+import { Box, Flex, Grid } from "@radix-ui/themes";
 import { AuthenticationForm } from "./components/authentication-form/authentication-form";
 import { ThemeToggle } from "../../components/theme-toggle/theme-toggle";
 import { LogoIcon } from "../../components/logo-icon/logo-icon";

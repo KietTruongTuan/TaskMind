@@ -42,7 +42,7 @@ describe("HttpService", () => {
       const result = await httpService.get<typeof mockData>("/users/1");
 
       expect(mockAxiosInstance.get).toHaveBeenCalledWith("/users/1", undefined);
-      expect(result.data).toEqual(mockData);
+      expect(result).toEqual(mockData);
     });
 
     it("should handle error response", async () => {
@@ -86,7 +86,7 @@ describe("HttpService", () => {
         input,
         undefined
       );
-      expect(res.data).toEqual(output);
+      expect(res).toEqual(output);
     });
   });
   describe("PATCH", () => {
@@ -107,7 +107,7 @@ describe("HttpService", () => {
         patchData,
         undefined
       );
-      expect(res.data).toEqual(output);
+      expect(res).toEqual(output);
     });
   });
 
@@ -129,7 +129,7 @@ describe("HttpService", () => {
         updateData,
         undefined
       );
-      expect(res.data).toEqual(output);
+      expect(res).toEqual(output);
     });
   });
 
@@ -146,7 +146,7 @@ describe("HttpService", () => {
         "/users/1",
         undefined
       );
-      expect(res.data).toEqual(deleted);
+      expect(res).toEqual(deleted);
     });
   });
 });

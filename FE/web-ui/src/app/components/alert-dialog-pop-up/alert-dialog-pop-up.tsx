@@ -18,7 +18,7 @@ export function AlertDialogPopUp({
 }: AlertDialogProps) {
   return (
     <AlertDialog.Root>
-      <AlertDialog.Trigger>{children}</AlertDialog.Trigger>
+      <AlertDialog.Trigger data-testid="alert-dialog-trigger">{children}</AlertDialog.Trigger>
       <AlertDialog.Content
         maxWidth={{ initial: "90%", sm: "60%", md: "40%"}}
         className={styles.dialogContent}
@@ -34,7 +34,7 @@ export function AlertDialogPopUp({
               Cancel
             </CustomButton>
           </AlertDialog.Cancel>
-          <AlertDialog.Action onClick={action}>
+          <AlertDialog.Action onClick={action} data-testid="alert-dialog-action">
             <CustomButton buttonType={ButtonType.Warning}>
               {actionText}
             </CustomButton>

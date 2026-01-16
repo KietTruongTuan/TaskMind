@@ -1,4 +1,4 @@
-import { CreateGoalRequestBody, CreateGoalResponseBody } from "@/app/constants/goal.constants";
+import { CreateGoalRequestBody, CreateGoalResponseBody } from "@/app/constants";
 import { HttpService } from "../http-service/http-service";
 import { ApiUrl } from "@/app/enum/api-url.enum";
 

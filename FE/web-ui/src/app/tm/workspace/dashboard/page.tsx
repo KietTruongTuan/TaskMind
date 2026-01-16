@@ -4,7 +4,6 @@ import {
   GoalCardPropsData,
   RecentGoalList,
 } from "./components/recent-goal-list/recent-goal-list";
-import { GoalCategory } from "@/app/enum/goal.enum";
 import { GoalCard } from "@/app/components/goal-card/goal-card";
 import { GoalCompletedCard } from "@/app/components/goal-completed-card/goal-completed-card";
 import { Crown, TrendingUp } from "lucide-react";

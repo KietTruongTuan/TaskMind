@@ -1,14 +1,5 @@
-import {
-  authenticationService,
-  RefreshTokenResponseBody,
-} from "@/app/constants";
-import { ApiUrl } from "@/app/enum/api-url.enum";
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from "axios";
-
-interface ApiError {
-  message: string;
-  status?: number;
-}
+import { ApiError } from "@/app/constants";
 
 export class HttpService {
   private instance: AxiosInstance;
@@ -70,7 +61,7 @@ export class HttpService {
       (response) => response,
       async (error) => {
         const originalRequest = error.config;
-        
+
         // If 401 and we haven't retried yet
         if (
           error.response?.status === 401 &&
@@ -78,6 +69,7 @@ export class HttpService {
           !originalRequest._isRefresh
         ) {
           originalRequest._retry = true;
+          const { authenticationService } = await import("@/app/constants");
           try {
             const refreshResponse = await authenticationService.refresh();
             const access = refreshResponse.data.access;
@@ -87,7 +79,7 @@ export class HttpService {
               return this.instance(originalRequest);
             }
           } catch (refreshError) {
-            await authenticationService.logout()
+            await authenticationService.logout();
             return Promise.reject(refreshError);
           }
         }

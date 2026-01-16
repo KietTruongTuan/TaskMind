@@ -1,9 +1,7 @@
-import { CardNoPadding } from "@/app/components/card-no-padding/card-no-padding";
 import { CustomButton } from "@/app/components/custom-button/custom-button";
 import { GoalCard } from "@/app/components/goal-card/goal-card";
 import { TaskList } from "@/app/components/task-list/task-list";
-import { CreateGoalResponseBody } from "@/app/constants/goal.constants";
-import { DraftTask } from "@/app/constants/task.constants";
+import { CreateGoalResponseBody } from "@/app/constants";
 import { ButtonType } from "@/app/enum/button-type.enum";
 import { Status } from "@/app/enum/status.enum";
 import { AddStep } from "@/app/enum/step.enum";
@@ -12,14 +10,11 @@ import { Dispatch, SetStateAction } from "react";
 
 export function GoalReview({
   setStep,
+  goalData,
 }: {
   setStep: Dispatch<SetStateAction<AddStep>>;
+  goalData: CreateGoalResponseBody;
 }) {
-  const storedGoal = localStorage.getItem("draftGoal");
-  const draftGoal: CreateGoalResponseBody = storedGoal
-    ? JSON.parse(storedGoal)
-    : {};
-
   const {
     name,
     description,
@@ -30,7 +25,7 @@ export function GoalReview({
     taskCount,
     tag,
     deadline,
-  } = draftGoal;
+  } = goalData;
   const handleCancel = () => {
     setStep(AddStep.FillInformation);
   };

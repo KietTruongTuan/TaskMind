@@ -3,7 +3,7 @@ import { DraftTask } from "./task.constants";
 
 export interface CreateGoalRequestBody {
   name: string;
-  description: string;
+  description?: string;
   tag?: string[];
   deadline: Date;
 }
@@ -12,7 +12,7 @@ export interface CreateGoalResponseBody {
   name: string;
   description: string;
   status: Status;
-  deadline: string;
+  deadline: Date;
   tag?: string[];
   completeCount: number;
   taskCount: number;

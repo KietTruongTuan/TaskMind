@@ -1,7 +1,7 @@
 import { Flex } from "@radix-ui/themes";
 import { CardNoPadding } from "../card-no-padding/card-no-padding";
 import { TaskListItem } from "../task-list-item/task-list-item";
-import { DraftTask } from "@/app/constants/task.constants";
+import { DraftTask } from "@/app/constants";
 
 export function TaskList({ tasks }: { tasks: DraftTask[] }) {
   return (

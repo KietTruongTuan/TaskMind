@@ -35,7 +35,7 @@ export function InputField({
     if (isMultiInput) {
       setValue(name, selected);
     }
-  }, [selected, name, setValue]);
+  }, [selected, name, setValue, isMultiInput]);
 
   const onAddTag = () => {
     const trimmed = query.trim();
@@ -70,7 +70,9 @@ export function InputField({
             <Input
               placeholder={placeholder}
               className={styles.fieldInput}
-              onChange={(e) => {setQuery(e.target.value)}}
+              onChange={(e) => {
+                setQuery(e.target.value);
+              }}
               value={query}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
@@ -78,12 +80,10 @@ export function InputField({
                   onAddTag();
                 }
               }}
-              onBlur={()=>trigger(name)}
+              onBlur={() => trigger(name)}
+              data-testid={`${name}-field`}
             />
-            <Input
-              type="hidden"
-              {...register(name, rules)}
-            />
+            <Input type="hidden" {...register(name, rules)} />
           </>
         ) : (
           <Form.Control asChild>
@@ -93,6 +93,7 @@ export function InputField({
                 {...register(name, rules)}
                 className={styles.fieldInput}
                 rows={6}
+                data-testid={`${name}-field`}
               />
             ) : (
               <Input
@@ -100,6 +101,7 @@ export function InputField({
                 placeholder={placeholder}
                 {...register(name, rules)}
                 className={styles.fieldInput}
+                data-testid={`${name}-field`}
               />
             )}
           </Form.Control>
@@ -115,24 +117,26 @@ export function InputField({
           {isPassword &&
             (showPassword ? <EyeIcon size={18} /> : <EyeOffIcon size={18} />)}
         </Box>
-
-        <Box
-          position="absolute"
-          right="3%"
-          top={
-            selected.length > 0 && errors
-              ? "35%"
-              : selected.length > 0
-              ? "39%"
-              : errors
-              ? "43%"
-              : "60%"
-          }
-          onMouseDown={(e) => e.preventDefault()}
-          onClick={onAddTag}
-        >
-          {isMultiInput && <Plus size={18} />}
-        </Box>
+        {isMultiInput && (
+          <Box
+            position="absolute"
+            right="3%"
+            top={
+              selected.length > 0 && errors
+                ? "35%"
+                : selected.length > 0
+                ? "39%"
+                : errors
+                ? "43%"
+                : "60%"
+            }
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={onAddTag}
+            data-testid="add-tag-button"
+          >
+            <Plus size={18} />
+          </Box>
+        )}
         {selected.length > 0 && (
           <Flex wrap="wrap" gap="1">
             {selected.map((value, index) => (

@@ -1,4 +1,4 @@
-import { Flex, Text } from "@radix-ui/themes";
+import { Flex } from "@radix-ui/themes";
 import { CardNoPadding } from "../card-no-padding/card-no-padding";
 import { Header } from "../header/header";
 

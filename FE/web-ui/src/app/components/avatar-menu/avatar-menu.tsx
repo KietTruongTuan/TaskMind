@@ -1,6 +1,6 @@
-import { Avatar, DropdownMenu, Flex, Skeleton, Text } from "@radix-ui/themes";
+import { Avatar, DropdownMenu, Flex, Text } from "@radix-ui/themes";
 import { AlertDialogPopUp } from "../alert-dialog-pop-up/alert-dialog-pop-up";
-import { authenticationService, UserPayload } from "@/app/constants";
+import { authenticationService } from "@/app/constants";
 import { LogOut } from "lucide-react";
 import styles from "./avatar-menu.module.scss";
 import { useTokenRefresherContext } from "@/app/contexts/token-refresher-context/token-refresher-context";

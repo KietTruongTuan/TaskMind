@@ -8,7 +8,7 @@ export function GoalAddForm() {
   } = useFormContext();
 
   return (
-    <Flex direction="column" gap="4">
+    <Flex direction="column" gap="4" data-testid="goal-add-form">
       <InputField
         name="name"
         type="text"
@@ -22,9 +22,6 @@ export function GoalAddForm() {
         name="description"
         type="text"
         placeholder="Describe your goal in detail, your current situation, and what you want to achieve..."
-        rules={{
-          required: "Description is required",
-        }}
         isMultiLine
         errors={errors.description as FieldError}
       />
@@ -42,6 +39,13 @@ export function GoalAddForm() {
           placeholder=""
           rules={{
             required: "Deadline is required",
+            validate: (value: Date) => {
+              const today = new Date();
+              today.setHours(0, 0, 0, 0);
+              const selectedDate = new Date(value);
+              selectedDate.setHours(0, 0, 0, 0);
+              return selectedDate >= today || "Deadline must be in the future";
+            },
           }}
           errors={errors.deadline as FieldError}
         />

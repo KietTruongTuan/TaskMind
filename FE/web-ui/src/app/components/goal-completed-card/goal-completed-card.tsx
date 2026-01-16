@@ -1,9 +1,9 @@
-import { Flex, Text } from "@radix-ui/themes";
+import { Flex } from "@radix-ui/themes";
 import { CardNoPadding } from "../card-no-padding/card-no-padding";
 import { CheckCircle } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { Header } from "../header/header";
-import styles from "./goal-completed-card.module.scss"
+import styles from "./goal-completed-card.module.scss";
 
 export function GoalCompletedCard({
   name,

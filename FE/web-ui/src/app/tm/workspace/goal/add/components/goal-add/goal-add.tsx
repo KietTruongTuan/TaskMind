@@ -2,7 +2,6 @@
 import { FormProvider, useForm } from "react-hook-form";
 import * as Form from "@radix-ui/react-form";
 import { Flex, Text } from "@radix-ui/themes";
-import { CreateGoalRequestBody, CreateGoalResponseBody } from "@/app/constants/goal.constants";
 import { Header } from "@/app/components/header/header";
 import { Sparkles } from "lucide-react";
 import styles from "./goal-add.module.scss";
@@ -12,9 +11,8 @@ import { ButtonType } from "@/app/enum/button-type.enum";
 import { CardNoPadding } from "@/app/components/card-no-padding/card-no-padding";
 import { AddStep } from "@/app/enum/step.enum";
 import { Dispatch, SetStateAction } from "react";
-import { set } from "date-fns";
 import { LoadingOverlay } from "@/app/components/loading-overlay/loading-overlay";
-import { aiService } from "@/app/constants";
+import { aiService, CreateGoalRequestBody, CreateGoalResponseBody } from "@/app/constants";
 
 export function GoalAdd({
   setStep,
@@ -56,7 +54,7 @@ export function GoalAdd({
                 onSubmit={handleSubmit(onSubmit)}
               >
                 <Flex direction="column" gap="4">
-                  <Flex direction="column" width="100%" gap="1">
+                  <Flex direction="column" width="100%" gap="1" data-testid="goal-add-header">
                     <Header
                       text="Let AI help you create a new goal"
                       subText="Type your goal and let AI create a detailed step-by-step plan for you."
@@ -68,8 +66,9 @@ export function GoalAdd({
                   <GoalAddForm />
                   <CustomButton
                     type="submit"
-                    disabled={!isValid || isSubmitting}
+                    disabled={!isValid}
                     buttonType={ButtonType.Primary}
+                    data-testid="goal-add-button"
                   >
                     <Sparkles size={18} />
                     Create your plan

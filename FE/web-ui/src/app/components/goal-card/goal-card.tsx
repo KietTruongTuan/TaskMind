@@ -1,5 +1,5 @@
 import { CardNoPadding } from "../card-no-padding/card-no-padding";
-import { Flex, Kbd, Progress, Text } from "@radix-ui/themes";
+import { Flex, Progress, Text } from "@radix-ui/themes";
 import { Calendar, CheckCircle, Clock, Target } from "lucide-react";
 import styles from "./goal-card.module.scss";
 import { GoalCardPropsData } from "@/app/tm/workspace/dashboard/components/recent-goal-list/recent-goal-list";
@@ -19,7 +19,8 @@ export function GoalCard({
   isPrimary = false,
 }: GoalCardPropsData) {
   const currentDate: Date = new Date();
-  const progress: number = taskCount === 0 ? 0 : (completedCount * 100) / taskCount;
+  const progress: number =
+    taskCount === 0 ? 0 : (completedCount * 100) / taskCount;
   const cardContent: StatusCardProps[] = [
     {
       label: "Progress",
@@ -63,7 +64,10 @@ export function GoalCard({
                 {tag?.map((value, index) => (
                   <React.Fragment key={index}>
                     {index > 0 && (
-                      <Text size={isDetailCard ? "2" : "1"} weight="bold"> · </Text>
+                      <Text size={isDetailCard ? "2" : "1"} weight="bold">
+                        {" "}
+                        ·{" "}
+                      </Text>
                     )}
                     <Text size={isDetailCard ? "2" : "1"}>{value}</Text>
                   </React.Fragment>

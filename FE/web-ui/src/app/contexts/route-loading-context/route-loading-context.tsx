@@ -7,10 +7,7 @@ interface RouteLoadingContextType {
   route: (url: string) => void;
 }
 
-const RouteLoadingContext = createContext<RouteLoadingContextType>({
-  isRouteLoading: false,
-  route: () => {},
-});
+const RouteLoadingContext = createContext<RouteLoadingContextType | null>(null);
 
 export const RouteLoadingProvider = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();

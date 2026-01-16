@@ -1,6 +1,5 @@
 "use client";
 import { Header } from "@/app/components/header/header";
-import { SkeletonLoading } from "@/app/components/skeleton-loading/skeleton-loading";
 import { useTokenRefresherContext } from "@/app/contexts/token-refresher-context/token-refresher-context";
 import { Box } from "@radix-ui/themes";
 

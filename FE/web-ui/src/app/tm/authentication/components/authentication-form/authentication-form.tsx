@@ -1,6 +1,6 @@
 "use client";
 import { CustomButton } from "@/app/components/custom-button/custom-button";
-import { Flex, Checkbox, Text, Heading, Box } from "@radix-ui/themes";
+import { Flex, Checkbox, Text, Box } from "@radix-ui/themes";
 import * as Form from "@radix-ui/react-form";
 import { FormProvider, useForm } from "react-hook-form";
 import styles from "./authentication-form.module.scss";
@@ -10,6 +10,7 @@ import { RegistrationForm } from "../registration-form/registration-form";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
+  ApiError,
   authenticationService,
   LoginRequestBody,
   RegistrationRequestBody,
@@ -79,11 +80,8 @@ export function AuthenticationForm() {
       }
     } catch (err) {
       setIsSuccess(false);
-      if (activeForm === AuthenticationModule.Login) {
-        showToast("Invalid username or password. Please try again.");
-      } else {
-        showToast("Email is already existed.");
-      }
+      const error = err as ApiError;
+      showToast(error.message);
     }
   };
   useEffect(() => {
@@ -134,6 +132,7 @@ export function AuthenticationForm() {
                       type="submit"
                       disabled={!isValid || isSubmitting}
                       buttonType={ButtonType.Primary}
+                      data-testid="register-submit-button"
                     >
                       {formContents[activeForm].header}
                     </CustomButton>
