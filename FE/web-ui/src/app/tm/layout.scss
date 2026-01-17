@@ -12,16 +12,17 @@
   --status-completed: #10B981;
   --status-cancel: #EF4444;
   --status-overdue: #B91C1C;
-  --message-error-light:#f8d1d1;
-  --message-error:#d60000;
-  --message-success-light:#d1fadc;
-  --message-success:#00d739;
-
-  /* Light theme variables (default) */
+  --message-error-light: #f8d1d1;
+  --message-error: #d60000;
+  --message-success-light: #d1fadc;
+  --message-success: #00d739;
+  --background-rgb: rgba(0, 0, 0, 0.077);
+  
+    /* Light theme variables (default) */
   --background: #F8FAFC;
   --text-primary: #0F172A;
   --text-secondary: #64748B;
-  --navbar: #475569;  
+  --navbar: #475569;
   --card-primary: #FFFFFF;
   --card-secondary: #F1F5F9;
   --card-border: #E2E8F0;
@@ -45,8 +46,8 @@
   --text-primary: #FFFFFF;
   --text-secondary: #94A3B8;
   --navbar: #2B384B;
-  --card-primary: #1F2937;
-  --card-secondary: #374151;
+  --card-primary: #1f29377f;
+  --card-secondary: #1F2937;
   --card-border: #334155;
   --button-hover: #374151dd;
   --font-family-sans: #{$typography-font-family-sans};
@@ -93,8 +94,8 @@
 
 html,
 body {
-  height: 100vh;
-  width: 100vw;
+  min-height: 100vh;
+  max-width: 100vw;
   margin: 0;
   padding: 0;
 }

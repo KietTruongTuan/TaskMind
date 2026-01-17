@@ -3,11 +3,26 @@
   border: 1px solid var(--card-border);
   border-radius: var(--spacing-small);
   background-color: var(--card-secondary);
-  color: var(--text-secondary);
+  resize: none;
+  font-family: inherit;
+
+  &::placeholder {
+    color: var(--text-secondary);
+  }
 }
 
-.validateMessage{
+.selectedItem {
+  background-color: var(--button-primary);
+  color: var(--button-secondary);
+  border-radius: var(--spacing-medium);
+}
+
+.validateMessage {
   color: var(--status-cancel);
   font-size: 12px;
   font-weight: light;
+}
+
+.fieldWrapper {
+  width: 100%;
 }

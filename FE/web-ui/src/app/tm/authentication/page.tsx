@@ -1,9 +1,9 @@
-import { Box, Flex, Grid, Heading, Text } from "@radix-ui/themes";
-import styles from "./page.module.scss";
+import { Box, Flex, Grid } from "@radix-ui/themes";
 import { AuthenticationForm } from "./components/authentication-form/authentication-form";
 import { ThemeToggle } from "../../components/theme-toggle/theme-toggle";
 import { LogoIcon } from "../../components/logo-icon/logo-icon";
 import { Header } from "@/app/components/header/header";
+import { CardNoPadding } from "@/app/components/card-no-padding/card-no-padding";
 
 export default function AuthenticationPage() {
   return (
@@ -15,7 +15,7 @@ export default function AuthenticationPage() {
         lg: "35% 30% 35%",
       }}
       rows="1fr auto 1fr"
-      height="100%"
+      height="100vh"
     >
       <Box position="fixed" top="1rem" right="1rem">
         <ThemeToggle />
@@ -41,17 +41,9 @@ export default function AuthenticationPage() {
           </Flex>
         </Flex>
 
-        <Flex
-          width="100%"
-          height="100%"
-          className={styles.authenticationForm}
-          direction="column"
-          align="center"
-          p="5"
-          gap="5"
-        >
+        <CardNoPadding p="5" gap="5" isPrimary>
           <AuthenticationForm />
-        </Flex>
+        </CardNoPadding>
       </Flex>
     </Grid>
   );

@@ -3,16 +3,16 @@
 
 $light-color-background: #ffffff;
 $light-color-foreground: #171717;
-$light-color-gray-rgb: 0, 0, 0;
-$light-color-gray-alpha-200: rgba(0, 0, 0, 0.08);
-$light-color-gray-alpha-100: rgba(0, 0, 0, 0.05);
+$light-color-gray-rgb: rgba(0, 0, 0, 0.08);
+$light-color-gray-alpha-200: #cccccc;;
+$light-color-gray-alpha-100: #e5e5e5;
 $light-color-button-primary-hover: #383838;
 $light-color-button-secondary-hover: #f2f2f2;
 $dark-color-background: #0a0a0a;
 $dark-color-foreground: #ededed;
-$dark-color-gray-rgb: 255, 255, 255;
-$dark-color-gray-alpha-200: rgba(255, 255, 255, 0.14);
-$dark-color-gray-alpha-100: rgba(255, 255, 255, 0.06);
+$dark-color-gray-rgb: rgba(255, 255, 255, 0.14);;
+$dark-color-gray-alpha-200: #242424;;
+$dark-color-gray-alpha-100: #0f0f0f;
 $dark-color-button-primary-hover: #cccccc;
 $dark-color-button-secondary-hover: #1a1a1a;
 $typography-font-family-sans: var(--font-geist-sans);

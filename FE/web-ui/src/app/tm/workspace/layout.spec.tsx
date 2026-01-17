@@ -1,15 +1,21 @@
 import { render, screen } from "@testing-library/react";
 import Layout from "./layout";
 import { ThemeProvider } from "@/app/contexts/theme-context/theme-context";
+import { TokenRefresherProvider } from "@/app/contexts/token-refresher-context/token-refresher-context";
+import { RouteLoadingProvider } from "@/app/contexts/route-loading-context/route-loading-context";
 
 describe("Workspace Layout", () => {
   it("should render the layout with navigation bar and theme toggle", async () => {
     render(
-      <ThemeProvider>
-        <Layout>
-          <div data-testid="child">Mock Component</div>
-        </Layout>
-      </ThemeProvider>
+      <RouteLoadingProvider>
+        <TokenRefresherProvider>
+          <ThemeProvider>
+            <Layout>
+              <div data-testid="child">Mock Component</div>
+            </Layout>
+          </ThemeProvider>
+        </TokenRefresherProvider>
+      </RouteLoadingProvider>
     );
 
     expect(screen.getByTestId("theme-toggle")).toBeInTheDocument();

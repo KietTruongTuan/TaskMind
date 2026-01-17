@@ -1,10 +1,5 @@
-import { TokenRefresher } from "@/app/components/token-refresher/token-refresher";
+import { AddGoalWrapper } from "./components/add-goal-wrapper/add-goal-wrapper";
 
 export default async function AddGoalPage() {
-  return (
-    <>
-      <TokenRefresher />
-      Add Page
-    </>
-  );
+  return <AddGoalWrapper />;
 }

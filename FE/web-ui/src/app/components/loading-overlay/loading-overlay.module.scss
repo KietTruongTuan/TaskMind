@@ -1,0 +1,16 @@
+/* Style the overlay */
+.rt-DialogOverlay {
+  background: rgba(0, 0, 0, 0.15) !important;
+  backdrop-filter: blur(2px) !important;
+}
+
+/* Style the content wrapper */
+.overlayContent {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  width: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

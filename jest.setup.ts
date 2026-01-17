@@ -16,3 +16,29 @@ jest.mock("next/navigation", () => ({
   }),
   usePathname: jest.fn(),
 }));
+
+const originalError = console.error;
+const originalWarn = console.warn;
+
+beforeAll(() => {
+  console.error = (...args) => {
+    // Hide the Radix UI "DialogTitle" error
+    if (typeof args[0] === 'string' && args[0].includes('requires a `DialogTitle`')) {
+      return;
+    }
+    originalError.call(console, ...args);
+  };
+
+  console.warn = (...args) => {
+    // Hide the Radix UI "Description" warning
+    if (typeof args[0] === 'string' && args[0].includes('Missing `Description`')) {
+      return;
+    }
+    originalWarn.call(console, ...args);
+  };
+});
+
+afterAll(() => {
+  console.error = originalError;
+  console.warn = originalWarn;
+});

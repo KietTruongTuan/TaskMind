@@ -21,3 +21,9 @@ export interface LoginResponseBody {
 export interface RefreshTokenResponseBody {
   access: string;
 }
+
+export interface UserPayload {
+  user_id: string;
+  username: string;
+  email: string;
+}

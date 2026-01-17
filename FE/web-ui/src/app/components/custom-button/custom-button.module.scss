@@ -26,9 +26,13 @@
     background-color: var(--card-secondary);
     color: var(--text-primary);
   }
-  
+
   &:disabled {
     cursor: default;
     pointer-events: none;
+  }
+
+  &:focus {
+    outline: none;
   }
 }

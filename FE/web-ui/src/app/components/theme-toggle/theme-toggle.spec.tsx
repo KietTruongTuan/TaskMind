@@ -13,7 +13,7 @@ describe("Theme toggle button", () => {
     );
 
     expect(await screen.findByTestId("theme-toggle")).toBeInTheDocument();
-    expect(await screen.findByTestId("dark-icon")).toBeInTheDocument();
+    expect(await screen.findByTestId("light-icon")).toBeInTheDocument();
   });
 
   it("should change the theme when click the button", async () => {
@@ -26,6 +26,6 @@ describe("Theme toggle button", () => {
       userEvent.click(await screen.findByTestId("theme-toggle"));
     });
 
-    expect(await screen.findByTestId("light-icon")).toBeInTheDocument();
+    expect(await screen.findByTestId("dark-icon")).toBeInTheDocument();
   });
 });

@@ -9,7 +9,8 @@ const ThemeContext = createContext<{
 } | null>(null);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<ThemeMode>(ThemeMode.Light);
+  const currentTheme = localStorage.getItem("theme") as ThemeMode;
+  const [theme, setTheme] = useState<ThemeMode>(currentTheme ?? ThemeMode.Light);
 
   useEffect(() => {
     const savedMode = localStorage.getItem("theme") as ThemeMode;
@@ -18,6 +19,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     localStorage.setItem("theme", theme);
+    const root = document.documentElement;
+    root.classList.remove(ThemeMode.Light, ThemeMode.Dark);
+    root.classList.add(theme);
   }, [theme]);
 
   return (
@@ -28,8 +32,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
           backgroundColor: "var(--background)",
           color: "var(--text-primary)",
           fontSize: "var(--font-size-base)",
-          height: "100%"
+          height: "100%",
         }}
+        id="theme-root"
       >
         {children}
       </Theme>
