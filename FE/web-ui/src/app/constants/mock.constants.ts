@@ -1,4 +1,5 @@
 import { Status } from "../enum/status.enum";
+import { LoginRequestBody, LoginResponseBody, RegistrationRequestBody, RegistrationResponseBody } from "./authentication.constants";
 import {
   CreateGoalRequestBody,
   CreateGoalResponseBody,
@@ -40,4 +41,24 @@ export const MOCK_GOAL_REQUEST_DATA: CreateGoalRequestBody = {
   description: "This is a test goal",
   tag: ["test", "goal"],
   deadline: new Date("2026-02-16"),
+};
+
+export const MOCK_LOGIN_REQUEST_DATA: LoginRequestBody = {
+  email: "test@example.com",
+  password: "password123",
+};
+
+export const MOCK_LOGIN_RESPONSE_DATA: LoginResponseBody = {
+  message: "Login successfully",
+  access: "mocked_jwt_token",
+};
+
+export const MOCK_REGISTER_REQUEST_DATA: RegistrationRequestBody = {
+  username: "testuser",
+  email: "test@example.com",
+  password: "password123",
+};
+
+export const MOCK_REGISTER_RESPONSE_DATA: RegistrationResponseBody = {
+  message: "Register successfully",
 };

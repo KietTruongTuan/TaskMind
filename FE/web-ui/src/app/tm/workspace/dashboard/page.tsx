@@ -7,7 +7,7 @@ import {
 import { GoalCard } from "@/app/components/goal-card/goal-card";
 import { GoalCompletedCard } from "@/app/components/goal-completed-card/goal-completed-card";
 import { Crown, TrendingUp } from "lucide-react";
-import { GreetingText } from "./components/greeting-text/greeting-text";
+import { GreetingText } from "@/app/components/greeting-text/greeting-text";
 
 export default function DashboardPage() {
   const recentGoals: GoalCardPropsData[] = [

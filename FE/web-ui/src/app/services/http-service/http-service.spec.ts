@@ -1,4 +1,4 @@
-import axios, { AxiosError, AxiosInstance, AxiosResponse } from "axios";
+import axios, { AxiosInstance, AxiosResponse } from "axios";
 import { HttpService } from "./http-service";
 
 jest.mock("axios");
@@ -27,7 +27,6 @@ describe("HttpService", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    // make axios.create return our fake instance
     mockedAxios.create.mockReturnValue(mockAxiosInstance);
     httpService = new HttpService("https://api.example.com");
   });
@@ -43,28 +42,6 @@ describe("HttpService", () => {
 
       expect(mockAxiosInstance.get).toHaveBeenCalledWith("/users/1", undefined);
       expect(result).toEqual(mockData);
-    });
-
-    it("should handle error response", async () => {
-      const error: Partial<AxiosError> = {
-        response: {
-          status: 404,
-          statusText: "Not Found",
-          data: {},
-        } as AxiosResponse,
-        message: "Request failed",
-      };
-
-      mockAxiosInstance.get.mockRejectedValueOnce(error);
-
-      await expect(httpService.get("/bad-url")).rejects.toEqual({
-        message: "Request failed",
-        response: {
-          data: {},
-          status: 404,
-          statusText: "Not Found",
-        },
-      });
     });
   });
 
@@ -147,6 +124,55 @@ describe("HttpService", () => {
         undefined
       );
       expect(res).toEqual(deleted);
+    });
+  });
+
+  describe("handleError", () => {
+    it("should handle error response", async () => {
+      const mockError = {
+        message: "Request failed",
+        response: {
+          status: 500,
+          statusText: "Internal Server Error",
+        },
+        isAxiosError: true,
+      };
+
+      const useMock = mockAxiosInstance.interceptors.response.use as jest.Mock;
+      const responseErrorInterceptor = useMock.mock.calls[0][1];
+
+      const interceptedPromise = responseErrorInterceptor(mockError);
+
+      await expect(interceptedPromise).rejects.toEqual({
+        message: "Request failed",
+        status: 500,
+      });
+    });
+
+    it("should handle error request", async () => {
+      const useMock = mockAxiosInstance.interceptors.response.use as jest.Mock;
+      const responseErrorInterceptor = useMock.mock.calls[0][1];
+
+      const networkError = {
+        request: {},
+        isAxiosError: true,
+      };
+
+      await expect(responseErrorInterceptor(networkError)).rejects.toEqual({
+        message: "No response received.",
+        status: 0,
+      });
+    });
+    it("should return 'Unknown Error.' when no message is provided", async () => {
+      const useMock = mockAxiosInstance.interceptors.response.use as jest.Mock;
+      const responseErrorInterceptor = useMock.mock.calls[0][1];
+      const mockError = {
+        isAxiosError: true,
+      };
+
+      await expect(responseErrorInterceptor(mockError)).rejects.toEqual({
+        message: "Unknown Error.",
+      });
     });
   });
 });
