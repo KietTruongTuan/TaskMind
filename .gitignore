@@ -7,3 +7,4 @@ pnpm-lock.yaml
 venv/
 
 FE/web-ui/src/assets/tokens/.obsidian/
+.vercel
