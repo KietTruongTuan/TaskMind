@@ -11,5 +11,5 @@ urlpatterns = [
 
     # Task endpoints
     path('tasks/', TaskListView.as_view(), name='task-list'),  # List all tasks
-    path('<int:goal_id>/tasks/<int:pk>', TaskDetailView.as_view(), name='task-detail')  # Update, delete a specific task
+    path('<int:goal_id>/tasks/<int:pk>/', TaskDetailView.as_view(), name='task-detail')  # Update, delete a specific task
 ]
