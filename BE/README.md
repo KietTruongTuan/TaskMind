@@ -79,7 +79,7 @@ curl -X GET http://localhost:8000/v1/goals/ \
 | GET | `/v1/goals/` | List all goals |
 | POST | `/v1/goals/` | Create goal with tasks |
 | GET | `/v1/goals/{id}` | Get goal details |
-| PUT | `/v1/goals/{id}` | Update goal |
+| PATCH | `/v1/goals/{id}` | Update goal |
 | DELETE | `/v1/goals/{id}` | Delete goal |
 | POST | `/v1/goals/generate` | **AI**: Generate goal with tasks |
 | PATCH | `/v1/goals/{id}/tasks/{task_id}` | Update task |
