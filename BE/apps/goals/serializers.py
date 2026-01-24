@@ -113,7 +113,16 @@ class GoalDetailSerializer(serializers.ModelSerializer):
         read_only_fields = ['complete_date', 'completed_count', 'task_count']
 
     def validate_deadline(self, value):
-        if value < timezone.now().date():
+        """
+        Prevent setting a new past deadline, but allow keeping an existing past
+        deadline unchanged when updating an existing goal.
+        """
+        today = timezone.now().date()
+        if value < today:
+            # Allow past deadline only if it's the same as the existing one
+            instance = getattr(self, "instance", None)
+            if instance is not None and instance.deadline == value:
+                return value
             raise serializers.ValidationError("Deadline cannot be in the past")
         return value
     
