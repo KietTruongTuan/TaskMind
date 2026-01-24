@@ -59,7 +59,25 @@ class TaskSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'status', 'deadline', 'complete_date', 'position']
 
     def validate_deadline(self, value):
-        if value < timezone.now().date():
+        """
+        Validate that the deadline is not set in the past.
+
+        For existing tasks (updates), allow the validation to pass if the
+        deadline is unchanged, even if it is already in the past. This avoids
+        blocking updates to other fields on overdue tasks.
+        """
+        today = timezone.now().date()
+
+        # For new tasks, always enforce that the deadline is not in the past.
+        if self.instance is None:
+            if value < today:
+                raise serializers.ValidationError("Deadline cannot be in the past")
+            return value
+
+        # For existing tasks, allow the existing past deadline to remain,
+        # but prevent changing the deadline to a different past date.
+        existing_deadline = getattr(self.instance, "deadline", None)
+        if value < today and value != existing_deadline:
             raise serializers.ValidationError("Deadline cannot be in the past")
         return value
 
