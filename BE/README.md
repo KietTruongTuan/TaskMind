@@ -141,7 +141,7 @@ pytest apps/accounts/tests/ -v
 
 | Test File | Tests | Description |
 |-----------|-------|-------------|
-| `test_api.py` | 22 | Unit tests with mocked AI |
+| `test_api.py` | 30 | Unit tests with mocked AI |
 | `test_e2e.py` | 1 | Full flow: register → generate → save |
 | `accounts/test_api.py` | 4 | Auth tests |
 
@@ -152,7 +152,7 @@ pytest apps/accounts/tests/ -v
 pytest -v
 
 # Expected: All tests should pass
-# ======================== 27 passed ========================
+# ======================== 35 passed ========================
 ```
 
 ---
