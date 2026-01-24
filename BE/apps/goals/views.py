@@ -476,8 +476,8 @@ class TaskListView(APIView):
         if search_query:
             tasks = tasks.filter(name__icontains=search_query)
 
-        # Order by deadline (soonest first)
-        tasks = tasks.select_related('goal').order_by('deadline', 'position')
+        # Order by deadline (soonest first), with tasks lacking a deadline placed after those with one
+        tasks = tasks.select_related('goal').order_by('deadline__isnull', 'deadline', 'position')
 
         serializer = TaskSerializer(tasks, many=True)
         
