@@ -22,7 +22,6 @@ from .serializers import (
     TaskSerializer,
     GoalGenerateRequestSerializer,
     GoalGenerateResponseSerializer,
-    MessageResponseSerializer
 )
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
