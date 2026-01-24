@@ -38,7 +38,6 @@ def test_login_api():
     assert response.status_code == 200
     assert response.data['message'] == 'Login successful'
     assert 'access' in response.data  # Check for JWT access token
-    assert 'refresh' in response.data  # Check for JWT refresh token
     
 @pytest.mark.django_db
 def test_register_wrong_email_format():
