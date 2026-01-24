@@ -382,7 +382,7 @@ class GoalDetailView(APIView):
         """
         goal = self.get_object(goal_id)
         goal.delete()
-        return Response({"message": "Goal deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 @extend_schema_view(
     patch=extend_schema(
