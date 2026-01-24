@@ -156,7 +156,12 @@ class GoalDetailSerializer(serializers.ModelSerializer):
                 task_id = task_data.get('id')
                 if task_id:
                     # Update existing task
-                    task = instance.tasks.get(id=task_id)
+                    try:
+                        task = instance.tasks.get(id=task_id)
+                    except Task.DoesNotExist:
+                        raise serializers.ValidationError(
+                            f"Task with id {task_id} does not exist or does not belong to this goal."
+                        )
                     for attr, value in task_data.items():
                         setattr(task, attr, value)
                     task.save()
