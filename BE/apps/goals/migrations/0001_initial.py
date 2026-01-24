@@ -25,7 +25,7 @@ class Migration(migrations.Migration):
                 ('complete_date', models.DateField(blank=True, null=True)),
                 ('tag', models.JSONField(blank=True, default=list)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('update_at', models.DateTimeField(auto_now=True)),
+                ('updated_at', models.DateTimeField(auto_now=True)),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='goals', to=settings.AUTH_USER_MODEL)),
             ],
             options={
