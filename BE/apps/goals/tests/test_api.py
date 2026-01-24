@@ -12,7 +12,7 @@ This module contains pytest tests covering all Goals API endpoints:
 """
 
 import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 from rest_framework.test import APIClient
 from django.contrib.auth import get_user_model
 from django.utils import timezone
