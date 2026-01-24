@@ -7,7 +7,7 @@ urlpatterns = [
 
     # Goal CRUD endpoints
     path('', GoalView.as_view(), name='goal-list'),  # List all goals / Create goal
-    path('<int:goal_id>', GoalDetailView.as_view(), name='goal-detail'),  # Get, update, or delete a specific goal
+    path('<int:goal_id>/', GoalDetailView.as_view(), name='goal-detail'),  # Get, update, or delete a specific goal
 
     # Task endpoints
     path('tasks/', TaskListView.as_view(), name='task-list'),  # List all tasks
