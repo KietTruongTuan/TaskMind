@@ -6,18 +6,33 @@ import {
   KanbanColumnBody,
   KanbanCard,
   KanbanDragOverlay,
+  OnCardDragEndHandler,
 } from "@saas-ui-pro/kanban";
 import { DraftTask, StatusDisplay } from "@/app/constants";
 import { Status } from "@/app/enum/status.enum";
 import { KanbanItem } from "../kanban-item/kanban-item";
-import { Badge, Box, Flex, Inset, Separator, Text } from "@radix-ui/themes";
+import {
+  Badge,
+  Box,
+  Flex,
+  Inset,
+  Separator,
+  Text,
+  Theme,
+} from "@radix-ui/themes";
 import { CardNoPadding } from "../card-no-padding/card-no-padding";
 import styles from "./kanban-board.module.scss";
-export function KanbanBoard({ tasks }: { tasks?: DraftTask[] }) {
+import { useCallback, useState } from "react";
+import { useToast } from "@/app/contexts/toast-context/toast-context";
+import { ThemeProvider } from "@/app/contexts/theme-context/theme-context";
+export function KanbanBoard({ tasks: initialTasks }: { tasks?: DraftTask[] }) {
+  const [tasks, setTasks] = useState(initialTasks);
+  const [key, setKey] = useState(0);
+  const { showToast, setIsSuccess } = useToast();
   const kanbanItems = tasks
     ? Object.values(Status).reduce(
         (acc, status) => {
-          acc[status] = tasks
+          acc[status] = tasks 
             .filter((task) => task.status === status)
             .map((task) => String(task.id));
           return acc;
@@ -26,10 +41,47 @@ export function KanbanBoard({ tasks }: { tasks?: DraftTask[] }) {
       )
     : {};
 
-  return !tasks || tasks.length === 0 ? (
-    <Box>No tasks</Box>
-  ) : (
-    <Kanban defaultItems={kanbanItems}>
+  const updateTaskStatus = async (taskId: number, status: Status) => {
+    // throw new Error("API call failed - testing revert behavior");
+  };
+
+  const onCardDragEnd: OnCardDragEndHandler = useCallback(
+    async (args) => {
+      const { to, items } = args;
+      const newStatus = to.columnId as Status;
+      const taskIds = items[newStatus] || [];
+      const taskId = Number(taskIds[to.index]);
+
+      const task = tasks?.find((t) => t.id === taskId);
+
+      if (task && task.status !== newStatus) {
+        const oldStatus = task.status;
+
+        setTasks((prevTasks) =>
+          prevTasks?.map((t) =>
+            t.id === taskId ? { ...t, status: newStatus } : t,
+          ),
+        );
+        try {
+          await updateTaskStatus(taskId, newStatus);
+        } catch (error) {
+          setTasks((prevTasks) =>
+            prevTasks?.map((t) =>
+              t.id === taskId ? { ...t, status: oldStatus } : t,
+            ),
+          );
+
+          setKey((k) => k + 1);
+          setIsSuccess(false);
+          showToast("Failed to update task status");
+        }
+      }
+    },
+    [tasks],
+  );
+
+  return (
+    <Kanban key={key} defaultItems={kanbanItems} onCardDragEnd={onCardDragEnd}>
       {(kanbanState) => (
         <>
           <Flex gap="4" align="start" mb="4">
@@ -39,7 +91,12 @@ export function KanbanBoard({ tasks }: { tasks?: DraftTask[] }) {
                   <KanbanColumn id={columnId}>
                     <Flex direction="column" gap="3">
                       <KanbanColumnHeader>
-                        <Flex>
+                        <Flex align="center" gap="2">
+                          <Box
+                            width="12px"
+                            height="12px"
+                            className={`${styles.statusDot} ${styles[columnId as Status]}`}
+                          />
                           <Text size="3" weight="medium">
                             {StatusDisplay[columnId as Status]?.title}
                           </Text>
@@ -61,7 +118,8 @@ export function KanbanBoard({ tasks }: { tasks?: DraftTask[] }) {
                       </Inset>
 
                       <KanbanColumnBody>
-                        {kanbanState.items[columnId]?.map((itemId) => {                          const task: DraftTask | undefined = tasks.find(
+                        {kanbanState.items[columnId]?.map((itemId) => {
+                          const task: DraftTask | undefined = tasks?.find(
                             (t) => String(t.id) === itemId,
                           );
                           return task ? (
@@ -85,9 +143,11 @@ export function KanbanBoard({ tasks }: { tasks?: DraftTask[] }) {
                     (t) => String(t.id) === kanbanState.activeId,
                   );
                   return task ? (
-                    <KanbanCard id={kanbanState.activeId}>
-                      <KanbanItem task={task} />
-                    </KanbanCard>
+                    <ThemeProvider>
+                      <KanbanCard id={kanbanState.activeId}>
+                        <KanbanItem task={task} />
+                      </KanbanCard>
+                    </ThemeProvider>
                   ) : null;
                 })()
               : null}

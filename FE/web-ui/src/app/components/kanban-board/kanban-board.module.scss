@@ -9,3 +9,30 @@
     color: var(--text-primary);
     border-radius: var(--spacing-small);
 }
+
+.statusDot {
+    border-radius: var(--border-radius-pill);
+}
+.ToDo {
+    background-color: var(--status-to-do);
+}
+
+.InProgress {
+    background-color: var(--status-in-progress);
+}
+
+.Completed {
+    background-color: var(--status-completed);
+}
+
+.OnHold {
+    background-color: var(--status-on-hold);
+}
+
+.Cancel {
+    background-color: var(--status-cancel);
+}
+
+.Overdue {
+    background-color: var(--status-overdue);
+}
