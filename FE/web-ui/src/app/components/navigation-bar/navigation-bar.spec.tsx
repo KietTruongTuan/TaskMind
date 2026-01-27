@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { NavigationBar } from "./navigation-bar";
 import userEvent from "@testing-library/user-event";
-import { MOCK_ROUTER_PUSH } from "../../../../../../jest.setup";
+import { MOCK_ROUTER_PUSH } from "../../../../jest.setup";
 import { ThemeProvider } from "@/app/contexts/theme-context/theme-context";
 import { WebUrl } from "@/app/enum/web-url.enum";
 
@@ -14,7 +14,7 @@ describe("Navigation bar", () => {
     render(
       <ThemeProvider>
         <NavigationBar />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
 
     expect(await screen.findByTestId("navbar-items")).toBeInTheDocument();
@@ -25,7 +25,7 @@ describe("Navigation bar", () => {
     render(
       <ThemeProvider>
         <NavigationBar />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
     await userEvent.click(await screen.findByTestId("add-goal-tab"));
 
