@@ -98,12 +98,7 @@ export default async function DashboardPage() {
   return (
     <GoalProvider>
       <Flex width="100%" justify="center" height="100%">
-        <Flex
-          width={{ initial: "90%", xs: "85%" }}
-          direction="column"
-          py="5"
-          gap="5"
-        >
+        <Flex width="100%" direction="column" py="5" gap="5">
           <GreetingText />
           <Grid rows="1fr auto auto" gap="5">
             <StatusCardList

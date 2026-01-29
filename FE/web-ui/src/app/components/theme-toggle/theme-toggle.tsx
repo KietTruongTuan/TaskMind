@@ -13,8 +13,8 @@ export function ThemeToggle() {
       justify="center"
       align="center"
       className={styles.toggleButton}
-      width="40px"
-      height="40px"
+      width="33px"
+      height="33px"
       onClick={() =>
         setTheme(theme === ThemeMode.Dark ? ThemeMode.Light : ThemeMode.Dark)
       }

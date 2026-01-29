@@ -38,6 +38,7 @@ export function AvatarMenu() {
               mr={{ initial: "3", md: "0" }}
               className={styles.avatarBox}
               fallback={username}
+              size="2"
             />
           </SkeletonLoading>
         </Flex>
