@@ -2,14 +2,14 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { SideBarDialog } from "./side-bar-dialog";
 import { ThemeProvider } from "@/app/contexts/theme-context/theme-context";
-import { MOCK_ROUTER_PUSH } from "../../../../../../jest.setup";
+import { MOCK_ROUTER_PUSH } from "../../../../jest.setup";
 
 describe("Side bar dialog", () => {
   it("should go to New goal page when click item", async () => {
     render(
       <ThemeProvider>
         <SideBarDialog />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
     await userEvent.click(await screen.findByTestId("sidebar-button"));
     await userEvent.click(await screen.findByText("New Goal"));
@@ -20,7 +20,7 @@ describe("Side bar dialog", () => {
     render(
       <ThemeProvider>
         <SideBarDialog />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
     await userEvent.click(await screen.findByTestId("sidebar-button"));
     await userEvent.keyboard("{Escape}");
