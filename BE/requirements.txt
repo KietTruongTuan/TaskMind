@@ -12,6 +12,7 @@ distro==1.9.0
 Django==5.2.6
 django-cors-headers==4.6.0
 djangorestframework==3.16.1
+djangorestframework-camel-case==1.4.2
 djangorestframework_simplejwt==5.5.1
 drf-spectacular==0.28.0
 eval_type_backport==0.2.2

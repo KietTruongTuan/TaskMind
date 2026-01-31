@@ -263,8 +263,8 @@ class GoalView(APIView):
         - status: Filter by status (ToDo, InProgress, Completed)
         - search: Search in name and description
         - tag: Filter by tag
-        - start_date: Filter by start date
-        - end_date: Filter by end date
+        - startDate: Filter by start date
+        - endDate: Filter by end date
         """
         user = request.user
         goals = Goal.objects.filter(user=user)
@@ -273,8 +273,8 @@ class GoalView(APIView):
         status_filter = request.query_params.get('status', None)
         search_query = request.query_params.get('search', None)
         tag_filter = request.query_params.get('tag', None)
-        start_date_filter = request.query_params.get('start_date', None)
-        end_date_filter = request.query_params.get('end_date', None)
+        start_date_filter = request.query_params.get('startDate', None)
+        end_date_filter = request.query_params.get('endDate', None)
 
         if status_filter:
             goals = goals.filter(status=status_filter)
@@ -387,7 +387,7 @@ class GoalDetailView(APIView):
     patch=extend_schema(
         tags=['Tasks'],
         summary="Update a task",
-        description="Update a task's status, name, deadline, or position.",
+        description="Update a task's status, name, deadline.",
         request=TaskSerializer,
         responses={200: TaskSerializer}
     ),
@@ -409,10 +409,10 @@ class TaskDetailView(APIView):
     def get_object(self, pk, user):
         return get_object_or_404(Task, pk=pk, goal__user=user)
     
-    def patch(self, request, goal_id, pk):
+    def patch(self, request, pk):
         """
         Update a task's status, name, or other attributes
-        URL: PATCH /goals/<goal_id>/tasks/<task_id>
+        URL: PATCH /v1/tasks/{taskId}/
         """
         task = self.get_object(pk, request.user)
         serializer = TaskSerializer(task, data=request.data, partial=True)
@@ -426,10 +426,10 @@ class TaskDetailView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request, goal_id, pk):
+    def delete(self, request, pk):
         """
         Delete a task
-        URL: DELETE /v1/goals/{goal_id}/tasks/{pk}
+        URL: DELETE /v1/tasks/{taskId}/
         """
         task = self.get_object(pk, request.user)
         task.delete()
@@ -464,7 +464,7 @@ class TaskListView(APIView):
 
         # Apply filters
         status_filter = request.query_params.get('status', None)
-        goal_id_filter = request.query_params.get('goal_id', None)
+        goal_id_filter = request.query_params.get('goalId', None)
         search_query = request.query_params.get('search', None)
 
         if status_filter:
@@ -477,14 +477,20 @@ class TaskListView(APIView):
             tasks = tasks.filter(name__icontains=search_query)
 
         # Order by deadline (soonest first), with tasks lacking a deadline placed after those with one
-        tasks = tasks.select_related('goal').order_by('deadline__isnull', 'deadline', 'position')
+        from django.db.models.functions import Coalesce
+        from django.db.models import Value
+        from datetime import date
+        tasks = tasks.select_related('goal').order_by(
+            Coalesce('deadline', Value(date.max)),
+            'created_at'
+        )
 
         serializer = TaskSerializer(tasks, many=True)
         
-        # Add goal_name to each task for context
+        # Add goal_name to each task for context (using camelCase for API consistency)
         data = serializer.data
         for i, task in enumerate(tasks):
-            data[i]['goal_name'] = task.goal.name
-            data[i]['goal_id'] = task.goal.id
+            data[i]['goalName'] = task.goal.name
+            data[i]['goalId'] = str(task.goal.id)
 
         return Response(data)

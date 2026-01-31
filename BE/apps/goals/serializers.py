@@ -52,11 +52,11 @@ class TaskSerializer(serializers.ModelSerializer):
     """
     Serializer for Task model
     """
-    id = serializers.IntegerField(required=False)
+    id = serializers.UUIDField(required=False, read_only=True)
 
     class Meta:
         model = Task
-        fields = ['id', 'name', 'status', 'deadline', 'complete_date', 'position']
+        fields = ['id', 'name', 'status', 'deadline', 'complete_date']
 
     def validate_deadline(self, value):
         """
@@ -85,7 +85,7 @@ class GoalListSerializer(serializers.ModelSerializer):
     """
     Serializer for Goal model
     """
-    id = serializers.IntegerField(required=False)
+    id = serializers.UUIDField(required=False, read_only=True)
     completed_count = serializers.IntegerField(read_only=True)
     task_count = serializers.IntegerField(read_only=True)
 
@@ -99,7 +99,7 @@ class GoalListSerializer(serializers.ModelSerializer):
 
 class GoalDetailSerializer(serializers.ModelSerializer):
     """Serializer for goal details (with tasks)"""
-    id = serializers.IntegerField(required=False)
+    id = serializers.UUIDField(required=False, read_only=True)
     tasks = TaskSerializer(many=True, required=False)  # Allow editing tasks
     completed_count = serializers.IntegerField(read_only=True)
     task_count = serializers.IntegerField(read_only=True)
@@ -194,8 +194,7 @@ class GoalCreateSerializer(serializers.ModelSerializer):
         tasks_data = validated_data.pop('tasks', [])
         goal = Goal.objects.create(**validated_data)
 
-        for idx, task_data in enumerate(tasks_data):
-            task_data['position'] = idx + 1
+        for task_data in tasks_data:
             Task.objects.create(goal=goal, **task_data)
 
         return goal

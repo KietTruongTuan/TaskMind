@@ -92,7 +92,27 @@ class LoginView(APIView):
 
             return response
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # Format error messages in a user-friendly way
+        errors = serializer.errors
+        
+        # Check for specific error types
+        if 'non_field_errors' in errors:
+            # Invalid credentials
+            error_message = str(errors['non_field_errors'][0])
+            return Response({'error': error_message}, status=status.HTTP_401_UNAUTHORIZED)
+        elif 'email' in errors:
+            # Email-related errors
+            error_message = f"Email: {errors['email'][0]}"
+            return Response({'error': error_message}, status=status.HTTP_400_BAD_REQUEST)
+        elif 'password' in errors:
+            # Password-related errors
+            error_message = f"Password: {errors['password'][0]}"
+            return Response({'error': error_message}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            # Generic error
+            first_field = list(errors.keys())[0] if errors else 'Unknown'
+            first_error = errors[first_field][0] if errors else 'An error occurred'
+            return Response({'error': f"{first_field}: {first_error}"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @extend_schema(

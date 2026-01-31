@@ -152,7 +152,7 @@ class TestEndToEndGoalFlow:
         print("STEP 4: Saving generated goal to database...")
         print("="*60)
         
-        # Prepare goal data for saving (add position to tasks)
+        # Prepare goal data for saving
         save_request = {
             "name": generated_goal.get('name'),
             "description": generated_goal.get('description'),
@@ -162,12 +162,11 @@ class TestEndToEndGoalFlow:
             "tasks": []
         }
         
-        for i, task in enumerate(generated_goal.get('tasks', []), 1):
+        for task in generated_goal.get('tasks', []):
             save_request["tasks"].append({
                 "name": task.get('name'),
                 "status": task.get('status', 'ToDo'),
-                "deadline": task.get('deadline'),
-                "position": i
+                "deadline": task.get('deadline')
             })
         
         save_response = api_client.post(
@@ -182,7 +181,7 @@ class TestEndToEndGoalFlow:
         
         saved_goal = save_response.data
         print(f"Saved Goal ID: {saved_goal.get('id')}")
-        print(f"Task Count: {saved_goal.get('task_count')}")
+        print(f"Task Count: {saved_goal.get('taskCount')}")
         print("✅ Goal saved successfully!")
         
         # ========== STEP 5: Verify Goal ==========
@@ -191,7 +190,7 @@ class TestEndToEndGoalFlow:
         print("="*60)
         
         goal_id = saved_goal.get('id')
-        verify_response = api_client.get(f'/v1/goals/{goal_id}')
+        verify_response = api_client.get(f'/v1/goals/{goal_id}/')
         
         assert verify_response.status_code == 200, f"Verify failed: {verify_response.data}"
         

@@ -72,5 +72,5 @@ def test_login_wrong_credentials():
         "password": "wrongpassword",
     }
     response = client.post(login_url, login_data, format='json')
-    assert response.status_code == 400
+    assert response.status_code == 401  # Unauthorized for invalid credentials
     assert 'Invalid credentials' in str(response.data)

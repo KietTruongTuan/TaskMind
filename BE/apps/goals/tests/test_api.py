@@ -78,14 +78,12 @@ def sample_goal_data(future_deadline):
             {
                 "name": "Research and Requirement Analysis",
                 "status": "ToDo",
-                "deadline": future_deadline,
-                "position": 1
+                "deadline": future_deadline
             },
             {
                 "name": "System Design",
                 "status": "ToDo",
-                "deadline": future_deadline,
-                "position": 2
+                "deadline": future_deadline
             }
         ]
     }
@@ -106,15 +104,13 @@ def created_goal(db, user, future_deadline):
         goal=goal,
         name="Task 1",
         status="ToDo",
-        deadline=future_deadline,
-        position=1
+        deadline=future_deadline
     )
     Task.objects.create(
         goal=goal,
         name="Task 2",
         status="ToDo",
-        deadline=future_deadline,
-        position=2
+        deadline=future_deadline
     )
     return goal
 
@@ -302,17 +298,19 @@ class TestGoalDetail:
 
     def test_get_goal_by_id_success(self, auth_client, created_goal):
         """Test getting goal by ID with tasks"""
-        response = auth_client.get(f'/v1/goals/{created_goal.id}')
+        response = auth_client.get(f'/v1/goals/{created_goal.id}/')
 
         assert response.status_code == 200
-        assert response.data['id'] == created_goal.id
+        assert str(response.data['id']) == str(created_goal.id)
         assert response.data['name'] == created_goal.name
         assert 'tasks' in response.data
         assert len(response.data['tasks']) == 2
 
     def test_get_goal_not_found_returns_404(self, auth_client):
         """Test 404 when goal doesn't exist"""
-        response = auth_client.get('/v1/goals/99999')
+        import uuid
+        fake_uuid = uuid.uuid4()
+        response = auth_client.get(f'/v1/goals/{fake_uuid}/')
 
         assert response.status_code == 404
 
@@ -327,7 +325,7 @@ class TestGoalUpdate:
             "name": "Updated Goal Name",
             "status": "InProgress"
         }
-        response = auth_client.patch(f'/v1/goals/{created_goal.id}', update_data, format='json')
+        response = auth_client.patch(f'/v1/goals/{created_goal.id}/', update_data, format='json')
 
         assert response.status_code == 200
         assert response.data['name'] == "Updated Goal Name"
@@ -339,11 +337,11 @@ class TestGoalUpdate:
         update_data = {
             "name": "Updated Name",
             "tasks": [
-                {"id": existing_task.id, "name": "Updated Task", "status": "InProgress", "deadline": future_deadline},
-                {"name": "New Task", "status": "ToDo", "deadline": future_deadline, "position": 3}
+                {"id": str(existing_task.id), "name": "Updated Task", "status": "InProgress", "deadline": future_deadline},
+                {"name": "New Task", "status": "ToDo", "deadline": future_deadline}
             ]
         }
-        response = auth_client.patch(f'/v1/goals/{created_goal.id}', update_data, format='json')
+        response = auth_client.patch(f'/v1/goals/{created_goal.id}/', update_data, format='json')
 
         assert response.status_code == 200
 
@@ -354,7 +352,7 @@ class TestGoalDelete:
 
     def test_delete_goal_success(self, auth_client, created_goal):
         """Test successful goal deletion"""
-        response = auth_client.delete(f'/v1/goals/{created_goal.id}')
+        response = auth_client.delete(f'/v1/goals/{created_goal.id}/')
 
         assert response.status_code == 204
         assert not Goal.objects.filter(id=created_goal.id).exists()
@@ -362,7 +360,7 @@ class TestGoalDelete:
     def test_delete_goal_cascades_tasks(self, auth_client, created_goal):
         """Test that deleting goal also deletes tasks"""
         task_ids = list(created_goal.tasks.values_list('id', flat=True))
-        auth_client.delete(f'/v1/goals/{created_goal.id}')
+        auth_client.delete(f'/v1/goals/{created_goal.id}/')
 
         assert Task.objects.filter(id__in=task_ids).count() == 0
 
@@ -371,13 +369,13 @@ class TestGoalDelete:
 
 @pytest.mark.django_db
 class TestTaskUpdate:
-    """Tests for PATCH /v1/goals/{goal_id}/tasks/{task_id}"""
+    """Tests for PATCH /v1/tasks/{task_id}"""
 
     def test_update_task_status_success(self, auth_client, created_goal):
         """Test updating task status"""
         task = created_goal.tasks.first()
         response = auth_client.patch(
-            f'/v1/goals/{created_goal.id}/tasks/{task.id}',
+            f'/v1/tasks/{task.id}/',
             {"status": "InProgress"},
             format='json'
         )
@@ -389,7 +387,7 @@ class TestTaskUpdate:
         """Test that completing task auto-sets complete_date"""
         task = created_goal.tasks.first()
         response = auth_client.patch(
-            f'/v1/goals/{created_goal.id}/tasks/{task.id}',
+            f'/v1/tasks/{task.id}/',
             {"status": "Completed"},
             format='json'
         )
@@ -403,7 +401,7 @@ class TestTaskUpdate:
         """Test updating task name"""
         task = created_goal.tasks.first()
         response = auth_client.patch(
-            f'/v1/goals/{created_goal.id}/tasks/{task.id}',
+            f'/v1/tasks/{task.id}/',
             {"name": "Renamed Task"},
             format='json'
         )
@@ -416,20 +414,22 @@ class TestTaskUpdate:
 
 @pytest.mark.django_db
 class TestTaskDelete:
-    """Tests for DELETE /v1/goals/{goal_id}/tasks/{task_id}"""
+    """Tests for DELETE /v1/tasks/{task_id}"""
 
     def test_delete_task_success(self, auth_client, created_goal):
         """Test successful task deletion"""
         task = created_goal.tasks.first()
         task_id = task.id
-        response = auth_client.delete(f'/v1/goals/{created_goal.id}/tasks/{task_id}')
+        response = auth_client.delete(f'/v1/tasks/{task_id}/')
 
         assert response.status_code == 204
         assert not Task.objects.filter(id=task_id).exists()
 
     def test_delete_task_not_found_returns_404(self, auth_client, created_goal):
         """Test 404 when task doesn't exist"""
-        response = auth_client.delete(f'/v1/goals/{created_goal.id}/tasks/99999')
+        import uuid
+        fake_uuid = uuid.uuid4()
+        response = auth_client.delete(f'/v1/tasks/{fake_uuid}/')
 
         assert response.status_code == 404
 
@@ -438,17 +438,17 @@ class TestTaskDelete:
 
 @pytest.mark.django_db
 class TestTaskList:
-    """Tests for GET /v1/goals/tasks/"""
+    """Tests for GET /v1/tasks/"""
 
     def test_list_tasks_success(self, auth_client, created_goal):
         """Test listing all tasks"""
-        response = auth_client.get('/v1/goals/tasks/')
+        response = auth_client.get('/v1/tasks/')
 
         assert response.status_code == 200
         assert len(response.data) == 2  # created_goal has 2 tasks
         # Check that goal info is included
-        assert 'goal_name' in response.data[0]
-        assert 'goal_id' in response.data[0]
+        assert 'goalName' in response.data[0]
+        assert 'goalId' in response.data[0]
 
     def test_list_tasks_filter_by_status(self, auth_client, created_goal):
         """Test filtering tasks by status"""
@@ -457,21 +457,21 @@ class TestTaskList:
         task.status = "InProgress"
         task.save()
 
-        response = auth_client.get('/v1/goals/tasks/?status=InProgress')
+        response = auth_client.get('/v1/tasks/?status=InProgress')
 
         assert response.status_code == 200
         assert len(response.data) == 1
         assert response.data[0]['status'] == "InProgress"
 
     def test_list_tasks_filter_by_goal_id(self, auth_client, user, future_deadline):
-        """Test filtering tasks by goal_id"""
+        """Test filtering tasks by goalId"""
         # Create another goal with tasks
         goal1 = Goal.objects.create(user=user, name="Goal 1", status="ToDo", deadline=future_deadline)
         goal2 = Goal.objects.create(user=user, name="Goal 2", status="ToDo", deadline=future_deadline)
         Task.objects.create(goal=goal1, name="Task for Goal 1", status="ToDo", deadline=future_deadline)
         Task.objects.create(goal=goal2, name="Task for Goal 2", status="ToDo", deadline=future_deadline)
 
-        response = auth_client.get(f'/v1/goals/tasks/?goal_id={goal1.id}')
+        response = auth_client.get(f'/v1/tasks/?goalId={goal1.id}')
 
         assert response.status_code == 200
         assert len(response.data) == 1
@@ -479,7 +479,7 @@ class TestTaskList:
 
     def test_list_tasks_search(self, auth_client, created_goal):
         """Test searching tasks by name"""
-        response = auth_client.get('/v1/goals/tasks/?search=Task 1')
+        response = auth_client.get('/v1/tasks/?search=Task 1')
 
         assert response.status_code == 200
         assert len(response.data) == 1
@@ -500,7 +500,7 @@ class TestTaskList:
             deadline=timezone.now().date() + timedelta(days=5)
         )
 
-        response = auth_client.get('/v1/goals/tasks/')
+        response = auth_client.get('/v1/tasks/')
 
         assert response.status_code == 200
         # Earlier deadline should come first
@@ -517,7 +517,7 @@ class TestTaskList:
             goal=other_goal, name="Other User Task", status="ToDo", deadline=future_deadline
         )
 
-        response = auth_client.get('/v1/goals/tasks/')
+        response = auth_client.get('/v1/tasks/')
 
         assert response.status_code == 200
         assert len(response.data) == 0  # Should not see other user's tasks

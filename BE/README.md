@@ -78,13 +78,13 @@ curl -X GET http://localhost:8000/v1/goals/ \
 | POST | `/v1/accounts/token/refresh` | Refresh access token |
 | GET | `/v1/goals/` | List all goals |
 | POST | `/v1/goals/` | Create goal with tasks |
-| GET | `/v1/goals/{id}` | Get goal details |
-| PATCH | `/v1/goals/{id}` | Update goal |
-| DELETE | `/v1/goals/{id}` | Delete goal |
+| GET | `/v1/goals/{uuid}/` | Get goal details |
+| PATCH | `/v1/goals/{uuid}/` | Update goal |
+| DELETE | `/v1/goals/{uuid}/` | Delete goal |
 | POST | `/v1/goals/generate` | **AI**: Generate goal with tasks |
-| GET | `/v1/goals/tasks/` | List all tasks |
-| PATCH | `/v1/goals/{id}/tasks/{task_id}` | Update task |
-| DELETE | `/v1/goals/{id}/tasks/{task_id}` | Delete task |
+| GET | `/v1/tasks/` | List all tasks |
+| PATCH | `/v1/tasks/{uuid}/` | Update task |
+| DELETE | `/v1/tasks/{uuid}/` | Delete task |
 
 ---
 
@@ -99,8 +99,10 @@ BE/
 │   │   └── tests/
 │   └── goals/             # Goal & Task management
 │       ├── views.py       # CRUD + AI generation
-│       ├── models.py      # Goal, Task models
+│       ├── models.py      # Goal, Task models (UUID primary keys)
 │       ├── serializers.py
+│       ├── urls.py        # Goal routes
+│       ├── tasks_urls.py  # Task routes (/v1/tasks/)
 │       └── tests/
 │           ├── test_api.py   # Unit tests (mocked AI)
 │           └── test_e2e.py   # E2E tests (real AI)
@@ -165,11 +167,11 @@ pytest -v
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `id` | int | Primary key |
+| `id` | UUID | Primary key |
 | `user` | FK | Owner |
 | `name` | string | Goal title |
 | `description` | text | Details |
-| `status` | enum | ToDo, InProgress, Completed |
+| `status` | enum | ToDo, InProgress, Completed, OnHold, Cancelled, Overdue |
 | `deadline` | date | Target date |
 | `complete_date` | date | When completed |
 | `tag` | JSON | List of tags |
@@ -178,13 +180,12 @@ pytest -v
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `id` | int | Primary key |
+| `id` | UUID | Primary key |
 | `goal` | FK | Parent goal |
 | `name` | string | Task title |
-| `status` | enum | ToDo, InProgress, Completed |
+| `status` | enum | ToDo, InProgress, Completed, OnHold, Cancelled, Overdue |
 | `deadline` | date | Target date |
 | `complete_date` | date | Auto-set on completion |
-| `position` | int | Sort order |
 
 ---
 
