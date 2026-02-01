@@ -1,14 +1,24 @@
 services:
-  app:
-    build: .
+  backend:
+    build:
+      context: ./BE
+    container_name: capstone-backend
+    ports:
+      - "8000:8000"
     volumes:
-      - .:/app
-      - /app/node_modules
-      - /app/BE/__pycache__
+      - ./BE:/app
+    # env_file:
+    #   - ./BE/.env
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./FE/web-ui
+    container_name: capstone-frontend
     ports:
       - "3000:3000"
-      - "8000:8000"
-    environment:
-      - PYTHONUNBUFFERED=1
-      - DEBUG=1
-      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    # volumes:
+    #   - ./FE:/app
+    depends_on:
+      - backend
+    restart: unless-stopped
