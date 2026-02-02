@@ -22,7 +22,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='docs'),
-    path('v1/goals/', include('apps.goals.urls')),
-    path('v1/tasks/', include('apps.goals.tasks_urls')),
-    path('v1/accounts/', include('apps.accounts.urls')),
+    path('v1/goals', include('apps.goals.urls')),
+    path('v1/tasks', include('apps.goals.tasks_urls')),
+    path('v1/accounts', include('apps.accounts.urls')),
 ]
