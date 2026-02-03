@@ -1,3 +1,4 @@
+"use client"
 import { CustomButton } from "@/app/components/custom-button/custom-button";
 import { GoalCard } from "@/app/components/goal-card/goal-card";
 import {
@@ -113,7 +114,7 @@ export function GoalReview({
           isPrimary
           isDraft={isDraft}
         />
-        <TabContainer tabList={tabList} />
+        <TabContainer tabList={tabList} isDraft = {isDraft}/>
       </Flex>
     </Flex>
   );

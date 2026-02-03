@@ -7,10 +7,16 @@ export interface TabListProps {
   icon?: React.ReactNode;
 }
 
-export function TabContainer({ tabList }: { tabList?: TabListProps[] }) {
+export function TabContainer({
+  tabList,
+  isDraft = false,
+}: {
+  tabList?: TabListProps[];
+  isDraft?: boolean;
+}) {
   return (
     <Tabs.Root defaultValue={tabList ? tabList[0].label : ""}>
-      <TabList tabList={tabList} />
+      {!isDraft && <TabList tabList={tabList} />}
 
       <Box pt="3">
         {tabList?.map((tab) => (
