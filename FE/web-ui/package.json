@@ -3,16 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "concurrently -k -n FRONT,BACK -c blue,green \"pnpm dev:fe\" \"pnpm dev:be\"",
-    "dev:fe": "next dev",
-    "dev:be": "cd ../../ && docker compose start",
+    "dev": "next dev -H 0.0.0.0",
     "build": "next build",
-    "build:tokens": "cd ./FE/web-ui/ && style-dictionary build --config ./style-dictionary.config.js --verbose   # build .scss styles from .json tokens",
     "start": "next start",
+    "build:tokens": "cd ./FE/web-ui/ && style-dictionary build --config ./style-dictionary.config.js --verbose   # build .scss styles from .json tokens",
     "lint": "next lint",
     "eslint --fix": "eslint --fix",
     "test:unit": "jest --coverage",
-    "test:e2e": "(cucumber-js e2e/features  || true) && tsx e2e/helper/report/report.ts"
+    "test:e2e": "(cucumber-js e2e/  features  || true) && tsx e2e/helper/report/report.ts"
   },
   "dependencies": {
     "geist": "^1.4.2",
