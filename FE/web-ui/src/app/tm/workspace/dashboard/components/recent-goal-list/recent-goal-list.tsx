@@ -15,6 +15,7 @@ export interface GoalCardPropsData {
   taskCount: number;
   isDetailCard?: boolean;
   isPrimary?: boolean;
+  isDraft?: boolean;
 }
 
 export function RecentGoalList({

@@ -17,13 +17,10 @@ export async function middleware(request: NextRequest) {
     "/tm/workspace",
     WebUrl.Dashboard,
     WebUrl.GoalAdd,
-    WebUrl.GoalBoard,
+    WebUrl.GoalList,
     WebUrl.TaskBoard,
   ];
-  if (
-    !refreshToken &&
-    protectedPaths.some((path) => url.pathname === path)
-  ) {
+  if (!refreshToken && protectedPaths.some((path) => url.pathname === path)) {
     return NextResponse.redirect(new URL(WebUrl.Authentication, request.url));
   }
 
@@ -38,7 +35,7 @@ export const config = {
     WebUrl.Authentication,
     WebUrl.Dashboard,
     WebUrl.GoalAdd,
-    WebUrl.GoalBoard,
+    WebUrl.GoalList,
     WebUrl.TaskBoard,
   ],
 };

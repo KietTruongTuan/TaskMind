@@ -2,7 +2,7 @@ import { Flex, Text } from "@radix-ui/themes";
 import { CustomButton } from "../custom-button/custom-button";
 import { WebUrl } from "@/app/enum/web-url.enum";
 import { usePathname, useRouter } from "next/navigation";
-import { Home, Kanban, List, Plus} from "lucide-react";
+import { Home, Kanban, List, Plus } from "lucide-react";
 import { ButtonType } from "@/app/enum/button-type.enum";
 
 interface BarItem {
@@ -32,11 +32,11 @@ export function BarItems({
     {
       icon: List,
       label: "My Goals",
-      url: WebUrl.GoalBoard,
+      url: WebUrl.GoalList,
       testId: "goal-board",
     },
     {
-      icon: Kanban  ,
+      icon: Kanban,
       label: "All Tasks",
       url: WebUrl.TaskBoard,
       testId: "task-board",

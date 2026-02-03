@@ -1,7 +1,7 @@
 "use client";
 import { AddStep } from "@/app/enum/step.enum";
 import { GoalAdd } from "../goal-add/goal-add";
-import { GoalReview } from "../goal-review/goal-review";
+import { GoalReview } from "../../../components/goal-review/goal-review";
 import { useState } from "react";
 import { CreateGoalResponseBody } from "@/app/constants";
 
@@ -14,7 +14,7 @@ export function AddGoalWrapper() {
   const stepComponents = {
     [AddStep.FillInformation]: <GoalAdd setStep={setStep} />,
     [AddStep.ReviewDetail]: (
-      <GoalReview setStep={setStep} goalData={draftGoal} />
+      <GoalReview setStep={setStep} goalData={draftGoal} isDraft />
     ),
   };
   return stepComponents[step];

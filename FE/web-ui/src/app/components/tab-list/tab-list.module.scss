@@ -1,0 +1,51 @@
+.tabList {
+    border: none !important;
+    border-bottom: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+}
+
+.tabTrigger {
+    border: none !important;
+    border-bottom: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    height: auto !important;
+    cursor: pointer;
+    border-radius: var(--border-radius-pill) !important;
+    outline: none !important;
+
+    &::after {
+        display: none !important;
+    }
+
+    &::before {
+        display: none !important;
+    }
+
+    :global(.rt-BaseTabListTriggerInner),
+    :global(.rt-BaseTabListTriggerInnerHidden) {
+        border-radius: var(--border-radius-pill) !important;
+    }
+
+    &[data-state="hover"] {
+        background-color: var(--button-hover) !important;
+        color: var(--text-primary) !important;
+        text-decoration: none !important;
+        box-shadow: none !important;
+    }
+
+    &[data-state="active"] {
+        background-color: var(--card-secondary) !important;
+        color: var(--text-primary) !important;
+        border: 1px solid var(--card-border) !important;
+        text-decoration: none !important;
+        box-shadow: none !important;
+        pointer-events: none !important;
+    }
+}
+
+.tabListWrapper {
+    border: 1px solid var(--card-border) !important;
+    border-radius: var(--border-radius-pill);
+}

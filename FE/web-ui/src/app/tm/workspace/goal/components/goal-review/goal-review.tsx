@@ -1,5 +1,9 @@
 import { CustomButton } from "@/app/components/custom-button/custom-button";
 import { GoalCard } from "@/app/components/goal-card/goal-card";
+import {
+  TabContainer,
+  TabListProps,
+} from "@/app/components/tab-container/tab-container";
 import { TaskList } from "@/app/components/task-list/task-list";
 import {
   ApiError,
@@ -14,14 +18,17 @@ import { Status } from "@/app/enum/status.enum";
 import { AddStep } from "@/app/enum/step.enum";
 import { WebUrl } from "@/app/enum/web-url.enum";
 import { Flex } from "@radix-ui/themes";
+import { Clock, Kanban, ListCheck, ListChecks } from "lucide-react";
 import { Dispatch, SetStateAction } from "react";
 
 export function GoalReview({
   setStep,
   goalData,
+  isDraft = false,
 }: {
-  setStep: Dispatch<SetStateAction<AddStep>>;
+  setStep?: Dispatch<SetStateAction<AddStep>>;
   goalData: CreateGoalResponseBody;
+  isDraft?: boolean;
 }) {
   const {
     name,
@@ -37,8 +44,9 @@ export function GoalReview({
 
   const { route } = useRouteLoadingContext();
   const { showToast, setIsSuccess } = useToast();
+
   const handleCancel = () => {
-    setStep(AddStep.FillInformation);
+    setStep && setStep(AddStep.FillInformation);
   };
 
   const handleSave = async () => {
@@ -53,7 +61,23 @@ export function GoalReview({
       showToast(error.message);
     }
   };
-
+  const tabList: TabListProps[] = [
+    {
+      label: "List",
+      component: <TaskList tasks={tasks} />,
+      icon: <ListChecks size={15} />,
+    },
+    {
+      label: "History",
+      component: <div>History View Coming Soon!</div>,
+      icon: <Clock size={15} />,
+    },
+    {
+      label: "Board",
+      component: <div>Board View Coming Soon!</div>,
+      icon: <Kanban size={15} />,
+    },
+  ];
   return (
     <Flex width="100%" justify="center" align="center" height="100%">
       <Flex
@@ -62,17 +86,20 @@ export function GoalReview({
         py="5"
         gap="5"
       >
-        <Flex width="100%" justify="end" gap="1">
-          <CustomButton
-            buttonType={ButtonType.Secondary}
-            onClick={handleCancel}
-          >
-            Cancel
-          </CustomButton>
-          <CustomButton buttonType={ButtonType.Primary} onClick={handleSave}>
-            Save
-          </CustomButton>
-        </Flex>
+        {isDraft && (
+          <Flex width="100%" justify="end" gap="1">
+            <CustomButton
+              buttonType={ButtonType.Secondary}
+              onClick={handleCancel}
+            >
+              Cancel
+            </CustomButton>
+            <CustomButton buttonType={ButtonType.Primary} onClick={handleSave}>
+              Save
+            </CustomButton>
+          </Flex>
+        )}
+
         <GoalCard
           name={name || ""}
           description={description || ""}
@@ -84,8 +111,9 @@ export function GoalReview({
           deadline={new Date(deadline) || new Date()}
           isDetailCard
           isPrimary
+          isDraft={isDraft}
         />
-        <TaskList tasks={tasks} />
+        <TabContainer tabList={tabList} />
       </Flex>
     </Flex>
   );

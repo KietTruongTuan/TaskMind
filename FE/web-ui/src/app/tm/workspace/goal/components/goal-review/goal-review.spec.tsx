@@ -53,6 +53,7 @@ describe("GoalReview", () => {
           <GoalReview
             setStep={mockSetStep}
             goalData={MOCK_BLANK_GOAL_RESPONSE_DATA}
+            isDraft
           />
         </RouteLoadingProvider>
       </ToastProvider>,
@@ -69,6 +70,7 @@ describe("GoalReview", () => {
           <GoalReview
             setStep={mockSetStep}
             goalData={MOCK_GOAL_RESPONSE_DATA}
+            isDraft
           />
         </RouteLoadingProvider>
       </ToastProvider>,
@@ -82,13 +84,16 @@ describe("GoalReview", () => {
 
   it("should save the goal", async () => {
     const user = userEvent.setup();
-    (goalService.save as jest.Mock).mockResolvedValueOnce(MOCK_GOAL_RESPONSE_DATA);
+    (goalService.save as jest.Mock).mockResolvedValueOnce(
+      MOCK_GOAL_RESPONSE_DATA,
+    );
     render(
       <ToastProvider>
         <RouteLoadingProvider>
           <GoalReview
             setStep={mockSetStep}
             goalData={MOCK_GOAL_RESPONSE_DATA}
+            isDraft
           />
         </RouteLoadingProvider>
       </ToastProvider>,
@@ -98,6 +103,8 @@ describe("GoalReview", () => {
     await user.click(saveButton);
 
     expect(goalService.save).toHaveBeenCalledWith(MOCK_GOAL_RESPONSE_DATA);
-    expect(await screen.findByText("Your goal is successfully saved")).toBeInTheDocument();
+    expect(
+      await screen.findByText("Your goal is successfully saved"),
+    ).toBeInTheDocument();
   });
 });
