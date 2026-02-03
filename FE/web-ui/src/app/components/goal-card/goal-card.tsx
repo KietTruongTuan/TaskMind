@@ -12,7 +12,7 @@ import styles from "./goal-card.module.scss";
 import { GoalCardPropsData } from "@/app/tm/workspace/dashboard/components/recent-goal-list/recent-goal-list";
 import { StatusDropDown } from "../status-dropdown/status-dropdown";
 import { StatusCard, StatusCardProps } from "../status-card/status-card";
-import React from "react";
+import React, { Fragment } from "react";
 import { CustomButton } from "../custom-button/custom-button";
 import { ButtonType } from "@/app/enum/button-type.enum";
 
@@ -74,7 +74,7 @@ export function GoalCard({
                 <Flex gap="4" align="center">
                   <Flex gap="2" align="center">
                     {tag?.map((value, index) => (
-                      <React.Fragment key={index}>
+                      <Fragment key={index}>
                         {index > 0 && (
                           <Text size={isDetailCard ? "2" : "1"} weight="bold">
                             {" "}
@@ -82,7 +82,7 @@ export function GoalCard({
                           </Text>
                         )}
                         <Text size={isDetailCard ? "2" : "1"}>{value}</Text>
-                      </React.Fragment>
+                      </Fragment>
                     ))}
                   </Flex>
                   {status && <StatusDropDown status={status} />}

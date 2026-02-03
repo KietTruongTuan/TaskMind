@@ -1,0 +1,37 @@
+.subText {
+    color: var(--text-secondary);
+
+
+
+}
+
+.deleteItem {
+    width: 100% !important;
+    padding: 0 !important;
+
+    &:hover {
+        background-color: transparent !important;
+    }
+}
+
+.deleteText {
+    color: var(--status-cancel);
+    cursor: pointer;
+
+    &:hover {
+        background-color: var(--message-error-light)
+    }
+}
+
+.contentWrapper {
+    padding: 0 !important;
+}
+
+.descriptionOverflow {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+

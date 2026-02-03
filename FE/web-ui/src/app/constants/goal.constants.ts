@@ -29,7 +29,7 @@ export interface GoalDetailResponseBody extends GoalResponseBody {
 export interface GoalListItemResponseBody extends GoalResponseBody {
   id: string;
 }
-
+  
 export interface GoalResponseBody {
   name: string;
   description: string;

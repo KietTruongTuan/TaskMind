@@ -1,5 +1,10 @@
 import { Status } from "../enum/status.enum";
-import { LoginRequestBody, LoginResponseBody, RegistrationRequestBody, RegistrationResponseBody } from "./authentication.constants";
+import {
+  LoginRequestBody,
+  LoginResponseBody,
+  RegistrationRequestBody,
+  RegistrationResponseBody,
+} from "./authentication.constants";
 import {
   CreateGoalRequestBody,
   CreateGoalResponseBody,

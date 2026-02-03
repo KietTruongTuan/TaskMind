@@ -18,7 +18,8 @@ export function CustomButton({
     <Button
       radius="large"
       disabled={isActive}
-      className={`${styles[`${buttonType}Button`]} ${isActive ? styles.active : ""}`} {...props}
+      className={`${styles[`${buttonType}Button`]} ${isActive ? styles.active : ""}`}
+      {...props}
     >
       {children}
     </Button>
