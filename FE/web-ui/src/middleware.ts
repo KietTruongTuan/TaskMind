@@ -15,15 +15,12 @@ export async function middleware(request: NextRequest) {
     "/",
     "/tm",
     "/tm/workspace",
-    WebUrl.Dashboard,
-    WebUrl.GoalAdd,
-    WebUrl.GoalBoard,
-    WebUrl.TaskBoard,
+    "/tm/workspace/dashboard",
+    "/tm/workspace/goal/add",
+    "/tm/workspace/goal/board",
+    "/tm/workspace/task/board",
   ];
-  if (
-    !refreshToken &&
-    protectedPaths.some((path) => url.pathname === path)
-  ) {
+  if (!refreshToken && protectedPaths.some((path) => url.pathname === path)) {
     return NextResponse.redirect(new URL(WebUrl.Authentication, request.url));
   }
 
@@ -35,10 +32,10 @@ export const config = {
     "/",
     "/tm",
     "/tm/workspace",
-    WebUrl.Authentication,
-    WebUrl.Dashboard,
-    WebUrl.GoalAdd,
-    WebUrl.GoalBoard,
-    WebUrl.TaskBoard,
+    "/tm/authentication",
+    "/tm/workspace/dashboard",
+    "/tm/workspace/goal/add",
+    "/tm/workspace/goal/board",
+    "/tm/workspace/task/board",
   ],
 };

@@ -3,19 +3,17 @@ import { AddStep } from "@/app/enum/step.enum";
 import { GoalAdd } from "../goal-add/goal-add";
 import { GoalReview } from "../goal-review/goal-review";
 import { useState } from "react";
-import { CreateGoalResponseBody } from "@/app/constants";
+import { useGoalContext } from "@/app/contexts/goal-context/goal-context";
 
 export function AddGoalWrapper() {
   const [step, setStep] = useState<AddStep>(AddStep.FillInformation);
-  const storedGoal = localStorage.getItem("draftGoal");
-  const draftGoal: CreateGoalResponseBody = storedGoal
-    ? JSON.parse(storedGoal)
-    : {};
+  const { draftGoal } = useGoalContext();
+
   const stepComponents = {
     [AddStep.FillInformation]: <GoalAdd setStep={setStep} />,
-    [AddStep.ReviewDetail]: (
+    [AddStep.ReviewDetail]: draftGoal ? (
       <GoalReview setStep={setStep} goalData={draftGoal} />
-    ),
+    ) : null,
   };
   return stepComponents[step];
 }
