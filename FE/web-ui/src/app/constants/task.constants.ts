@@ -7,3 +7,13 @@ export interface DraftTask {
   deadline: Date;
   completedDate?: Date;
 }
+
+export interface Task {
+  id: number;
+  name: string;
+  status: Status;
+  deadline: Date;
+  completedDate?: Date;
+}
+
+
