@@ -1,10 +1,37 @@
+# Node
 node_modules/
 coverage/
 reports/
 package-lock.json
 pnpm-lock.yaml
-.pytest_cache/
-venv/
 
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+
+# Django
+*.sqlite3
+db.sqlite3
+staticfiles/
+media/
+
+# Environment (NEVER commit secrets!)
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Other
 FE/web-ui/src/assets/tokens/.obsidian/
 .vercel

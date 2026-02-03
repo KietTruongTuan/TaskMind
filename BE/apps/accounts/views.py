@@ -1,11 +1,20 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import RegisterSerializer, LoginSerializer, CustomTokenSerializer
+from .serializers import (
+    RegisterSerializer, 
+    LoginSerializer, 
+    CustomTokenSerializer,
+    MessageResponseSerializer,
+    LoginResponseSerializer,
+    TokenResponseSerializer,
+    ErrorResponseSerializer
+)
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
 from django.conf import settings
 from .models import User
+from drf_spectacular.utils import extend_schema
 import logging
 
 logger = logging.getLogger(__name__)
@@ -14,6 +23,17 @@ logger = logging.getLogger(__name__)
 # Create your views here.
 
 
+@extend_schema(
+    tags=['Accounts'], 
+    auth=[],
+    request=RegisterSerializer,
+    responses={
+        201: MessageResponseSerializer,
+        400: ErrorResponseSerializer
+    },
+    summary="Register a new user",
+    description="Create a new user account with username, email, and password."
+)
 class RegisterView(APIView):
     """View for user registration
 
@@ -28,6 +48,17 @@ class RegisterView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+@extend_schema(
+    tags=['Accounts'], 
+    auth=[],
+    request=LoginSerializer,
+    responses={
+        200: LoginResponseSerializer,
+        400: ErrorResponseSerializer
+    },
+    summary="Login user",
+    description="Authenticate with email and password. Returns access token in response body and sets refresh token as HttpOnly cookie."
+)
 class LoginView(APIView):
     """View for user login
 
@@ -61,9 +92,40 @@ class LoginView(APIView):
 
             return response
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # Format error messages in a user-friendly way
+        errors = serializer.errors
+        
+        # Check for specific error types
+        if 'non_field_errors' in errors:
+            # Invalid credentials
+            error_message = str(errors['non_field_errors'][0])
+            return Response({'error': error_message}, status=status.HTTP_401_UNAUTHORIZED)
+        elif 'email' in errors:
+            # Email-related errors
+            error_message = f"Email: {errors['email'][0]}"
+            return Response({'error': error_message}, status=status.HTTP_400_BAD_REQUEST)
+        elif 'password' in errors:
+            # Password-related errors
+            error_message = f"Password: {errors['password'][0]}"
+            return Response({'error': error_message}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            # Generic error
+            first_field = list(errors.keys())[0] if errors else 'Unknown'
+            first_error = errors[first_field][0] if errors else 'An error occurred'
+            return Response({'error': f"{first_field}: {first_error}"}, status=status.HTTP_400_BAD_REQUEST)
 
 
+@extend_schema(
+    tags=['Accounts'], 
+    auth=[],
+    request=None,
+    responses={
+        200: TokenResponseSerializer,
+        401: ErrorResponseSerializer
+    },
+    summary="Refresh access token",
+    description="Get a new access token using the refresh token stored in HttpOnly cookie."
+)
 class RefreshTokenView(APIView):
     """View for refreshing access token
 
@@ -142,6 +204,15 @@ class RefreshTokenView(APIView):
             )
 
 
+@extend_schema(
+    tags=['Accounts'],
+    request=None,
+    responses={
+        200: MessageResponseSerializer
+    },
+    summary="Logout user",
+    description="Blacklist the refresh token and clear the HttpOnly cookie."
+)
 class LogoutView(APIView):
     """View for user logout
 

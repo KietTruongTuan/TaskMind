@@ -38,7 +38,6 @@ def test_login_api():
     assert response.status_code == 200
     assert response.data['message'] == 'Login successful'
     assert 'access' in response.data  # Check for JWT access token
-    assert 'refresh' in response.data  # Check for JWT refresh token
     
 @pytest.mark.django_db
 def test_register_wrong_email_format():
@@ -73,5 +72,5 @@ def test_login_wrong_credentials():
         "password": "wrongpassword",
     }
     response = client.post(login_url, login_data, format='json')
-    assert response.status_code == 400
+    assert response.status_code == 401  # Unauthorized for invalid credentials
     assert 'Invalid credentials' in str(response.data)

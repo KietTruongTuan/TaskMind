@@ -38,6 +38,30 @@ class LoginSerializer(serializers.Serializer):
         data['user'] = user
         return data
 
+
+# ========== Response Serializers (for Swagger documentation) ==========
+
+class MessageResponseSerializer(serializers.Serializer):
+    """Generic message response"""
+    message = serializers.CharField()
+
+
+class LoginResponseSerializer(serializers.Serializer):
+    """Login response with access token"""
+    message = serializers.CharField()
+    access = serializers.CharField(help_text="JWT access token")
+
+
+class TokenResponseSerializer(serializers.Serializer):
+    """Token refresh response"""
+    access = serializers.CharField(help_text="New JWT access token")
+
+
+class ErrorResponseSerializer(serializers.Serializer):
+    """Error response"""
+    error = serializers.CharField()
+
+
 class CustomTokenSerializer:
     """Utility class for handling custom token data if needed in future."""
     @classmethod
