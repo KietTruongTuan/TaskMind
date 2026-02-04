@@ -9,5 +9,6 @@ export default async function GoalDetailPage({
 }) {
   const { id } = await params;
   const { goalService } = await useServerSideService();
-  return <GoalReview goalData={MOCK_GOAL_RESPONSE_DATA} />;
+  const goalDetailData = await goalService.geyById(id);
+  return <GoalReview goalData={goalDetailData} />;
 }

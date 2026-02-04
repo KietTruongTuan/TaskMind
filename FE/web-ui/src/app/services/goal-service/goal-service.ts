@@ -23,8 +23,13 @@ export class GoalService extends HttpService {
 
   async getAll(params: Record<GoalSearchParams, string | null | undefined>) {
     const url = buildUrl(ApiUrl.Goal, undefined, params);
-    console.log("Full URL:", url);
     const res = await this.get<GoalListItemResponseBody[]>(url);
+    return res;
+  }
+
+  async geyById(id: string) {
+    const url = buildUrl(ApiUrl.Goal, id, undefined);
+    const res = await this.get<GoalDetailResponseBody>(url);
     return res;
   }
 }

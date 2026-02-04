@@ -1,6 +1,7 @@
 .navBar {
     background-color: var(--navbar);
     color: var(--navbar-text-primary);
+    z-index: 1000;
 }
 
 .navTab {
