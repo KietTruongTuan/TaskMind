@@ -137,7 +137,7 @@ class RefreshTokenView(APIView):
         
         refresh_token = request.COOKIES.get('refresh_token')
         print(refresh_token)
-
+        no_rotation = request.query_params.get('no_rotation', 'false').lower() == 'true'
         if not refresh_token:
             return Response(
                 {'error': 'Refresh token not found'},
@@ -166,6 +166,13 @@ class RefreshTokenView(APIView):
                     {'error': 'User not found'}, 
                     status=status.HTTP_401_UNAUTHORIZED
                 )
+            
+            if no_rotation:
+                access_token = str(refresh.access_token)
+                
+                return Response({
+                    'access': access_token,
+                }, status=status.HTTP_200_OK)
 
             # Blacklist the old refresh token (if rotation is enabled)
             try: 

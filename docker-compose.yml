@@ -22,4 +22,7 @@ services:
       - /app/.next
     depends_on:
       - backend
-    # restart: unless-stopped
+    environment:
+      NEXT_PUBLIC_API_BASE_URL: http://localhost:8000
+
+      INTERNAL_API_BASE_URL: http://backend:8000

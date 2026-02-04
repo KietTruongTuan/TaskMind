@@ -21,12 +21,13 @@ export function GoalListItem({ goal }: { goal: GoalListItemResponseBody }) {
     status,
     deadline,
     tag,
-    completeCount,
+    completedCount,
     taskCount,
   } = goal;
   const { route } = useRouteLoadingContext();
   const progress: number =
-    taskCount === 0 ? 0 : (completeCount * 100) / taskCount;
+    taskCount === 0 ? 0 : (completedCount * 100) / taskCount;
+
   return (
     <CardNoPadding p="4" isPrimary>
       <Flex direction="column" width="100%" height="100%" gap="6">
@@ -92,14 +93,16 @@ export function GoalListItem({ goal }: { goal: GoalListItemResponseBody }) {
               <Text
                 size="1"
                 className={styles.subText}
-              >{`${completeCount}/${taskCount}`}</Text>
+              >{`${completedCount}/${taskCount}`}</Text>
             </Flex>
           </Flex>
           <Flex width="100%" justify="between">
             <StatusDropDown status={status} />
             <Flex gap="1" className={styles.subText}>
               <Clock size={15} />
-              <Text size="1">{deadline.toISOString().split("T")[0]}</Text>
+              <Text size="1">
+                {new Date(deadline).toISOString().split("T")[0]}
+              </Text>
             </Flex>
           </Flex>
           <Flex width="100%" gap="2">

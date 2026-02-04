@@ -21,7 +21,7 @@ export class AuthenticationService extends HttpService {
   async login(data: LoginRequestBody) {
     const res = await this.post<LoginResponseBody, LoginRequestBody>(
       ApiUrl.Login,
-      data
+      data,
     );
     if (res.access) {
       this.setAccessToken(res.access);
@@ -32,18 +32,21 @@ export class AuthenticationService extends HttpService {
   async register(data: RegistrationRequestBody) {
     return this.post<RegistrationResponseBody, RegistrationRequestBody>(
       ApiUrl.Register,
-      data
+      data,
     );
   }
 
-  async refresh() {
+  async refresh(options?: { noRotation?: boolean }) {
+    const url = options?.noRotation
+      ? `${ApiUrl.RefreshToken}?no_rotation=true`
+      : ApiUrl.RefreshToken;
     const res = await this.refreshInstance.post<RefreshTokenResponseBody>(
-      ApiUrl.RefreshToken,
+      url,
       undefined,
       {
         withCredentials: true,
         _isRefresh: true,
-      } as CustomAxiosRequestConfig
+      } as CustomAxiosRequestConfig,
     );
     return res;
   }

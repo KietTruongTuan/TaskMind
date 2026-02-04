@@ -9,6 +9,7 @@ import { TaskList } from "@/app/components/task-list/task-list";
 import {
   ApiError,
   CreateGoalResponseBody,
+  GoalDetailResponseBody,
   goalService,
   SaveGoalRequestBody,
 } from "@/app/constants";
@@ -28,7 +29,7 @@ export function GoalReview({
   isDraft = false,
 }: {
   setStep?: Dispatch<SetStateAction<AddStep>>;
-  goalData: CreateGoalResponseBody;
+  goalData: CreateGoalResponseBody | GoalDetailResponseBody;
   isDraft?: boolean;
 }) {
   const {
@@ -37,7 +38,7 @@ export function GoalReview({
     status,
     tasks,
     completedDate,
-    completeCount,
+    completedCount,
     taskCount,
     tag,
     deadline,
@@ -106,7 +107,7 @@ export function GoalReview({
           description={description || ""}
           status={status || Status.ToDo}
           completedDate={completedDate ? new Date(completedDate) : undefined}
-          completedCount={completeCount || 0}
+          completedCount={completedCount || 0}
           taskCount={taskCount || 0}
           tag={tag || []}
           deadline={new Date(deadline) || new Date()}

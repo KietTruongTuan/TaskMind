@@ -36,7 +36,7 @@ export interface GoalResponseBody {
   status: Status;
   deadline: Date;
   tag?: string[];
-  completeCount: number;
+  completedCount: number;
   taskCount: number;
   completedDate?: Date;
 }

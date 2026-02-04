@@ -7,8 +7,9 @@ export class HttpService {
   private accessToken: string | null = null;
 
   constructor(baseURL?: string) {
+    const finalBaseUrl = this.resolveBaseUrl(baseURL);
     this.instance = axios.create({
-      baseURL,
+      baseURL: finalBaseUrl,
       timeout: 60000,
       headers: {
         "Content-Type": "application/json",
@@ -17,13 +18,27 @@ export class HttpService {
     });
 
     this.refreshInstance = axios.create({
-      baseURL,
+      baseURL: finalBaseUrl,
       timeout: 30000,
       headers: { "Content-Type": "application/json" },
       withCredentials: true,
     });
 
     this.setUpInterceptor();
+  }
+
+  private resolveBaseUrl(passedURL?: string): string {
+    if (typeof window === "undefined") {
+      if (process.env.INTERNAL_API_BASE_URL) {
+        return process.env.INTERNAL_API_BASE_URL;
+      }
+    }
+
+    if (passedURL) {
+      return passedURL;
+    }
+
+    return process.env.NEXT_PUBLIC_API_BASE_URL || "";
   }
 
   setAccessToken(token: string) {
@@ -54,7 +69,7 @@ export class HttpService {
       },
       (error) => {
         return Promise.reject(this.handleError(error));
-      }
+      },
     );
 
     this.instance.interceptors.response.use(
@@ -85,7 +100,7 @@ export class HttpService {
         }
 
         return Promise.reject(this.handleError(error));
-      }
+      },
     );
   }
 
@@ -118,7 +133,7 @@ export class HttpService {
   async post<Res, Req = undefined>(
     url: string,
     data?: Req,
-    request?: AxiosRequestConfig
+    request?: AxiosRequestConfig,
   ): Promise<Res> {
     const response = await this.instance.post<Res>(url, data, request);
     return response.data;
@@ -128,7 +143,7 @@ export class HttpService {
   async put<Res, Req>(
     url: string,
     data?: Req,
-    request?: AxiosRequestConfig
+    request?: AxiosRequestConfig,
   ): Promise<Res> {
     const response = await this.instance.put<Res>(url, data, request);
     return response.data;
@@ -138,7 +153,7 @@ export class HttpService {
   async patch<Res, Req>(
     url: string,
     data?: Req,
-    request?: AxiosRequestConfig
+    request?: AxiosRequestConfig,
   ): Promise<Res> {
     const response = await this.instance.patch<Res>(url, data, request);
     return response.data;

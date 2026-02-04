@@ -1,6 +1,12 @@
-import { GoalDetailResponseBody, SaveGoalRequestBody } from "@/app/constants";
+import {
+  GoalDetailResponseBody,
+  GoalListItemResponseBody,
+  SaveGoalRequestBody,
+} from "@/app/constants";
 import { HttpService } from "../http-service/http-service";
 import { ApiUrl } from "@/app/enum/api-url.enum";
+import { GoalSearchParams } from "@/app/enum/search-params.enum";
+import { buildUrl } from "@/app/tm/utils";
 
 export class GoalService extends HttpService {
   constructor() {
@@ -12,6 +18,13 @@ export class GoalService extends HttpService {
       ApiUrl.Goal,
       data,
     );
+    return res;
+  }
+
+  async getAll(params: Record<GoalSearchParams, string | null | undefined>) {
+    const url = buildUrl(ApiUrl.Goal, undefined, params);
+    console.log("Full URL:", url);
+    const res = await this.get<GoalListItemResponseBody[]>(url);
     return res;
   }
 }
