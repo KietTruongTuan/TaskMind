@@ -236,6 +236,7 @@ body {
 }
 
 .logo-text {
+    font-family: 'Press Start 2P', cursive;
     font-size: 16px;
     color: var(--pixel-green);
     text-shadow: 2px 2px 0 var(--pixel-green-dark);
@@ -1445,6 +1446,7 @@ body {
     text-transform: uppercase;
     border-bottom: 1px solid var(--border-primary);
     transition: all 0.2s;
+    white-space: nowrap;
 }
 
 .language-option:last-child {
@@ -1470,33 +1472,222 @@ body {
    VIETNAMESE FONT OVERRIDE
    =================================== */
 /* When Vietnamese is active, use VT323 instead of Press Start 2P */
-html[lang="vi"] .hero-title,
-html[lang="vi"] .pixel-badge,
-html[lang="vi"] .feature-title,
-html[lang="vi"] h1,
-html[lang="vi"] h2,
-html[lang="vi"] h3 {
+/* VT323 renders larger and needs bold weight to match visual impact */
+
+html[lang="vi"] * {
     font-family: 'VT323', monospace !important;
-    letter-spacing: 1px;
+    font-weight: bold !important;
 }
 
-/* Adjust VT323 sizing (it renders larger than Press Start 2P) */
+/* Hero Section - Main Title */
 html[lang="vi"] .hero-title {
-    font-size: 32px;
-    line-height: 1.2;
+    font-size: 72px !important;
+    line-height: 1.3 !important;
+    letter-spacing: 2px !important;
 }
 
+html[lang="vi"] .title-line {
+    font-size: 72px !important;
+}
+
+/* Hero Badge */
 html[lang="vi"] .pixel-badge {
-    font-size: 12px;
+    padding: 12px 24px !important;
 }
 
-html[lang="vi"] .feature-title {
-    font-size: 16px;
+html[lang="vi"] .badge-text {
+    font-size: 20px !important;
+    letter-spacing: 1.5px !important;
 }
 
-/* Keep pixel buttons readable in Vietnamese */
+/* Hero Subtitle */
+html[lang="vi"] .hero-subtitle {
+    font-size: 24px !important;
+    line-height: 1.7 !important;
+    letter-spacing: 1px !important;
+}
+
+/* Buttons */
 html[lang="vi"] .pixel-button {
-    font-family: 'VT323', monospace !important;
-    font-size: 14px;
-    letter-spacing: 0.5px;
+    font-size: 22px !important;
+    padding: 16px 32px !important;
+    letter-spacing: 1.5px !important;
+}
+
+html[lang="vi"] .pixel-button span {
+    font-size: 22px !important;
+}
+
+/* Navigation */
+html[lang="vi"] .nav-link {
+    font-size: 18px !important;
+    letter-spacing: 1.5px !important;
+}
+
+html[lang="vi"] .logo-text {
+    font-size: 26px !important;
+}
+
+/* Stats */
+html[lang="vi"] .stat-value {
+    font-size: 52px !important;
+    letter-spacing: 2px !important;
+}
+
+html[lang="vi"] .stat-label {
+    font-size: 20px !important;
+    letter-spacing: 1px !important;
+}
+
+/* Screen Title */
+html[lang="vi"] .screen-title {
+    font-size: 20px !important;
+    letter-spacing: 1px !important;
+}
+
+/* Tasks */
+html[lang="vi"] .task-text {
+    font-size: 22px !important;
+    letter-spacing: 1px !important;
+}
+
+html[lang="vi"] .task-xp {
+    font-size: 20px !important;
+}
+
+html[lang="vi"] .xp-label {
+    font-size: 20px !important;
+}
+
+/* Feature Cards */
+html[lang="vi"] .feature-title,
+html[lang="vi"] .card-title {
+    font-size: 28px !important;
+    letter-spacing: 1.5px !important;
+}
+
+html[lang="vi"] .feature-description,
+html[lang="vi"] .card-description {
+    font-size: 22px !important;
+    line-height: 1.7 !important;
+}
+
+/* Section Titles */
+html[lang="vi"] h1,
+html[lang="vi"] .section-title {
+    font-size: 64px !important;
+    letter-spacing: 3px !important;
+}
+
+html[lang="vi"] h2 {
+    font-size: 48px !important;
+    letter-spacing: 2px !important;
+}
+
+html[lang="vi"] h3 {
+    font-size: 32px !important;
+    letter-spacing: 1.5px !important;
+}
+
+/* Section Subtitle */
+html[lang="vi"] .section-subtitle {
+    font-size: 22px !important;
+    letter-spacing: 1px !important;
+}
+
+/* Console Text */
+html[lang="vi"] .retro-text,
+html[lang="vi"] .loading-text {
+    font-size: 22px !important;
+    letter-spacing: 1.5px !important;
+}
+
+/* Footer */
+html[lang="vi"] .footer-heading {
+    font-size: 24px !important;
+}
+
+html[lang="vi"] .footer-link,
+html[lang="vi"] .footer-text,
+html[lang="vi"] .copyright {
+    font-size: 20px !important;
+}
+
+/* Footer list links (Features, Demo, About, etc.) */
+html[lang="vi"] .footer-links a,
+html[lang="vi"] .footer-links li {
+    font-size: 18px !important;
+
+}
+
+html[lang="vi"] .footer-title {
+    font-family: 'Press Start 2P', cursive !important;
+    font-size: 16px !important;
+
+}
+
+html[lang="vi"] .social-link {
+    font-size: 17px !important;
+}
+
+/* CTA Section */
+html[lang="vi"] .cta-title {
+    font-size: 56px !important;
+    letter-spacing: 2.5px !important;
+}
+
+html[lang="vi"] .cta-subtitle {
+    font-size: 24px !important;
+    letter-spacing: 1px !important;
+}
+
+/* Demo Section */
+html[lang="vi"] .demo-title {
+    font-size: 52px !important;
+    letter-spacing: 2px !important;
+}
+
+html[lang="vi"] .demo-description {
+    font-size: 22px !important;
+    line-height: 1.7 !important;
+}
+
+html[lang="vi"] .demo-feature {
+    font-size: 20px !important;
+}
+
+/* Language Dropdown */
+html[lang="vi"] .language-option {
+    font-size: 20px !important;
+    letter-spacing: 1px !important;
+}
+
+html[lang="vi"] .language-text {
+    font-size: 20px !important;
+}
+
+/* ===================================
+   LOGO EXCEPTION - ALWAYS PRESS START 2P
+   =================================== */
+/* Keep ChibChob logo in Press Start 2P even in Vietnamese mode */
+html[lang="vi"] .logo-text {
+    font-family: 'Press Start 2P', cursive !important;
+    font-size: 16px !important;
+}
+
+html[lang="vi"] .screen-title {
+    font-family: 'Press Start 2P', cursive !important;
+    font-size: 10px !important;
+}
+
+html[lang="vi"] .stat-value {
+    font-family: 'Press Start 2P', cursive !important;
+    font-size: 24px !important;
+}
+
+/* Make badges larger and more visible */
+html[lang="vi"] .card-badge {
+    font-size: 18px !important;
+    padding: 8px 16px !important;
+    font-weight: bold !important;
 }

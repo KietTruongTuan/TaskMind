@@ -140,6 +140,27 @@ const translations = {
         'features-title': 'Power-Ups & Features',
         'features-subtitle': 'Unlock legendary productivity tools',
 
+        // Feature Cards
+        'card-1-title': 'Gamified Tasks',
+        'card-1-desc': 'Turn boring tasks into exciting quests. Earn XP, unlock achievements, and level up your productivity.',
+        'card-2-title': 'Battle System',
+        'card-2-desc': 'Compete with teammates in productivity battles. Complete tasks faster to claim victory.',
+        'card-3-title': 'Achievements',
+        'card-3-desc': 'Unlock rare achievements as you complete challenges and maintain streaks.',
+        'card-4-title': 'Analytics Dashboard',
+        'card-4-desc': 'Track your progress with detailed stats and beautiful pixel charts.',
+        'card-5-title': 'Smart Notifications',
+        'card-5-desc': 'Never miss a quest deadline with intelligent reminders and alerts.',
+        'card-6-title': 'Party Mode',
+        'card-6-desc': 'Team up with friends for collaborative quests and shared victories.',
+
+        // Badges
+        'badge-common': 'Common',
+        'badge-uncommon': 'Uncommon',
+        'badge-rare': 'Rare',
+        'badge-epic': 'Epic',
+        'badge-legendary': 'Legendary',
+
         // CTA Section
         'cta-title': 'Ready to Start Your Quest?',
         'cta-subtitle': 'Join thousands of players leveling up their productivity',
@@ -151,7 +172,23 @@ const translations = {
         'footer-quick': 'Quick Links',
         'footer-resources': 'Resources',
         'footer-legal': 'Legal',
-        'copyright': '© 2026 ChibChob. All rights reserved. Made with ❤️ by productivity enthusiasts.'
+        'footer-docs': 'Documentation',
+        'footer-api': 'API Reference',
+        'footer-community': 'Community',
+        'footer-blog': 'Blog',
+        'footer-privacy': 'Privacy Policy',
+        'footer-terms': 'Terms of Service',
+        'footer-license': 'License',
+        'copyright': '© 2026 ChibChob. All rights reserved. Made with ❤️ by productivity enthusiasts.',
+
+        // Level Up Message
+        'level-up': 'LEVEL UP!',
+        'level-reached': 'You reached Level 2!',
+
+        // Coming Soon Message
+        'coming-soon-title': 'Quest Coming Soon!',
+        'coming-soon-subtitle': 'The adventure is being prepared...',
+        'coming-soon-button': 'OK'
     },
     vi: {
         // Navigation
@@ -162,10 +199,10 @@ const translations = {
         'start-quest': 'Bắt đầu',
 
         // Hero Section
-        'hero-badge': 'Đang tải trò chơi mới...',
+        'hero-badge': 'Đang tải trò chơi...',
         'hero-title-1': 'Nâng cấp',
         'hero-title-2': 'Năng suất',
-        'hero-subtitle': 'Quản lý công việc như game thủ chuyên nghiệp. ChibChob sẽ chặt nhỏ mục tiêu lớn thành nhiệm vụ hàng ngày.',
+        'hero-subtitle': 'Quản lý công việc như game thủ chuyên nghiệp. ChibChob sẽ giúp bạn chặt nhỏ mục tiêu mập địt thành nhiệm vụ hàng ngày.',
         'hero-btn-1': 'Bắt đầu phiêu lưu',
         'hero-btn-2': 'Xem tài liệu',
 
@@ -175,7 +212,7 @@ const translations = {
         'stat-2-value': '50K+',
         'stat-2-label': 'Nhiệm vụ hoàn thành',
         'stat-3-value': '99%',
-        'stat-3-label': 'Tỷ lệ thành công',
+        'stat-3-label': 'Web sẽ sống (chắc thế..)',
 
         // Demo Tasks
         'task-1': 'Thiết kế trang chủ',
@@ -196,6 +233,27 @@ const translations = {
         'features-title': 'Năng lực & Tính năng',
         'features-subtitle': 'Mở khóa công cụ năng suất huyền thoại',
 
+        // Feature Cards
+        'card-1-title': 'Nhiệm vụ trò chơi hóa',
+        'card-1-desc': 'Biến công việc nhàm chán thành nhiệm vụ thú vị. Kiếm XP, mở khóa thành tựu và nâng cấp năng suất.',
+        'card-2-title': 'Hệ thống chiến đấu',
+        'card-2-desc': 'Cạnh tranh với đồng đội trong trận chiến năng suất. Hoàn thành nhiệm vụ nhanh hơn để giành chiến thắng.',
+        'card-3-title': 'Thành tựu',
+        'card-3-desc': 'Mở khóa thành tựu hiếm khi hoàn thành thử thách và duy trì chuỗi.',
+        'card-4-title': 'Bảng phân tích',
+        'card-4-desc': 'Theo dõi tiến độ với thống kê chi tiết và biểu đồ pixel đẹp mắt.',
+        'card-5-title': 'Thông báo thông minh',
+        'card-5-desc': 'Không bao giờ bỏ lỡ hạn chót nhiệm vụ với lời nhắc và cảnh báo thông minh.',
+        'card-6-title': 'Chế độ nhóm',
+        'card-6-desc': 'Hợp tác với bạn bè cho nhiệm vụ chung và chiến thắng chung.',
+
+        // Badges
+        'badge-common': 'Thường',
+        'badge-uncommon': 'Không thường',
+        'badge-rare': 'Hiếm',
+        'badge-epic': 'Sử thi',
+        'badge-legendary': 'Huyền thoại',
+
         // CTA Section
         'cta-title': 'Sẵn sàng bắt đầu nhiệm vụ?',
         'cta-subtitle': 'Tham gia cùng hàng nghìn người chơi nâng cao năng suất',
@@ -207,7 +265,23 @@ const translations = {
         'footer-quick': 'Liên kết nhanh',
         'footer-resources': 'Tài nguyên',
         'footer-legal': 'Pháp lý',
-        'copyright': '© 2026 ChibChob. Đã đăng ký bản quyền. Được tạo với ❤️ bởi những người đam mê năng suất.'
+        'footer-docs': 'Tài liệu',
+        'footer-api': 'Tham chiếu API',
+        'footer-community': 'Cộng đồng',
+        'footer-blog': 'Blog',
+        'footer-privacy': 'Chính sách bảo mật',
+        'footer-terms': 'Điều khoản dịch vụ',
+        'footer-license': 'Giấy phép',
+        'copyright': '© 2026 ChibChob. Đã đăng ký bản quyền. Được tạo với ❤️ bởi những người đam mê năng suất.',
+
+        // Level Up Message
+        'level-up': 'NÂNG CẤP!',
+        'level-reached': 'Bạn đã đạt Cấp độ 2!',
+
+        // Coming Soon Message
+        'coming-soon-title': 'Nhiệm vụ sắp ra mắt!',
+        'coming-soon-subtitle': 'Cuộc phiêu lưu đang được chuẩn bị...',
+        'coming-soon-button': 'OK'
     }
 };
 
@@ -631,6 +705,14 @@ function createCompletionEffect(task, xpValue) {
 }
 
 function showLevelUpMessage() {
+    const currentLang = document.documentElement.lang || 'en';
+    const levelUpText = translations[currentLang]['level-up'] || 'LEVEL UP!';
+    const levelReachedText = translations[currentLang]['level-reached'] || 'You reached Level 2!';
+
+    // Vietnamese gets larger font sizes to match visual weight
+    const titleSize = currentLang === 'vi' ? '38px' : '24px';
+    const subtitleSize = currentLang === 'vi' ? '24px' : '12px';
+
     const message = document.createElement('div');
     message.innerHTML = `
         <div style="
@@ -644,13 +726,13 @@ function showLevelUpMessage() {
             border: 4px solid #5aa03a;
             box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.5);
             z-index: 10000;
-            font-family: Press Start 2P;
-            font-size: 24px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: ${titleSize};
             text-align: center;
             animation: scaleIn 0.15s ease-out;
         ">
-            🎉 LEVEL UP! 🎉
-            <div style="font-size: 12px; margin-top: 16px;">You reached Level 2!</div>
+            🎉 ${levelUpText} 🎉
+            <div style="font-size: ${subtitleSize}; margin-top: 16px; line-height: 1.6;">${levelReachedText}</div>
         </div>
     `;
 
@@ -658,7 +740,7 @@ function showLevelUpMessage() {
 
     setTimeout(() => {
         message.remove();
-    }, 800);
+    }, 1200);
 }
 
 // Add float up animation
@@ -765,6 +847,16 @@ ctaButtons.forEach(button => {
 });
 
 function showComingSoonMessage() {
+    const currentLang = document.documentElement.lang || 'en';
+    const titleText = translations[currentLang]['coming-soon-title'] || 'Quest Coming Soon!';
+    const subtitleText = translations[currentLang]['coming-soon-subtitle'] || 'The adventure is being prepared...';
+    const buttonText = translations[currentLang]['coming-soon-button'] || 'OK';
+
+    // Vietnamese gets larger font sizes
+    const titleSize = currentLang === 'vi' ? '24px' : '16px';
+    const subtitleSize = currentLang === 'vi' ? '16px' : '10px';
+    const buttonSize = currentLang === 'vi' ? '14px' : '10px';
+
     const message = document.createElement('div');
     message.innerHTML = `
         <div style="
@@ -778,14 +870,14 @@ function showComingSoonMessage() {
             border: 4px solid #7cd956;
             box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.5);
             z-index: 10000;
-            font-family: Press Start 2P;
-            font-size: 16px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: ${titleSize};
             text-align: center;
             animation: scaleIn 0.3s ease-out;
         ">
-            🎮 Quest Coming Soon! 🎮
-            <div style="font-size: 10px; margin-top: 16px; color: #8b8b8b;">
-                The adventure is being prepared...
+            🎮 ${titleText} 🎮
+            <div style="font-size: ${subtitleSize}; margin-top: 16px; color: #8b8b8b; line-height: 1.6;">
+                ${subtitleText}
             </div>
             <button id="closeMessage" style="
                 margin-top: 24px;
@@ -793,10 +885,10 @@ function showComingSoonMessage() {
                 background: #7cd956;
                 color: #1a1a1a;
                 border: none;
-                font-family: Press Start 2P;
-                font-size: 10px;
+                font-family: 'Press Start 2P', cursive;
+                font-size: ${buttonSize};
                 cursor: pointer;
-            ">OK</button>
+            ">${buttonText}</button>
         </div>
         <div style="
             position: fixed;
