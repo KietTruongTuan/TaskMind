@@ -1,4 +1,5 @@
 import {
+  DraftGoalRequestBody,
   GoalDetailResponseBody,
   GoalListItemResponseBody,
   SaveGoalRequestBody,
@@ -27,9 +28,18 @@ export class GoalService extends HttpService {
     return res;
   }
 
-  async geyById(id: string) {
+  async getById(id: string) {
     const url = buildUrl(ApiUrl.Goal, id, undefined);
     const res = await this.get<GoalDetailResponseBody>(url);
+    return res;
+  }
+
+  async update(id: string, data: DraftGoalRequestBody) {
+    const url = buildUrl(ApiUrl.Goal, id, undefined);
+    const res = await this.patch<GoalDetailResponseBody, DraftGoalRequestBody>(
+      url,
+      data,
+    );
     return res;
   }
 }

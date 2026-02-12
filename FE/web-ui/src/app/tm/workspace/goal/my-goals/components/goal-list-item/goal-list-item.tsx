@@ -27,16 +27,16 @@ export function GoalListItem({ goal }: { goal: GoalListItemResponseBody }) {
     taskCount === 0 ? 0 : (completedCount * 100) / taskCount;
 
   return (
-    <CardNoPadding
-      p="4"
-      isPrimary
-      onClick={() => route(buildUrl(WebUrl.GoalDetail, id))}
-      style={{ cursor: "pointer" }}
-    >
-      <Flex direction="column" width="100%" height="100%" gap="6">
+    <CardNoPadding p="4" isPrimary>
+      <Flex direction="column" width="100%" height="100%" gap="4">
         <Flex width="100%" height="100%" justify="between">
           <Flex width="100%" height="100%" direction="column">
-            <Text size="3" weight="medium">
+            <Text
+              size="3"
+              weight="medium"
+              onClick={() => route(buildUrl(WebUrl.GoalDetail, id))}
+              style={{ cursor: "pointer", width: "auto" }}
+            >
               {name}
             </Text>
             <Flex gap="1" align="center" className={styles.subText}>
@@ -77,7 +77,7 @@ export function GoalListItem({ goal }: { goal: GoalListItemResponseBody }) {
             </DropdownMenu.Content>
           </DropdownMenu.Root>
         </Flex>
-        <Flex direction="column" width="100%" gap="5">
+        <Flex direction="column" width="100%" gap="4">
           <Text
             size="2"
             className={`${styles.subText} ${styles.descriptionOverflow}`}

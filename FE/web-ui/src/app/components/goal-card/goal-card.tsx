@@ -1,3 +1,4 @@
+"use client";
 import { CardNoPadding } from "../card-no-padding/card-no-padding";
 import { Flex, Progress, Text } from "@radix-ui/themes";
 import {
@@ -12,11 +13,15 @@ import styles from "./goal-card.module.scss";
 import { GoalCardPropsData } from "@/app/tm/workspace/dashboard/components/recent-goal-list/recent-goal-list";
 import { StatusDropDown } from "../status-dropdown/status-dropdown";
 import { StatusCard, StatusCardProps } from "../status-card/status-card";
-import React, { Fragment } from "react";
+import React, { Fragment, useState } from "react";
 import { CustomButton } from "../custom-button/custom-button";
 import { ButtonType } from "@/app/enum/button-type.enum";
+import { Status } from "@/app/enum/status.enum";
+import { ApiError, DraftGoalRequestBody, goalService } from "@/app/constants";
+import { useToast } from "@/app/contexts/toast-context/toast-context";
 
 export function GoalCard({
+  id,
   name,
   status,
   description,
@@ -31,6 +36,9 @@ export function GoalCard({
   const currentDate: Date = new Date();
   const progress: number =
     taskCount === 0 ? 0 : (completedCount * 100) / taskCount;
+  const [currentStatus, setCurrentStatus] = useState<Status>(status);
+  const { showToast, setIsSuccess } = useToast();
+
   const cardContent: StatusCardProps[] = [
     {
       label: "Progress",
@@ -55,7 +63,23 @@ export function GoalCard({
       icon: <Clock size="30" className={styles.onHold} />,
     },
   ];
-
+  const handleStatusChange = async (newStatus: Status) => {
+    const oldStatus = currentStatus;
+    setCurrentStatus(newStatus);
+    const updateStatus: DraftGoalRequestBody = { status: newStatus };
+    if (id) {
+      try {
+        console.log(updateStatus);
+        const res = await goalService.update(id, updateStatus);
+        console.log(res);
+      } catch (err) {
+        setCurrentStatus(oldStatus);
+        setIsSuccess(false);
+        const error = err as ApiError;
+        showToast(error.message);
+      }
+    }
+  };
   return (
     <CardNoPadding p={isDetailCard ? "5" : "3"} isPrimary={isPrimary}>
       <Flex direction="column" width="100%" height="100%" gap="4">
@@ -67,7 +91,7 @@ export function GoalCard({
               direction="column"
               gap={isDetailCard ? "2" : "1"}
             >
-              <Text size={isDetailCard ? "6" : "2"} weight="regular">
+              <Text size={isDetailCard ? "6" : "2"} weight="medium">
                 {name}
               </Text>
               <Flex justify="between" className={styles.subText}>
@@ -85,7 +109,13 @@ export function GoalCard({
                       </Fragment>
                     ))}
                   </Flex>
-                  {status && <StatusDropDown status={status} />}
+                  {currentStatus && (
+                    <StatusDropDown
+                      status={currentStatus}
+                      onStatusChange={handleStatusChange}
+                      isDropdown
+                    />
+                  )}
                 </Flex>
                 {!isDetailCard && (
                   <Text size="1">{deadline.toISOString().split("T")[0]}</Text>

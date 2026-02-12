@@ -103,6 +103,7 @@ export function GoalReview({
         )}
 
         <GoalCard
+          id={(goalData as GoalDetailResponseBody).id || ""}
           name={name || ""}
           description={description || ""}
           status={status || Status.ToDo}

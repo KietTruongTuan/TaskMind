@@ -5,6 +5,7 @@ import { Flex } from "@radix-ui/themes";
 import { ElementType } from "react";
 
 export interface GoalCardPropsData {
+  id?: string;
   name: string;
   status: Status;
   description?: string;
