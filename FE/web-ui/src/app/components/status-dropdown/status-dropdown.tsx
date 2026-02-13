@@ -16,8 +16,12 @@ export function StatusDropDown({
       value={status}
       onValueChange={(value) => onStatusChange?.(value as Status)}
       disabled={!isDropdown}
+      size="1"
     >
-      <Select.Trigger className={styles.statusTrigger}>
+      <Select.Trigger
+        className={styles.statusTrigger}
+        style={{ cursor: isDropdown ? "pointer" : "default" }}
+      >
         <Flex
           className={`${styles.status} ${styles[status]}`}
           px="2"
@@ -30,7 +34,7 @@ export function StatusDropDown({
           </Text>
         </Flex>
       </Select.Trigger>
-      <Select.Content position="item-aligned">
+      <Select.Content position="item-aligned" className={styles.statusContent}>
         <Select.Group>
           <Flex direction="column" gap="1">
             {Object.values(Status).map((value) => (

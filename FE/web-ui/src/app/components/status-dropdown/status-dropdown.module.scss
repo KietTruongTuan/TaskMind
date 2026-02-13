@@ -6,7 +6,6 @@
 .statusTrigger {
     all: unset;
     display: inline-flex;
-    cursor: pointer;
 
     & :global(.rt-SelectIcon) {
         display: none !important;
@@ -17,13 +16,19 @@
     display: none !important;
 }
 
+.statusContent {
+    background-color: var(--background);
+    color: var(--text-secondary);
+    border-radius: var(--spacing-small);
+}
+
 .selectItem {
     cursor: pointer;
     color: var(--text-secondary);
 
     &[data-highlighted],
     &[data-state="checked"] {
-        color: white;
+        color: var(--button-secondary);
 
         &.ToDo {
             background-color: var(--status-to-do);
