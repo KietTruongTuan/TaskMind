@@ -1,8 +1,6 @@
 name: ci run test
 
 on:
-  push:
-    branches: ["**"]
   pull_request:
     branches: ["**"]
 
