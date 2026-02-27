@@ -1,0 +1,39 @@
+name: ci run test
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+jobs:
+
+  backend-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build backend Docker image
+        run: docker build -t capstone-backend-test ./BE
+
+      - name: Run backend tests inside container
+        run: |
+          docker run --rm capstone-backend-test \
+          sh -c "python manage.py test"
+
+  frontend-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build frontend Docker image
+        run: docker build -t capstone-frontend-test ./FE/web-ui
+
+      - name: Run frontend tests inside container
+        run: |
+          docker run --rm capstone-frontend-test \
+          sh -c "pnpm test:unit"
