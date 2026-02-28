@@ -4,6 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { MOCK_ROUTER_PUSH } from "../../../../jest.setup";
 import { ThemeProvider } from "@/app/contexts/theme-context/theme-context";
 import { WebUrl } from "@/app/enum/web-url.enum";
+import { RouteLoadingProvider } from "@/app/contexts/route-loading-context/route-loading-context";
 
 jest.mock("../avatar-menu/avatar-menu", () => ({
   AvatarMenu: () => <div>Avatar Menu</div>,
@@ -13,7 +14,9 @@ describe("Navigation bar", () => {
   it("should render the navigation bar", async () => {
     render(
       <ThemeProvider>
-        <NavigationBar />
+        <RouteLoadingProvider>
+          <NavigationBar />
+        </RouteLoadingProvider>
       </ThemeProvider>,
     );
 
@@ -23,9 +26,11 @@ describe("Navigation bar", () => {
 
   it("should go to add goal page when click the tab button", async () => {
     render(
-      <ThemeProvider>
-        <NavigationBar />
-      </ThemeProvider>,
+      <RouteLoadingProvider>
+        <ThemeProvider>
+          <NavigationBar />
+        </ThemeProvider>
+      </RouteLoadingProvider>,
     );
     await userEvent.click(await screen.findByTestId("add-goal-tab"));
 

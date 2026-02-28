@@ -9,6 +9,7 @@ import {
 } from "@/app/constants";
 import { RouteLoadingProvider } from "@/app/contexts/route-loading-context/route-loading-context";
 import { ToastProvider } from "@/app/contexts/toast-context/toast-context";
+import { ThemeProvider } from "@/app/contexts/theme-context/theme-context";
 
 jest.mock("@/app/constants", () => ({
   ...jest.requireActual("@/app/constants"),
@@ -25,14 +26,16 @@ describe("GoalReview", () => {
 
   it("should render goal details correctly", async () => {
     render(
-      <ToastProvider>
-        <RouteLoadingProvider>
-          <GoalReview
-            setStep={mockSetStep}
-            goalData={MOCK_GOAL_RESPONSE_DATA}
-          />
-        </RouteLoadingProvider>
-      </ToastProvider>,
+      <ThemeProvider>
+        <ToastProvider>
+          <RouteLoadingProvider>
+            <GoalReview
+              setStep={mockSetStep}
+              goalData={MOCK_GOAL_RESPONSE_DATA}
+            />
+          </RouteLoadingProvider>
+        </ToastProvider>
+      </ThemeProvider>,
     );
 
     expect(
@@ -48,15 +51,17 @@ describe("GoalReview", () => {
 
   it("should render blank goal details correctly", async () => {
     render(
-      <ToastProvider>
-        <RouteLoadingProvider>
-          <GoalReview
-            setStep={mockSetStep}
-            goalData={MOCK_BLANK_GOAL_RESPONSE_DATA}
-            isDraft
-          />
-        </RouteLoadingProvider>
-      </ToastProvider>,
+      <ThemeProvider>
+        <ToastProvider>
+          <RouteLoadingProvider>
+            <GoalReview
+              setStep={mockSetStep}
+              goalData={MOCK_BLANK_GOAL_RESPONSE_DATA}
+              isDraft
+            />
+          </RouteLoadingProvider>
+        </ToastProvider>
+      </ThemeProvider>,
     );
 
     expect(await screen.findByText("Cancel")).toBeInTheDocument();
@@ -65,15 +70,17 @@ describe("GoalReview", () => {
   it("should navigate back to FillInformation step when Cancel is clicked", async () => {
     const user = userEvent.setup();
     render(
-      <ToastProvider>
-        <RouteLoadingProvider>
-          <GoalReview
-            setStep={mockSetStep}
-            goalData={MOCK_GOAL_RESPONSE_DATA}
-            isDraft
-          />
-        </RouteLoadingProvider>
-      </ToastProvider>,
+      <ThemeProvider>
+        <ToastProvider>
+          <RouteLoadingProvider>
+            <GoalReview
+              setStep={mockSetStep}
+              goalData={MOCK_GOAL_RESPONSE_DATA}
+              isDraft
+            />
+          </RouteLoadingProvider>
+        </ToastProvider>
+      </ThemeProvider>,
     );
 
     const cancelButton = screen.getByRole("button", { name: /cancel/i });
@@ -88,15 +95,17 @@ describe("GoalReview", () => {
       MOCK_GOAL_RESPONSE_DATA,
     );
     render(
-      <ToastProvider>
-        <RouteLoadingProvider>
-          <GoalReview
-            setStep={mockSetStep}
-            goalData={MOCK_GOAL_RESPONSE_DATA}
-            isDraft
-          />
-        </RouteLoadingProvider>
-      </ToastProvider>,
+      <ThemeProvider>
+        <ToastProvider>
+          <RouteLoadingProvider>
+            <GoalReview
+              setStep={mockSetStep}
+              goalData={MOCK_GOAL_RESPONSE_DATA}
+              isDraft
+            />
+          </RouteLoadingProvider>
+        </ToastProvider>
+      </ThemeProvider>,
     );
 
     const saveButton = screen.getByRole("button", { name: /save/i });
