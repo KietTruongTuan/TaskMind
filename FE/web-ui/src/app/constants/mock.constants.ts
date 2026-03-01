@@ -40,7 +40,7 @@ export const MOCK_GOAL_REQUEST_DATA: CreateGoalRequestBody = {
   name: "Test Goal",
   description: "This is a test goal",
   tag: ["test", "goal"],
-  deadline: new Date("2026-02-16"),
+  deadline: new Date("2100-02-16"),
 };
 
 export const MOCK_LOGIN_REQUEST_DATA: LoginRequestBody = {

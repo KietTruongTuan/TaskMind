@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { GoalAdd } from "./goal-add";
 import {
   aiService,
@@ -35,11 +35,11 @@ describe("AddForm", () => {
       MOCK_GOAL_RESPONSE_DATA,
     );
     render(
-      <RouteLoadingProvider>
-        <GoalProvider>
+      <GoalProvider>
+        <RouteLoadingProvider>
           <GoalAdd setStep={mockSetStep} />
-        </GoalProvider>
-      </RouteLoadingProvider>,
+        </RouteLoadingProvider>
+      </GoalProvider>,
     );
     const user = userEvent.setup();
     await user.type(
@@ -62,17 +62,20 @@ describe("AddForm", () => {
 
     const submitButton = await screen.findByTestId("goal-add-button");
     await user.click(submitButton);
-    expect(aiService.createGoal).toHaveBeenCalled();
-    expect(mockSetStep).toHaveBeenCalledWith(AddStep.ReviewDetail);
+
+    await waitFor(() => {
+      expect(aiService.createGoal).toHaveBeenCalled();
+      expect(mockSetStep).toHaveBeenCalledWith(AddStep.ReviewDetail);
+    });
   });
 
   it("should show error message when deadline is in the past", async () => {
     render(
-      <RouteLoadingProvider>
-        <GoalProvider>
+      <GoalProvider>
+        <RouteLoadingProvider>
           <GoalAdd setStep={mockSetStep} />
-        </GoalProvider>
-      </RouteLoadingProvider>,
+        </RouteLoadingProvider>
+      </GoalProvider>,
     );
     const user = userEvent.setup();
 

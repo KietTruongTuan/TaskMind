@@ -30,12 +30,10 @@ export class HttpService {
     this.accessToken = token;
   }
 
-  // Get access token from cookie
   getAccessToken(): string | null {
     return this.accessToken;
   }
 
-  // Clear access token cookie
   clearAccessToken() {
     this.accessToken = null;
   }
