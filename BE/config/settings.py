@@ -35,7 +35,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-dev-key-change-in-pro
 DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
 
 # Allow both localhost and Docker container names
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1,backend,frontend').split(',')
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1,backend,frontend,').split(',')
 
 # Application definition
 
@@ -116,6 +116,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",    
     "http://localhost:3001",
     "http://localhost:8000",
+    "https://capstone-frontend-dev-latest.onrender.com",
 ]
 
 CORS_ALLOW_CREDENTIALS = True # Important: allows cookies to be sent
@@ -123,6 +124,7 @@ CORS_ALLOW_CREDENTIALS = True # Important: allows cookies to be sent
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:3000",
     "http://localhost:3001",
+    "https://capstone-frontend-dev-latest.onrender.com",
 ]
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -238,3 +240,9 @@ SIMPLE_JWT = {
 # CSRF_COOKIE_SECURE = True
 # SESSION_COOKIE_SECURE = True
 # SECURE_SSL_REDIRECT = True
+
+SESSION_COOKIE_SAMESITE = 'None'
+CSRF_COOKIE_SAMESITE = 'None'
+
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
