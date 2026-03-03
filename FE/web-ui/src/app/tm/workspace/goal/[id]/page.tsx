@@ -1,5 +1,5 @@
 import { GoalReview } from "../components/goal-review/goal-review";
-import { useServerSideService } from "@/app/hooks/useServerSideService";
+import { useServerSideService } from "@/app/hooks/useServerSideService/useServerSideService";
 
 export default async function GoalDetailPage({
   params,

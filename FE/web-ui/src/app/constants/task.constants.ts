@@ -9,11 +9,9 @@ export interface DraftTask {
 }
 
 export interface Task {
-  id: number;
+  id: string;
   name: string;
   status: Status;
   deadline: Date;
   completedDate?: Date;
 }
-
-

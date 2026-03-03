@@ -1,8 +1,8 @@
 import { GoalSearchParams } from "@/app/enum/search-params.enum";
-import { Box, Flex, ScrollArea } from "@radix-ui/themes";
+import { Box, Flex, ScrollArea, Text } from "@radix-ui/themes";
 import { Header } from "@/app/components/header/header";
 import { GoalListItem } from "./components/goal-list-item/goal-list-item";
-import { useServerSideService } from "@/app/hooks/useServerSideService";
+import { useServerSideService } from "@/app/hooks/useServerSideService/useServerSideService";
 
 export default async function MyGoalPage({
   searchParams,
@@ -27,21 +27,29 @@ export default async function MyGoalPage({
 
         <ScrollArea type="auto" scrollbars="vertical">
           <Flex gap="3" wrap="wrap">
-            {goalListData.map((goal) => (
-              <Box
-                key={goal.id}
-                flexBasis={{
-                  initial: "calc(100% - 0.75rem)",
-                  sm: "calc(50% - 0.75rem)",
-                  md: "calc(33.333% - 0.75rem)",
-                  lg: "calc(25% - 0.75rem)",
-                }}
-                flexShrink="0"
-                minWidth="0"
-              >
-                <GoalListItem goal={goal} />
-              </Box>
-            ))}
+            {goalListData.length > 0 ? (
+              goalListData.map((goal) => (
+                <Box
+                  key={goal.id}
+                  flexBasis={{
+                    initial: "calc(100% - 0.75rem)",
+                    sm: "calc(50% - 0.75rem)",
+                    md: "calc(33.333% - 0.75rem)",
+                    lg: "calc(25% - 0.75rem)",
+                  }}
+                  flexShrink="0"
+                  minWidth="0"
+                >
+                  <GoalListItem goal={goal} />
+                </Box>
+              ))
+            ) : (
+              <Flex height="100%" width="100%" justify="center" align="center">
+                <Text size="2" align="center" mt="3">
+                  No goal found
+                </Text>
+              </Flex>
+            )}
           </Flex>
         </ScrollArea>
       </Flex>

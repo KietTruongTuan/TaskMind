@@ -2,18 +2,24 @@ import { Status } from "../enum/status.enum";
 import {
   LoginRequestBody,
   LoginResponseBody,
+  RefreshTokenResponseBody,
   RegistrationRequestBody,
   RegistrationResponseBody,
 } from "./authentication.constants";
 import {
   CreateGoalRequestBody,
   CreateGoalResponseBody,
+  GoalDetailResponseBody,
+  GoalListItemResponseBody,
 } from "./goal.constants";
 
 const getFutureDate = () => {
   const date = new Date();
   date.setFullYear(date.getFullYear() + 1);
   return date;
+};
+export const MOCK_ACCESS_TOKEN: RefreshTokenResponseBody = {
+  access: "mocked_access_token",
 };
 
 export const MOCK_GOAL_RESPONSE_DATA: CreateGoalResponseBody = {
@@ -22,13 +28,18 @@ export const MOCK_GOAL_RESPONSE_DATA: CreateGoalResponseBody = {
   status: Status.ToDo,
   deadline: getFutureDate(),
   tag: ["test", "goal"],
-  completeCount: 0,
+  completedCount: 0,
   taskCount: 3,
   tasks: [
-    { id: 1, name: "Task 1", status: Status.ToDo, deadline: getFutureDate() },
-    { id: 2, name: "Task 2", status: Status.ToDo, deadline: getFutureDate() },
+    { id: "1", name: "Task 1", status: Status.ToDo, deadline: getFutureDate() },
+    { id: "2", name: "Task 2", status: Status.ToDo, deadline: getFutureDate() },
   ],
 };
+
+export const MOCK_GOAL_DETAIL_RESPONSE_DATA = {
+  ...MOCK_GOAL_RESPONSE_DATA,
+  id: "1",
+} as GoalDetailResponseBody;
 
 export const MOCK_BLANK_GOAL_RESPONSE_DATA: CreateGoalResponseBody = {
   name: "",
@@ -36,16 +47,39 @@ export const MOCK_BLANK_GOAL_RESPONSE_DATA: CreateGoalResponseBody = {
   status: undefined as unknown as Status,
   deadline: null as unknown as Date,
   tag: undefined as unknown as string[],
-  completeCount: 0,
+  completedCount: 0,
   taskCount: 0,
   tasks: [],
 };
+
+export const MOCK_GOAL_LIST_DATA: GoalListItemResponseBody[] = [
+  {
+    id: "1",
+    name: "Test Goal 1",
+    description: "This is a test goal",
+    status: Status.ToDo,
+    deadline: getFutureDate(),
+    tag: ["test", "goal"],
+    completedCount: 0,
+    taskCount: 0,
+  },
+  {
+    id: "2",
+    name: "Test Goal 2",
+    description: "This is a test goal",
+    status: Status.InProgress,
+    deadline: getFutureDate(),
+    tag: ["test", "goal"],
+    completedCount: 1,
+    taskCount: 3,
+  },
+];
 
 export const MOCK_GOAL_REQUEST_DATA: CreateGoalRequestBody = {
   name: "Test Goal",
   description: "This is a test goal",
   tag: ["test", "goal"],
-  deadline: new Date("2026-02-16"),
+  deadline: new Date("2100-02-16"),
 };
 
 export const MOCK_LOGIN_REQUEST_DATA: LoginRequestBody = {

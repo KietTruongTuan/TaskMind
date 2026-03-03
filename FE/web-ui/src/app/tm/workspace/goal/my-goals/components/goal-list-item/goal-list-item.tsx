@@ -53,29 +53,6 @@ export function GoalListItem({ goal }: { goal: GoalListItemResponseBody }) {
               ))}
             </Flex>
           </Flex>
-          <DropdownMenu.Root modal={false}>
-            <DropdownMenu.Trigger>
-              <Ellipsis size={20} cursor="pointer" />
-            </DropdownMenu.Trigger>
-            <DropdownMenu.Content variant="soft" side="left">
-              <DropdownMenu.Item
-                onSelect={(e) => e.preventDefault()}
-                className={styles.deleteItem}
-              >
-                <Flex
-                  align="center"
-                  gap="2"
-                  className={styles.deleteText}
-                  width="100%"
-                  height="100%"
-                  px="2"
-                >
-                  <Trash2 size={15} />
-                  <Text>Delete</Text>
-                </Flex>
-              </DropdownMenu.Item>
-            </DropdownMenu.Content>
-          </DropdownMenu.Root>
         </Flex>
         <Flex direction="column" width="100%" gap="4">
           <Text

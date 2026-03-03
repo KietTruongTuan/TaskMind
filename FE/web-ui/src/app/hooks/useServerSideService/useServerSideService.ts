@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { aiService, authenticationService, goalService } from "../constants";
+import { aiService, authenticationService, goalService } from "@/app/constants";
 
 const REFRESH_COOKIE_NAME = "refresh_token";
 export async function useServerSideService() {

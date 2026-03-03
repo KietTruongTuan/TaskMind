@@ -1,4 +1,5 @@
 import {
+  MOCK_ACCESS_TOKEN,
   MOCK_LOGIN_REQUEST_DATA,
   MOCK_LOGIN_RESPONSE_DATA,
   MOCK_REGISTER_REQUEST_DATA,
@@ -21,10 +22,7 @@ describe("AuthenticationService", () => {
       .mockResolvedValue(MOCK_LOGIN_RESPONSE_DATA);
 
     const result = await authenticationService.login(MOCK_LOGIN_REQUEST_DATA);
-    expect(postSpy).toHaveBeenCalledWith(
-      ApiUrl.Login,
-      MOCK_LOGIN_REQUEST_DATA
-    );
+    expect(postSpy).toHaveBeenCalledWith(ApiUrl.Login, MOCK_LOGIN_REQUEST_DATA);
 
     expect(result).toEqual(MOCK_LOGIN_RESPONSE_DATA);
   });
@@ -34,12 +32,46 @@ describe("AuthenticationService", () => {
       .spyOn(AuthenticationService.prototype, "post")
       .mockResolvedValue(MOCK_REGISTER_RESPONSE_DATA);
 
-    const result = await authenticationService.register(MOCK_REGISTER_REQUEST_DATA);
+    const result = await authenticationService.register(
+      MOCK_REGISTER_REQUEST_DATA,
+    );
     expect(postSpy).toHaveBeenCalledWith(
       ApiUrl.Register,
-      MOCK_REGISTER_REQUEST_DATA
+      MOCK_REGISTER_REQUEST_DATA,
     );
 
     expect(result).toEqual(MOCK_REGISTER_RESPONSE_DATA);
+  });
+
+  it("should call refresh with the correct URL and data", async () => {
+    const postSpy = jest
+      .spyOn(authenticationService["refreshInstance"], "post")
+      .mockResolvedValue(MOCK_ACCESS_TOKEN);
+
+    const result = await authenticationService.refresh();
+    expect(postSpy).toHaveBeenCalledWith(ApiUrl.RefreshToken, undefined, {
+      withCredentials: true,
+      _isRefresh: true,
+    });
+
+    expect(result).toEqual(MOCK_ACCESS_TOKEN);
+  });
+
+  it("should call refresh with no rotation with the correct URL and data", async () => {
+    const postSpy = jest
+      .spyOn(authenticationService["refreshInstance"], "post")
+      .mockResolvedValue(MOCK_ACCESS_TOKEN);
+
+    const result = await authenticationService.refresh({ noRotation: true });
+    expect(postSpy).toHaveBeenCalledWith(
+      `${ApiUrl.RefreshToken}?no_rotation=true`,
+      undefined,
+      {
+        withCredentials: true,
+        _isRefresh: true,
+      },
+    );
+
+    expect(result).toEqual(MOCK_ACCESS_TOKEN);
   });
 });

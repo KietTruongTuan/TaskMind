@@ -1,4 +1,4 @@
-import { Box, Flex, Tabs, Text } from "@radix-ui/themes";
+import { Box, Tabs, Text } from "@radix-ui/themes";
 import { TabList } from "../tab-list/tab-list";
 
 export interface TabListProps {
@@ -11,11 +11,11 @@ export function TabContainer({
   tabList,
   isDraft = false,
 }: {
-  tabList?: TabListProps[];
+  tabList: TabListProps[];
   isDraft?: boolean;
 }) {
   return (
-    <Tabs.Root defaultValue={tabList ? tabList[0].label : ""}>
+    <Tabs.Root defaultValue={tabList[0].label}>
       {!isDraft && <TabList tabList={tabList} />}
 
       <Box pt="3">
