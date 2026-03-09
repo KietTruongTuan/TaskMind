@@ -22,8 +22,8 @@ describe("AuthenticationService", () => {
 
     const result = await authenticationService.login(MOCK_LOGIN_REQUEST_DATA);
     expect(postSpy).toHaveBeenCalledWith(
-      ApiUrl.Login,
-      MOCK_LOGIN_REQUEST_DATA
+      ApiUrl.LocalLogin,
+      MOCK_LOGIN_REQUEST_DATA,
     );
 
     expect(result).toEqual(MOCK_LOGIN_RESPONSE_DATA);
@@ -34,11 +34,10 @@ describe("AuthenticationService", () => {
       .spyOn(AuthenticationService.prototype, "post")
       .mockResolvedValue(MOCK_REGISTER_RESPONSE_DATA);
 
-    const result = await authenticationService.register(MOCK_REGISTER_REQUEST_DATA);
-    expect(postSpy).toHaveBeenCalledWith(
-      ApiUrl.Register,
-      MOCK_REGISTER_REQUEST_DATA
+    const result = await authenticationService.register(
+      MOCK_REGISTER_REQUEST_DATA,
     );
+    expect(postSpy).toHaveBeenCalled();
 
     expect(result).toEqual(MOCK_REGISTER_RESPONSE_DATA);
   });

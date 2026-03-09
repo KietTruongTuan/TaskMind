@@ -9,12 +9,11 @@ const ThemeContext = createContext<{
 } | null>(null);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const currentTheme = localStorage.getItem("theme") as ThemeMode;
-  const [theme, setTheme] = useState<ThemeMode>(currentTheme ?? ThemeMode.Light);
+  const [theme, setTheme] = useState<ThemeMode>(ThemeMode.Light);
 
   useEffect(() => {
     const savedMode = localStorage.getItem("theme") as ThemeMode;
-    if (savedMode) setTheme(savedMode);
+    setTheme(savedMode ?? ThemeMode.Light);
   }, []);
 
   useEffect(() => {

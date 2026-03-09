@@ -12,7 +12,12 @@ import { CardNoPadding } from "@/app/components/card-no-padding/card-no-padding"
 import { AddStep } from "@/app/enum/step.enum";
 import { Dispatch, SetStateAction } from "react";
 import { LoadingOverlay } from "@/app/components/loading-overlay/loading-overlay";
-import { aiService, CreateGoalRequestBody, CreateGoalResponseBody } from "@/app/constants";
+import {
+  aiService,
+  CreateGoalRequestBody,
+  CreateGoalResponseBody,
+} from "@/app/constants";
+import { useGoalContext } from "@/app/contexts/goal-context/goal-context";
 
 export function GoalAdd({
   setStep,
@@ -29,11 +34,12 @@ export function GoalAdd({
     formState: { isValid, isSubmitting },
     getValues,
   } = methods;
-  
+  const { setDraftGoal } = useGoalContext();
   const onSubmit = async () => {
     const data = getValues();
-    const draftGoalData: CreateGoalResponseBody =  await aiService.createGoal(data);
-    localStorage.setItem("draftGoal", JSON.stringify(draftGoalData));
+    const draftGoalData: CreateGoalResponseBody =
+      await aiService.createGoal(data);
+    setDraftGoal(draftGoalData);
     setStep(AddStep.ReviewDetail);
   };
 
@@ -54,7 +60,12 @@ export function GoalAdd({
                 onSubmit={handleSubmit(onSubmit)}
               >
                 <Flex direction="column" gap="4">
-                  <Flex direction="column" width="100%" gap="1" data-testid="goal-add-header">
+                  <Flex
+                    direction="column"
+                    width="100%"
+                    gap="1"
+                    data-testid="goal-add-header"
+                  >
                     <Header
                       text="Let AI help you create a new goal"
                       subText="Type your goal and let AI create a detailed step-by-step plan for you."

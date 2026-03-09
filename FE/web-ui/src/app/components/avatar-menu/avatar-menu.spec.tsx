@@ -59,7 +59,7 @@ describe("AvatarMenu onLogOut", () => {
 
     await waitFor(() => {
       expect(authenticationService.logout).toHaveBeenCalledTimes(1);
-      expect(mockRoute).toHaveBeenCalledWith(WebUrl.Dashboard);
+      expect(mockRoute).toHaveBeenCalledWith(WebUrl.Authentication);
     });
   });
 });

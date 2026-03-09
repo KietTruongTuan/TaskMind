@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { GoalAdd } from "./goal-add";
 import {
   aiService,
@@ -8,8 +8,10 @@ import {
 import userEvent from "@testing-library/user-event";
 import { AddStep } from "@/app/enum/step.enum";
 import { RouteLoadingProvider } from "@/app/contexts/route-loading-context/route-loading-context";
+import { GoalProvider } from "@/app/contexts/goal-context/goal-context";
 
-jest.mock("../../../../../../constants/service.constants", () => ({
+jest.mock("@/app/constants", () => ({
+  ...jest.requireActual("@/app/constants"),
   aiService: {
     createGoal: jest.fn(),
   },
@@ -26,29 +28,27 @@ describe("AddForm", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    Object.defineProperty(window, "localStorage", {
-      value: { setItem: jest.fn() },
-      writable: true,
-    });
   });
 
-  const user = userEvent.setup();
   it("should call aiService and move to next step", async () => {
     (aiService.createGoal as jest.Mock).mockResolvedValue(
-      MOCK_GOAL_RESPONSE_DATA
+      MOCK_GOAL_RESPONSE_DATA,
     );
     render(
-      <RouteLoadingProvider>
-        <GoalAdd setStep={mockSetStep} />
-      </RouteLoadingProvider>
+      <GoalProvider>
+        <RouteLoadingProvider>
+          <GoalAdd setStep={mockSetStep} />
+        </RouteLoadingProvider>
+      </GoalProvider>,
     );
+    const user = userEvent.setup();
     await user.type(
       await screen.findByTestId("name-field"),
-      MOCK_GOAL_REQUEST_DATA.name
+      MOCK_GOAL_REQUEST_DATA.name,
     );
     await user.type(
       await screen.findByTestId("description-field"),
-      MOCK_GOAL_REQUEST_DATA.description ?? ""
+      MOCK_GOAL_REQUEST_DATA.description ?? "",
     );
     for (const tag of MOCK_GOAL_REQUEST_DATA.tag ?? []) {
       await user.type(await screen.findByTestId("tag-field"), tag);
@@ -57,32 +57,35 @@ describe("AddForm", () => {
 
     await user.type(
       await screen.findByTestId("deadline-field"),
-      MOCK_GOAL_REQUEST_DATA.deadline.toISOString().split("T")[0]
+      MOCK_GOAL_REQUEST_DATA.deadline.toISOString().split("T")[0],
     );
 
     const submitButton = await screen.findByTestId("goal-add-button");
     await user.click(submitButton);
-    expect(aiService.createGoal).toHaveBeenCalled();
-    expect(localStorage.setItem).toHaveBeenCalledWith(
-      "draftGoal",
-      JSON.stringify(MOCK_GOAL_RESPONSE_DATA)
-    );
-    expect(mockSetStep).toHaveBeenCalledWith(AddStep.ReviewDetail);
+
+    await waitFor(() => {
+      expect(aiService.createGoal).toHaveBeenCalled();
+      expect(mockSetStep).toHaveBeenCalledWith(AddStep.ReviewDetail);
+    });
   });
 
   it("should show error message when deadline is in the past", async () => {
     render(
-      <RouteLoadingProvider>
-        <GoalAdd setStep={mockSetStep} />
-      </RouteLoadingProvider>
+      <GoalProvider>
+        <RouteLoadingProvider>
+          <GoalAdd setStep={mockSetStep} />
+        </RouteLoadingProvider>
+      </GoalProvider>,
     );
+    const user = userEvent.setup();
+
     await user.type(
       await screen.findByTestId("name-field"),
-      MOCK_GOAL_REQUEST_DATA.name
+      MOCK_GOAL_REQUEST_DATA.name,
     );
     await user.type(
       await screen.findByTestId("description-field"),
-      MOCK_GOAL_REQUEST_DATA.description ?? ""
+      MOCK_GOAL_REQUEST_DATA.description ?? "",
     );
     for (const tag of MOCK_GOAL_REQUEST_DATA.tag ?? []) {
       await user.type(await screen.findByTestId("tag-field"), tag);
@@ -90,13 +93,13 @@ describe("AddForm", () => {
     }
     await user.type(
       await screen.findByTestId("deadline-field"),
-      getPastDate().toISOString().split("T")[0]
+      getPastDate().toISOString().split("T")[0],
     );
 
     const submitButton = await screen.findByTestId("goal-add-button");
     await user.click(submitButton);
     expect(
-      await screen.findByText("Deadline must be in the future")
+      await screen.findByText("Deadline must be in the future"),
     ).toBeInTheDocument();
   });
 });

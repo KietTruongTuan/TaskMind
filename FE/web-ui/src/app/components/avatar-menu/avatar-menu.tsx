@@ -16,7 +16,7 @@ export function AvatarMenu() {
 
   const onLogOut = async () => {
     await authenticationService.logout();
-    route(WebUrl.Dashboard);
+    route(WebUrl.Authentication);
   };
 
   return (
