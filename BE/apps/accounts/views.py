@@ -16,6 +16,7 @@ from django.conf import settings
 from .models import User
 from drf_spectacular.utils import extend_schema
 import logging
+from datetime import timedelta
 
 logger = logging.getLogger(__name__)
 
@@ -136,27 +137,26 @@ class RefreshTokenView(APIView):
         # Get refresh token from HttpOnly cookie
         
         refresh_token = request.COOKIES.get('refresh_token')
-        print(refresh_token)
 
         if not refresh_token:
             return Response(
                 {'error': 'Refresh token not found'},
                 status=status.HTTP_401_UNAUTHORIZED
             )
+
+        ROTATION_THRESHOLD = timedelta(hours=24)
+
         try:
             # Verify refresh token
             refresh = RefreshToken(refresh_token)
             
             # Get user ID from the token payload
             user_id = refresh.get('user_id')  # or refresh['user_id']
-            
             if not user_id:
-                
                 return Response(
                     {'error': 'Invalid token payload'}, 
                     status=status.HTTP_401_UNAUTHORIZED
                 )
-            
             
             # Fetch the user from database
             try:
@@ -167,17 +167,30 @@ class RefreshTokenView(APIView):
                     status=status.HTTP_401_UNAUTHORIZED
                 )
 
+            # Read rotation_issued_at from token payload
+            rotation_issued_at = refresh.get('rotation_issued_at')
+            should_rotate = True
+            if rotation_issued_at:
+                try:
+                    issued_at = timezone.datetime.fromtimestamp(rotation_issued_at, tz=timezone.utc)
+                    should_rotate = (timezone.now() - issued_at) > ROTATION_THRESHOLD
+                except (TypeError, ValueError):
+                    pass
+
             # Blacklist the old refresh token (if rotation is enabled)
-            try: 
-                refresh.blacklist()
-            except AttributeError:
-                pass  # Blacklisting not enabled
-            except (TokenError, Exception) as e:
-                logger.warning(f"Failed to blacklist token: {e}")
+            if should_rotate:
+                try: 
+                    refresh.blacklist()
+                except AttributeError:
+                    pass  # Blacklisting not enabled
+                except (TokenError, Exception) as e:
+                    logger.warning(f"Failed to blacklist token: {e}")
             
-            # Create new refresh token
-            new_refresh = CustomTokenSerializer.get_token(user)
-            access_token = str(new_refresh.access_token)
+                # Create new refresh token
+                new_refresh = CustomTokenSerializer.get_token(user)
+                access_token = str(new_refresh.access_token)
+            else:
+                access_token = str(refresh.access_token)
 
             response = Response({
                 'access': access_token
@@ -186,14 +199,13 @@ class RefreshTokenView(APIView):
             # Set new refresh token as HttpOnly cookie
             response.set_cookie(
                 key='refresh_token',
-                value=str(new_refresh),
+                value=refresh_token if not should_rotate else str(new_refresh),
                 httponly=True,
                 secure=False, # Set to True in production
                 samesite='Lax',
                 max_age=settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME'].total_seconds(),
                 path='/',
             )
-            print(response)
             return response
             
             

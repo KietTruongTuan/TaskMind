@@ -383,7 +383,15 @@ class GoalDetailView(APIView):
         goal.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+
+
 @extend_schema_view(
+    get=extend_schema(
+        tags=['Tasks'],
+        summary="Get a task",
+        description="Retrieve a specific task by ID.",
+        responses={200: TaskSerializer}
+    ),
     patch=extend_schema(
         tags=['Tasks'],
         summary="Update a task",
@@ -400,21 +408,31 @@ class GoalDetailView(APIView):
 )
 class TaskDetailView(APIView):
     """
-    API endpoint for updating individual tasks
+    API endpoint for CRUD operations on an individual task
+    GET: Retrieve a task by ID
     PATCH: Update a task (quick status/name changes)
     DELETE: Delete a task
     """
     permission_classes = [IsAuthenticated]
     
-    def get_object(self, pk, user):
-        return get_object_or_404(Task, pk=pk, goal__user=user)
+    def get_object(self, pk):
+        return get_object_or_404(Task, pk=pk, goal__user=self.request.user)
+
+    def get(self, request, pk):
+        """
+        Retrieve a task by ID
+        URL: GET /v1/tasks/{taskId}/
+        """
+        task = self.get_object(pk)
+        serializer = TaskSerializer(task)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
     def patch(self, request, pk):
         """
         Update a task's status, name, or other attributes
         URL: PATCH /v1/tasks/{taskId}/
         """
-        task = self.get_object(pk, request.user)
+        task = self.get_object(pk)
         serializer = TaskSerializer(task, data=request.data, partial=True)
         
         if serializer.is_valid():
@@ -431,7 +449,7 @@ class TaskDetailView(APIView):
         Delete a task
         URL: DELETE /v1/tasks/{taskId}/
         """
-        task = self.get_object(pk, request.user)
+        task = self.get_object(pk)
         task.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -442,12 +460,20 @@ class TaskDetailView(APIView):
         summary="List all tasks",
         description="Get all tasks for the authenticated user with optional filtering by status, goal_id, and search.",
         responses={200: TaskSerializer(many=True)}
+    ),
+    post=extend_schema(
+        tags=['Tasks'],
+        summary="Create a new task",
+        description="Create a new task under a specific goal. The goal must belong to the authenticated user.",
+        request=TaskSerializer,
+        responses={201: TaskSerializer}
     )
 )
 class TaskListView(APIView):
     """
-    API endpoint to list all tasks for the authenticated user
+    API endpoint for task collection
     GET: List all tasks with optional filtering
+    POST: Create a new task under a specific goal
     """
     permission_classes = [IsAuthenticated]
 
@@ -494,3 +520,30 @@ class TaskListView(APIView):
             data[i]['goalId'] = str(task.goal.id)
 
         return Response(data)
+
+    def post(self, request):
+        """
+        Create a new task under a specific goal.
+        Request body:
+        {
+            "goal_id": "<uuid>",   # required - must belong to the current user
+            "name": "Task name",
+            "deadline": "YYYY-MM-DD",
+            "status": "ToDo"        # optional, defaults to ToDo
+        }
+        """
+        goal_id = request.data.get('goal_id')
+        if not goal_id:
+            return Response(
+                {"goal_id": "This field is required."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Security: ensure the goal belongs to the current user
+        goal = get_object_or_404(Goal, id=goal_id, user=request.user)
+
+        serializer = TaskSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(goal=goal)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
