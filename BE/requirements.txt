@@ -18,6 +18,7 @@ drf-spectacular==0.28.0
 eval_type_backport==0.2.2
 filelock==3.19.1
 frozenlist==1.7.0
+gunicorn==22.0.0
 h11==0.16.0
 httpcore==1.0.9
 httpx==0.28.1
@@ -27,6 +28,7 @@ iniconfig==2.1.0
 jiter==0.12.0
 jsonschema==4.25.1
 jsonschema-specifications==2025.4.1
+lxml==6.0.2
 markdown-it-py==4.0.0
 mdurl==0.1.2
 multidict==6.6.4
@@ -41,8 +43,10 @@ pydantic==2.11.7
 pydantic_core==2.33.2
 Pygments==2.19.2
 PyJWT==2.10.1
+pypdf==6.8.0
 pytest==8.4.2
 pytest-django==4.11.1
+python-docx==1.2.0
 python-dotenv==1.1.1
 PyYAML==6.0.2
 referencing==0.36.2
@@ -60,4 +64,5 @@ typing-inspection==0.4.1
 typing_extensions==4.15.0
 uritemplate==4.2.0
 urllib3==2.5.0
+whitenoise==6.8.2
 yarl==1.20.1
