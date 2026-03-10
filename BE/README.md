@@ -78,13 +78,14 @@ curl -X GET http://localhost:8000/v1/goals/ \
 | POST | `/v1/accounts/token/refresh` | Refresh access token |
 | GET | `/v1/goals/` | List all goals |
 | POST | `/v1/goals/` | Create goal with tasks |
-| GET | `/v1/goals/{uuid}/` | Get goal details |
-| PATCH | `/v1/goals/{uuid}/` | Update goal |
-| DELETE | `/v1/goals/{uuid}/` | Delete goal |
+| GET | `/v1/goals/{uuid}` | Get goal details |
+| PATCH | `/v1/goals/{uuid}` | Update goal |
+| DELETE | `/v1/goals/{uuid}` | Delete goal |
 | POST | `/v1/goals/generate` | **AI**: Generate goal with tasks |
 | GET | `/v1/tasks/` | List all tasks |
-| PATCH | `/v1/tasks/{uuid}/` | Update task |
-| DELETE | `/v1/tasks/{uuid}/` | Delete task |
+| POST | `/v1/tasks` | Create a new task under a goal |
+| PATCH | `/v1/tasks/{uuid}` | Update task |
+| DELETE | `/v1/tasks/{uuid}` | Delete task |
 
 ---
 
@@ -145,7 +146,7 @@ pytest apps/accounts/tests/ -v
 
 | Test File | Tests | Description |
 |-----------|-------|-------------|
-| `test_api.py` | 30 | Unit tests with mocked AI |
+| `test_api.py` | 35 | Unit tests with mocked AI |
 | `test_e2e.py` | 1 | Full flow: register → generate → save |
 | `accounts/test_api.py` | 4 | Auth tests |
 
@@ -156,7 +157,7 @@ pytest apps/accounts/tests/ -v
 pytest -v
 
 # Expected: All tests should pass
-# ======================== 35 passed ========================
+# ======================== 40 passed ========================
 ```
 
 ---
