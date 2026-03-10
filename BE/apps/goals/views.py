@@ -5,16 +5,9 @@ from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from drf_spectacular.utils import extend_schema, extend_schema_view
-import os
-import json
-from together import Together
-import dotenv
-from pathlib import Path
-import re
-from openai import OpenAI
 from django.utils import timezone
-
 from .models import Goal, Task
+from .services import AIGoalGeneratorService
 from .serializers import (
     GoalListSerializer, 
     GoalDetailSerializer, 
@@ -23,9 +16,6 @@ from .serializers import (
     GoalGenerateRequestSerializer,
     GoalGenerateResponseSerializer,
 )
-
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
-dotenv.load_dotenv(os.path.join(BASE_DIR, '.env'))
 
 @extend_schema(
     tags=['Goals'], 
@@ -41,15 +31,16 @@ class GoalBreakdownView(APIView):
     and returns a list of actionable tasks to achieve that goal using the Groq API."""
     def post(self, request):
         name = request.data.get('name')
-        description = request.data.get('description')
+        description = request.data.get('description', '')
         tag = request.data.get('tag')
         deadline = request.data.get('deadline')
+        files = request.FILES.getlist('files')
 
         if not name:
             return Response({"error": "Please provide a goal's name"}, status=status.HTTP_400_BAD_REQUEST)
         
-        if not description:
-            return Response({"error": "Please provide a goal's description"}, status=status.HTTP_400_BAD_REQUEST)
+        # if not description and not files:
+        #     return Response({"error": "Please provide a description or upload files to provide context."}, status=status.HTTP_400_BAD_REQUEST)
         
         if not deadline:
             return Response({"error": "Please provide a goal's deadline"}, status=status.HTTP_400_BAD_REQUEST)
@@ -59,14 +50,20 @@ class GoalBreakdownView(APIView):
         # if not tag:
         #     return Response({"error": "Please provide a goal's tag"}, status=status.HTTP_400_BAD_REQUEST)
 
-        api_key = self.get_api_key()
+        api_key = AIGoalGeneratorService.get_api_key()
         if not api_key:
             return Response({"error": "Together AI API Key is not configured."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        task_prompt = self.build_prompt_for_task(name, description, deadline)
-        description_prompt = self.build_prompt_for_description(name, description, deadline)
-        task_list = self.get_ai_response(task_prompt, api_key)
+            
+        # Parse context from files
+        file_context = AIGoalGeneratorService.extract_context_from_files(files, api_key)
+        if file_context:
+            description = f"{description}\n\n[Additional Context from Files:]\n{file_context}" if description else file_context
 
-        description_response = self.get_ai_response(description_prompt, api_key)
+        task_prompt = AIGoalGeneratorService.build_prompt_for_task(name, description, deadline)
+        description_prompt = AIGoalGeneratorService.build_prompt_for_description(name, description, deadline)
+        task_list = AIGoalGeneratorService.get_ai_response(task_prompt, api_key)
+
+        description_response = AIGoalGeneratorService.get_ai_response(description_prompt, api_key)
         
         # FIX: Check if it is ALREADY a list before trying to parse
         if isinstance(description_response, list):
@@ -103,135 +100,7 @@ class GoalBreakdownView(APIView):
         except ValueError as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    def get_api_key(self):
-        return os.getenv("API_KEY")
-
-    def get_ai_response(self, prompt, api_key, max_retries=3):
-        """Get AI response with retry logic for network issues"""
-        import time
-        import httpx
-        
-        GROQ_MODEL = "groq/compound"
-        
-        for attempt in range(max_retries):
-            try:
-                client = OpenAI(
-                    api_key=api_key,
-                    base_url="https://api.groq.com/openai/v1",
-                    timeout=60.0  # 60 second timeout
-                )
-                response_stream = client.chat.completions.create(
-                    model=GROQ_MODEL,
-                    messages=[
-                        {"role": "system",
-                            "content": "You are a helpful project management assistant."},
-                        {"role": "user", "content": prompt}
-                    ],
-                    stream=True,
-                    temperature=0.7
-                )
-                full_content = ""
-                for chunk in response_stream:
-                    if hasattr(chunk, 'choices') and chunk.choices and chunk.choices[0].delta.content is not None:
-                        full_content += chunk.choices[0].delta.content
-                        
-                if not full_content:
-                    raise ValueError("No response received from AI.")
-
-                return self.extract_json_response(full_content)
-                
-            except (httpx.RemoteProtocolError, httpx.ReadTimeout, ConnectionError) as e:
-                if attempt < max_retries - 1:
-                    wait_time = (attempt + 1) * 2  # 2, 4, 6 seconds
-                    time.sleep(wait_time)
-                    continue
-                else:
-                    raise ValueError(f"AI service unavailable after {max_retries} attempts. Please try again later. Error: {str(e)}")
-
-    def extract_json_response(self, text):
-        # \s* means "zero or more whitespace characters."
-        match = re.search(r"\[\s*[\s\S]*?\]", text)
-        if match:
-            json_array_response = match.group(0)
-            try:
-                tasks = json.loads(json_array_response)
-                if not isinstance(tasks, list):
-                    raise ValueError(
-                        "AI did not return a JSON array as expected.")
-                return tasks
-            except (json.JSONDecodeError, ValueError):
-                raise ValueError(
-                    f"AI returned invalid format. Extracted: {json_array_response}")
-        else:
-            raise ValueError(
-                f"Could not find a JSON array in AI response. Content: {text}")
-            
-    def build_prompt_for_task(self, name, description, deadline):
-        return (
-            f"""You are an excellent project management assistant.
-            Here is a new goal:
-            Name: '{name}'
-            Description: '{description}'
-            Deadline: '{deadline}'
-            Please help me break down this goal name and description into specific, actionable steps from {timezone.now().date().isoformat()} to "{deadline}".
-            Each step should be a clear, achievable task within deadline.
-            
-            Must return the list of tasks as a JSON array of strings.
-            
-            The return language should match the name and description language.
-            
-            Example:
-            If the name is "Complete a graduation project on Fanpage Management" and description is "A project to manage a fanpage for a product" and deadline is "2023-12-31" and start date is "2023-09-29", return the result in the following format:
-            
-            [
-                {{
-                    "name": "Design Database",
-                    "status": "ToDo",
-                    "deadline": "2023-10-01",
-                }}, 
-                {{
-                    "name": "Build API Login",
-                    "status": "ToDo",
-                    "deadline": "2023-10-15",
-                }}, 
-                {{  
-                    "name": "Integrate Facebook API",
-                    "status": "ToDo",
-                    "deadline": "2023-11-01",
-                }},
-                {{
-                    "name": "Build management interface",
-                    "status": "ToDo",
-                    "deadline": "2023-11-15",
-                }},
-                {{
-                    "name": "Test and fix bugs",
-                    "status": "ToDo",
-                    "deadline": "2023-12-15",
-                }},
-                {{
-                    "name": "Write report and prepare presentation",
-                    "status": "ToDo",
-                    "deadline": "2023-12-31",
-                }}
-            ]
-            """
-        )
-    
-    def build_prompt_for_description(self, name, description, deadline):
-        return (
-            f"""You are an excellent project management assistant.
-            Here is a new goal:
-            Name: '{name}'
-            Description: '{description}'
-            Deadline: '{deadline}'
-            Please help me rewrite the goal description in a summary to just understand the context with expected outcomes not so detailed.
-            
-            Must return the rewritten description as a string inside a JSON array.
-            
-            The return language should match the name and description language.
-            """
-        )
+# The rest of the AI logic was moved to services.py
 
 @extend_schema_view(
     get=extend_schema(

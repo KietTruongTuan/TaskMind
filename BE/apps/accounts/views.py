@@ -16,7 +16,8 @@ from django.conf import settings
 from .models import User
 from drf_spectacular.utils import extend_schema
 import logging
-from datetime import timedelta
+from datetime import timedelta, datetime, timezone as dt_timezone
+from django.utils import timezone
 
 logger = logging.getLogger(__name__)
 
@@ -172,7 +173,7 @@ class RefreshTokenView(APIView):
             should_rotate = True
             if rotation_issued_at:
                 try:
-                    issued_at = timezone.datetime.fromtimestamp(rotation_issued_at, tz=timezone.utc)
+                    issued_at = datetime.fromtimestamp(rotation_issued_at, tz=dt_timezone.utc)
                     should_rotate = (timezone.now() - issued_at) > ROTATION_THRESHOLD
                 except (TypeError, ValueError):
                     pass

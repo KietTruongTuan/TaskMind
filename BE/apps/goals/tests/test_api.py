@@ -138,8 +138,8 @@ class TestAuthentication:
 class TestGoalGeneration:
     """Tests for POST /v1/goals/generate"""
 
-    @patch('apps.goals.views.GoalBreakdownView.get_api_key')
-    @patch('apps.goals.views.GoalBreakdownView.get_ai_response')
+    @patch('apps.goals.services.AIGoalGeneratorService.get_api_key')
+    @patch('apps.goals.services.AIGoalGeneratorService.get_ai_response')
     def test_generate_goal_success(self, mock_ai_response, mock_api_key, auth_client, future_deadline):
         """Test successful goal generation with valid inputs"""
         # Mock AI responses
@@ -189,7 +189,38 @@ class TestGoalGeneration:
         response = auth_client.post('/v1/goals/generate', data, format='json')
 
         assert response.status_code == 400
-        assert response.data['error'] == "Please provide a goal's description"
+        assert response.data['error'] == "Please provide a description or upload files to provide context."
+
+    @patch('apps.goals.services.AIGoalGeneratorService.get_api_key')
+    @patch('apps.goals.services.AIGoalGeneratorService.get_ai_response')
+    def test_generate_goal_with_files_only(self, mock_ai_response, mock_api_key, auth_client, future_deadline):
+        """Test success when description is missing but files are uploaded"""
+        from io import BytesIO
+        from django.core.files.uploadedfile import SimpleUploadedFile
+        
+        mock_api_key.return_value = 'fake-api-key'
+        mock_ai_response.side_effect = [
+            [{"name": "File Task", "status": "ToDo", "deadline": future_deadline}],
+            ["A refined description of the goal extracted from the file"]
+        ]
+        
+        # Create a tiny valid dummy pdf file so pypdf doesn't crash on 'PdfReadError'
+        # A simple string will fail PdfReader validation, so we mock extract_context_from_files
+        with patch('apps.goals.services.AIGoalGeneratorService.extract_context_from_files') as mock_extract:
+            mock_extract.return_value = "--- Document Content (test.txt) ---\nThis is some file context."
+            
+            dummy_file = SimpleUploadedFile("test.txt", b"file content", content_type="text/plain")
+            data = {
+                "name": "Test Goal with File",
+                "deadline": future_deadline,
+                "files": [dummy_file]
+                # Notice no description here
+            }
+            # For file uploads, we must use multipart format
+            response = auth_client.post('/v1/goals/generate', data, format='multipart')
+
+        assert response.status_code == 200
+        assert mock_extract.called
 
     def test_generate_goal_missing_deadline_returns_400(self, auth_client):
         """Test error when deadline is missing"""

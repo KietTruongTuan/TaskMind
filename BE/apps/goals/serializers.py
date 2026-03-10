@@ -11,7 +11,9 @@ class GoalGenerateRequestSerializer(serializers.Serializer):
         help_text="The name/title of the goal"
     )
     description = serializers.CharField(
-        help_text="A detailed description of what you want to achieve"
+        help_text="A detailed description of what you want to achieve",
+        required=False,
+        allow_blank=True
     )
     deadline = serializers.DateField(
         help_text="Target completion date (YYYY-MM-DD format)"
@@ -20,6 +22,11 @@ class GoalGenerateRequestSerializer(serializers.Serializer):
         child=serializers.CharField(),
         required=False,
         help_text="Optional list of tags for categorization"
+    )
+    files = serializers.ListField(
+        child=serializers.FileField(),
+        required=False,
+        help_text="Optional physical files (PDF, DOCX, Images) to provide extra context"
     )
 
 
