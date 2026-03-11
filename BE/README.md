@@ -76,8 +76,8 @@ curl -X GET http://localhost:8000/v1/goals/ \
 | POST | `/v1/accounts/login` | Login, get JWT tokens |
 | POST | `/v1/accounts/logout` | Logout (blacklist token) |
 | POST | `/v1/accounts/token/refresh` | Refresh access token |
-| GET | `/v1/goals/` | List all goals |
-| POST | `/v1/goals/` | Create goal with tasks |
+| GET | `/v1/goals` | List all goals |
+| POST | `/v1/goals` | Create goal with tasks |
 | GET | `/v1/goals/{uuid}` | Get goal details |
 | PATCH | `/v1/goals/{uuid}` | Update goal |
 | DELETE | `/v1/goals/{uuid}` | Delete goal |

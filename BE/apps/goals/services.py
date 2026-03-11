@@ -86,7 +86,9 @@ class AIGoalGeneratorService:
                     reader = PdfReader(file)
                     text = ""
                     for page in reader.pages:
-                        text += page.extract_text() + "\n"
+                        page_text = page.extract_text() or ""
+                        if page_text:
+                            text += page_text + "\n"
                     if text.strip():
                         context_parts.append(f"--- Document Content ({file.name}) ---\n{text.strip()}")
                 elif ext == '.docx':
@@ -96,7 +98,8 @@ class AIGoalGeneratorService:
                         context_parts.append(f"--- Document Content ({file.name}) ---\n{text.strip()}")
                 elif ext in ['.jpg', '.jpeg', '.png', '.webp']:
                     image_base64 = base64.b64encode(file.read()).decode('utf-8')
-                    image_summary = AIGoalGeneratorService.analyze_image_with_vision(image_base64, api_key)
+                    mime_type = file.content_type or f"image/{ext.lstrip('.')}" # example: image/jpeg
+                    image_summary = AIGoalGeneratorService.analyze_image_with_vision(image_base64, api_key, mime_type)
                     if image_summary:
                         context_parts.append(f"--- Image Content Description ({file.name}) ---\n{image_summary.strip()}")
             except Exception as e:
@@ -105,7 +108,7 @@ class AIGoalGeneratorService:
         return "\n\n".join(context_parts)
 
     @staticmethod
-    def analyze_image_with_vision(base64_image, api_key):
+    def analyze_image_with_vision(base64_image, api_key, mime_type="image/jpeg"):
         """Use Groq's Vision model to extract context from an image."""
         try:
             client = OpenAI(
@@ -123,7 +126,7 @@ class AIGoalGeneratorService:
                             {
                                 "type": "image_url",
                                 "image_url": {
-                                    "url": f"data:image/jpeg;base64,{base64_image}"
+                                    "url": f"data:{mime_type};base64,{base64_image}"
                                 }
                             }
                         ]
@@ -133,9 +136,12 @@ class AIGoalGeneratorService:
             )
             if response.choices and response.choices[0].message.content:
                 return response.choices[0].message.content
+            # If no usable content is returned, do not inject a placeholder into the prompt.
+            return None
         except Exception as e:
             print(f"Vision API Error: {str(e)}")
-        return "Could not process image."
+            # On failure, return None so callers can skip adding this to the prompt.
+            return None
             
     @staticmethod
     def build_prompt_for_task(name, description, deadline):

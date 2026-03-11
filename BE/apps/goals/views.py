@@ -6,6 +6,9 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from django.utils import timezone
+import json
+import re
+
 from .models import Goal, Task
 from .services import AIGoalGeneratorService
 from .serializers import (
@@ -47,6 +50,22 @@ class GoalBreakdownView(APIView):
 
         if deadline < timezone.now().date().isoformat():
             return Response({"error": "Deadline must be a future date"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # File upload limits
+        MAX_FILES = 5
+        MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB per file
+        ALLOWED_EXTENSIONS = ['.pdf', '.docx', '.jpg', '.jpeg', '.png', '.webp']
+
+        if len(files) > MAX_FILES:
+            return Response({"error": f"Maximum {MAX_FILES} files allowed."}, status=status.HTTP_400_BAD_REQUEST)
+
+        for file in files:
+            if file.size > MAX_FILE_SIZE:
+                return Response({"error": f"File '{file.name}' exceeds the 10MB size limit."}, status=status.HTTP_400_BAD_REQUEST)
+            ext = file.name.rsplit('.', 1)[-1].lower() if '.' in file.name else ''
+            if f'.{ext}' not in ALLOWED_EXTENSIONS:
+                return Response({"error": f"File '{file.name}' has an unsupported format. Allowed: PDF, DOCX, JPG, PNG, WebP."}, status=status.HTTP_400_BAD_REQUEST)
+
         # if not tag:
         #     return Response({"error": "Please provide a goal's tag"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -290,7 +309,7 @@ class TaskDetailView(APIView):
     def get(self, request, pk):
         """
         Retrieve a task by ID
-        URL: GET /v1/tasks/{taskId}/
+        URL: GET /v1/tasks/{taskId}
         """
         task = self.get_object(pk)
         serializer = TaskSerializer(task)
@@ -299,7 +318,7 @@ class TaskDetailView(APIView):
     def patch(self, request, pk):
         """
         Update a task's status, name, or other attributes
-        URL: PATCH /v1/tasks/{taskId}/
+        URL: PATCH /v1/tasks/{taskId}
         """
         task = self.get_object(pk)
         serializer = TaskSerializer(task, data=request.data, partial=True)
@@ -316,7 +335,7 @@ class TaskDetailView(APIView):
     def delete(self, request, pk):
         """
         Delete a task
-        URL: DELETE /v1/tasks/{taskId}/
+        URL: DELETE /v1/tasks/{taskId}
         """
         task = self.get_object(pk)
         task.delete()
