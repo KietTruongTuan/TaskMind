@@ -1,7 +1,8 @@
 "use client";
-import { authenticationService, UserPayload } from "@/app/constants";
+import { ApiError, authenticationService, UserPayload } from "@/app/constants";
 import { jwtDecode } from "jwt-decode";
 import { createContext, useContext, useEffect, useState } from "react";
+import { isAxiosError } from "axios";
 
 const TokenRefresherContext = createContext<{
   user?: UserPayload;
@@ -26,8 +27,11 @@ export function TokenRefresherProvider({
           const user = jwtDecode<UserPayload>(access);
           setUser(user);
         }
-      } catch {
-        authenticationService.logout();
+      } catch (err) {
+        const error = err as ApiError;
+        if (error.status === 401) {
+          authenticationService.clearAccessToken();
+        }
       } finally {
         setLoading(false);
       }
@@ -46,7 +50,7 @@ export function useTokenRefresherContext() {
   const context = useContext(TokenRefresherContext);
   if (!context)
     throw new Error(
-      "useTokenRefresherContext must be used inside TokenRefresherProvider"
+      "useTokenRefresherContext must be used inside TokenRefresherProvider",
     );
   return context;
 }

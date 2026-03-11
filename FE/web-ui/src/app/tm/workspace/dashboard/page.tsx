@@ -8,55 +8,70 @@ import { GoalCard } from "@/app/components/goal-card/goal-card";
 import { GoalCompletedCard } from "@/app/components/goal-completed-card/goal-completed-card";
 import { Crown, TrendingUp } from "lucide-react";
 import { GreetingText } from "@/app/components/greeting-text/greeting-text";
+import { Status } from "@/app/enum/status.enum";
 
 export default function DashboardPage() {
   const recentGoals: GoalCardPropsData[] = [
     {
       name: "Learn TypeScript",
+      status: Status.InProgress,
       tag: ["Study"],
       deadline: new Date("2025-12-31"),
-      progress: 45,
+      completedCount: 10,
+      taskCount: 20,
     },
     {
       name: "ABC Project",
+      status: Status.InProgress,
       tag: ["Work"],
       deadline: new Date("2025-10-15"),
-      progress: 90,
+      completedCount: 10,
+      taskCount: 20,
     },
     {
       name: "Six-pack abs",
+      status: Status.InProgress,
       tag: ["Health", "Gym"],
       deadline: new Date("2025-12-31"),
-      progress: 60,
+      completedCount: 10,
+      taskCount: 20,
     },
     {
       name: "Visit Indonesia",
+      status: Status.InProgress,
       tag: ["Travel"],
       deadline: new Date("2025-11-01"),
-      progress: 20,
+      completedCount: 10,
+      taskCount: 20,
     },
   ];
 
   const recentCompletedGoals: GoalCardPropsData[] = [
     {
       name: "Learn TypeScript",
+      status: Status.InProgress,
       tag: ["Study"],
       deadline: new Date("2025-12-31"),
-      progress: 45,
+      completedCount: 10,
+      taskCount: 20,
       completedDate: new Date("2025-09-02"),
     },
     {
       name: "ABC Project",
+      status: Status.InProgress,
       tag: ["Work"],
       deadline: new Date("2025-10-15"),
-      progress: 90,
+      completedCount: 10,
+      taskCount: 20,
       completedDate: new Date("2025-08-02"),
     },
     {
       name: "ABC Project",
+      status: Status.InProgress,
       tag: ["Work"],
       deadline: new Date("2025-09-06"),
-      progress: 90,
+      completedCount: 10,
+      taskCount: 20,
       completedDate: new Date("2025-09-06"),
     },
   ];

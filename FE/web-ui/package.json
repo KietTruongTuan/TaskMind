@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -H 0.0.0.0",
+    "dev": "next dev -H 0.0.0.0 -p ${PORT:-3000}",
     "build": "next build",
     "start": "next start",
     "build:tokens": "cd ./FE/web-ui/ && style-dictionary build --config ./style-dictionary.config.js --verbose   # build .scss styles from .json tokens",
@@ -14,11 +14,11 @@
   },
   "dependencies": {
     "geist": "^1.4.2",
-    "next": "15.4.1",
+    "next": "16.1.6",
     "non.geist": "^1.0.4",
     "pnpm": "10.14.0",
-    "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
   },
   "devDependencies": {
     "@cucumber/cucumber": "12.1.0",
@@ -29,6 +29,7 @@
     "@radix-ui/react-alert-dialog": "^1.1.15",
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-form": "^0.1.8",
+    "@radix-ui/react-label": "^2.1.8",
     "@radix-ui/react-toast": "^1.2.15",
     "@radix-ui/themes": "3.2.1",
     "@testing-library/dom": "10.4.0",

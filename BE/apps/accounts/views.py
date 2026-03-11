@@ -85,9 +85,9 @@ class LoginView(APIView):
             response.set_cookie(
                 key='refresh_token',
                 value=str(refresh),
-                httponly=True,  # Cannot be accessed by JavaScript
-                secure=False,  # Set to True in production with HTTPS
-                samesite='Lax',  # CSRF protection ('Strict' or 'Lax')
+                httponly=True,   # Cannot be accessed by JavaScript
+                secure=True,     # Required for HTTPS (production)
+                samesite='None', # Required for cross-origin requests (FE and BE on different domains)
                 max_age=settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME'].total_seconds(),
                 path='/',
             )
