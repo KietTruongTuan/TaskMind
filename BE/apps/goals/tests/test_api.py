@@ -217,7 +217,7 @@ class TestGoalGeneration:
         with patch('apps.goals.services.AIGoalGeneratorService.extract_context_from_files') as mock_extract:
             mock_extract.return_value = "--- Document Content (test.txt) ---\nThis is some file context."
             
-            dummy_file = SimpleUploadedFile("test.txt", b"file content", content_type="text/plain")
+            dummy_file = SimpleUploadedFile("test.pdf", b"file content", content_type="application/pdf")
             data = {
                 "name": "Test Goal with File",
                 "deadline": future_deadline,

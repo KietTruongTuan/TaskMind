@@ -198,13 +198,24 @@ class RefreshTokenView(APIView):
             }, status=status.HTTP_200_OK)
             
             # Set new refresh token as HttpOnly cookie
+            if should_rotate:
+                cookie_max_age = settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME'].total_seconds()
+            else:
+                # Use the token's actual remaining lifetime so the cookie doesn't outlive the token
+                exp = refresh.get('exp')
+                if exp:
+                    remaining = datetime.fromtimestamp(exp, tz=dt_timezone.utc) - datetime.now(tz=dt_timezone.utc)
+                    cookie_max_age = max(int(remaining.total_seconds()), 0)
+                else:
+                    cookie_max_age = settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME'].total_seconds()
+
             response.set_cookie(
                 key='refresh_token',
                 value=refresh_token if not should_rotate else str(new_refresh),
                 httponly=True,
                 secure=False, # Set to True in production
                 samesite='Lax',
-                max_age=settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME'].total_seconds(),
+                max_age=cookie_max_age,
                 path='/',
             )
             return response

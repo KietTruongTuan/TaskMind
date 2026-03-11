@@ -2,10 +2,13 @@ import os
 import json
 import base64
 import re
+import logging
 from openai import OpenAI
 from pypdf import PdfReader
 from docx import Document
 from django.utils import timezone
+
+logger = logging.getLogger(__name__)
 
 class AIGoalGeneratorService:
     """Service class for handling AI goal generation and document parsing"""
@@ -103,7 +106,7 @@ class AIGoalGeneratorService:
                     if image_summary:
                         context_parts.append(f"--- Image Content Description ({file.name}) ---\n{image_summary.strip()}")
             except Exception as e:
-                print(f"Failed to process file {file.name}: {str(e)}")
+                logger.warning("Failed to process file %s: %s", file.name, str(e), exc_info=True)
                 continue
         return "\n\n".join(context_parts)
 
@@ -139,7 +142,7 @@ class AIGoalGeneratorService:
             # If no usable content is returned, do not inject a placeholder into the prompt.
             return None
         except Exception as e:
-            print(f"Vision API Error: {str(e)}")
+            logger.error("Vision API Error for image: %s", str(e), exc_info=True)
             # On failure, return None so callers can skip adding this to the prompt.
             return None
             
