@@ -60,7 +60,7 @@ describe("AuthenticationService", () => {
       .mockResolvedValue(MOCK_ACCESS_TOKEN);
 
     const result = await authenticationService.refresh({ noRotation: true });
-    expect(postSpy).toHaveBeenCalledWith(ApiUrl.LocalRefreshToken, { noRotation: true });
+    expect(postSpy).toHaveBeenCalledWith(ApiUrl.LocalRefreshToken, { no_rotation: true });
 
     expect(result).toEqual(MOCK_ACCESS_TOKEN);
   });
