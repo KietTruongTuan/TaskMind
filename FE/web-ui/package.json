@@ -10,7 +10,7 @@
     "lint": "next lint",
     "eslint --fix": "eslint --fix",
     "test:unit": "jest --coverage",
-    "test:e2e": "(cucumber-js e2e/  features  || true) && tsx e2e/helper/report/report.ts"
+    "test:e2e": "(cucumber-js e2e/  features  || exit 0) && tsx e2e/helper/report/report.ts"
   },
   "dependencies": {
     "@dnd-kit/utilities": "3.2.2",
