@@ -1,4 +1,4 @@
-import { Given, When, Then } from '@cucumber/cucumber';
+import { Given, When, Then, DataTable } from '@cucumber/cucumber';
 import { expect } from '@playwright/test';
 import { CustomWorld } from './shared.steps';
 
@@ -17,4 +17,18 @@ When('I click the login button', async function (this: CustomWorld) {
 
 Then('I should see the {string} page', async function (this: CustomWorld, expectedText: string) {
     await expect(this.page.getByText(expectedText).first()).toBeVisible();
+});
+Then('I should see the greeting Hi, {string}!', async function (this: CustomWorld, username: string) {
+    await expect(this.page.getByRole('heading', {name: `Hi, ${username}!`}).first()).toBeVisible();
+});
+
+Then('I should see the {string} section', async function (this: CustomWorld, sectionName: string) {
+    await expect(this.page.getByText(sectionName).first()).toBeVisible();
+});
+
+Then('I should see the metrics:', async function (this: CustomWorld, dataTable: DataTable) {
+    const metrics = dataTable.raw().flat();
+    for (const metric of metrics) {
+        await expect(this.page.getByText(metric).first()).toBeVisible();
+    }
 });
