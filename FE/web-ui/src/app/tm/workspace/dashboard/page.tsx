@@ -15,6 +15,8 @@ export default function DashboardPage() {
     {
       name: "Learn TypeScript",
       status: Status.InProgress,
+      description:
+        "Master TypeScript to enhance your JavaScript skills and build robust applications.",
       tag: ["Study"],
       deadline: new Date("2025-12-31"),
       completedCount: 10,
@@ -23,6 +25,8 @@ export default function DashboardPage() {
     {
       name: "ABC Project",
       status: Status.InProgress,
+      description:
+        "Complete the ABC project to deliver a high-quality product that meets client requirements and deadlines.",
       tag: ["Work"],
       deadline: new Date("2025-10-15"),
       completedCount: 10,
@@ -31,6 +35,8 @@ export default function DashboardPage() {
     {
       name: "Six-pack abs",
       status: Status.InProgress,
+      description:
+        "Achieve six-pack abs through a combination of regular exercise, a healthy diet, and consistent effort to improve physical fitness.",
       tag: ["Health", "Gym"],
       deadline: new Date("2025-12-31"),
       completedCount: 10,
@@ -39,6 +45,8 @@ export default function DashboardPage() {
     {
       name: "Visit Indonesia",
       status: Status.InProgress,
+      description:
+        "Explore the diverse culture, stunning landscapes, and vibrant cities of Indonesia for an unforgettable travel experience.",
       tag: ["Travel"],
       deadline: new Date("2025-11-01"),
       completedCount: 10,
@@ -50,6 +58,8 @@ export default function DashboardPage() {
     {
       name: "Learn TypeScript",
       status: Status.InProgress,
+      description:
+        "Master TypeScript to enhance your JavaScript skills and build robust applications.",
       tag: ["Study"],
       deadline: new Date("2025-12-31"),
       completedCount: 10,
@@ -59,6 +69,8 @@ export default function DashboardPage() {
     {
       name: "ABC Project",
       status: Status.InProgress,
+      description:
+        "Complete the ABC project to deliver a high-quality product that meets client requirements and deadlines.",
       tag: ["Work"],
       deadline: new Date("2025-10-15"),
       completedCount: 10,
@@ -67,6 +79,8 @@ export default function DashboardPage() {
     },
     {
       name: "ABC Project",
+      description:
+        "Complete the ABC project to deliver a high-quality product that meets client requirements and deadlines.",
       status: Status.InProgress,
       tag: ["Work"],
       deadline: new Date("2025-09-06"),
