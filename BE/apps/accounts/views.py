@@ -147,6 +147,10 @@ class RefreshTokenView(APIView):
 
         ROTATION_THRESHOLD = timedelta(hours=24)
 
+        # Check if request comes from server-side (Next.js SSR)
+        # Server-side cannot update browser's HttpOnly cookie, so skip rotation
+        is_server_side = request.headers.get('X-Server-Side') == 'true'
+
         try:
             # Verify refresh token
             refresh = RefreshToken(refresh_token)
@@ -167,6 +171,13 @@ class RefreshTokenView(APIView):
                     {'error': 'User not found'}, 
                     status=status.HTTP_401_UNAUTHORIZED
                 )
+
+            # Skip rotation entirely for server-side requests
+            if is_server_side:
+                access_token = str(refresh.access_token)
+                return Response({
+                    'access': access_token
+                }, status=status.HTTP_200_OK)
 
             # Read rotation_issued_at from token payload
             rotation_issued_at = refresh.get('rotation_issued_at')
