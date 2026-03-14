@@ -123,12 +123,12 @@ class TestAuthentication:
 
     def test_list_goals_unauthenticated_returns_401(self, unauthenticated_client):
         """Unauthenticated users cannot list goals (JWT auth returns 401)"""
-        response = unauthenticated_client.get('/v1/goals/')
+        response = unauthenticated_client.get('/v1/goals')
         assert response.status_code == 401
 
     def test_create_goal_unauthenticated_returns_401(self, unauthenticated_client, sample_goal_data):
         """Unauthenticated users cannot create goals"""
-        response = unauthenticated_client.post('/v1/goals/', sample_goal_data, format='json')
+        response = unauthenticated_client.post('/v1/goals', sample_goal_data, format='json')
         assert response.status_code == 401
 
 
@@ -138,8 +138,8 @@ class TestAuthentication:
 class TestGoalGeneration:
     """Tests for POST /v1/goals/generate"""
 
-    @patch('apps.goals.views.GoalBreakdownView.get_api_key')
-    @patch('apps.goals.views.GoalBreakdownView.get_ai_response')
+    @patch('apps.goals.services.AIGoalGeneratorService.get_api_key')
+    @patch('apps.goals.services.AIGoalGeneratorService.get_ai_response')
     def test_generate_goal_success(self, mock_ai_response, mock_api_key, auth_client, future_deadline):
         """Test successful goal generation with valid inputs"""
         # Mock AI responses
@@ -180,16 +180,55 @@ class TestGoalGeneration:
         assert response.status_code == 400
         assert response.data['error'] == "Please provide a goal's name"
 
-    def test_generate_goal_missing_description_returns_400(self, auth_client, future_deadline):
-        """Test error when description is missing"""
+    @patch('apps.goals.services.AIGoalGeneratorService.get_api_key')
+    @patch('apps.goals.services.AIGoalGeneratorService.get_ai_response')
+    def test_generate_goal_missing_description_returns_200(self, mock_ai_response, mock_api_key, auth_client, future_deadline):
+        """Test success when description is missing (optional)"""
+        mock_api_key.return_value = 'fake-api-key'
+        mock_ai_response.side_effect = [
+            [{"name": "Generated Task", "status": "ToDo", "deadline": future_deadline}],
+            ["A generated description of the goal"]
+        ]
+        
         data = {
             "name": "Test Goal",
             "deadline": future_deadline
         }
         response = auth_client.post('/v1/goals/generate', data, format='json')
 
-        assert response.status_code == 400
-        assert response.data['error'] == "Please provide a goal's description"
+        assert response.status_code == 200
+        assert response.data['name'] == "Test Goal"
+
+    @patch('apps.goals.services.AIGoalGeneratorService.get_api_key')
+    @patch('apps.goals.services.AIGoalGeneratorService.get_ai_response')
+    def test_generate_goal_with_files_only(self, mock_ai_response, mock_api_key, auth_client, future_deadline):
+        """Test success when description is missing but files are uploaded"""
+        from io import BytesIO
+        from django.core.files.uploadedfile import SimpleUploadedFile
+        
+        mock_api_key.return_value = 'fake-api-key'
+        mock_ai_response.side_effect = [
+            [{"name": "File Task", "status": "ToDo", "deadline": future_deadline}],
+            ["A refined description of the goal extracted from the file"]
+        ]
+        
+        # Create a tiny valid dummy pdf file so pypdf doesn't crash on 'PdfReadError'
+        # A simple string will fail PdfReader validation, so we mock extract_context_from_files
+        with patch('apps.goals.services.AIGoalGeneratorService.extract_context_from_files') as mock_extract:
+            mock_extract.return_value = "--- Document Content (test.txt) ---\nThis is some file context."
+            
+            dummy_file = SimpleUploadedFile("test.pdf", b"file content", content_type="application/pdf")
+            data = {
+                "name": "Test Goal with File",
+                "deadline": future_deadline,
+                "files": [dummy_file]
+                # Notice no description here
+            }
+            # For file uploads, we must use multipart format
+            response = auth_client.post('/v1/goals/generate', data, format='multipart')
+
+        assert response.status_code == 200
+        assert mock_extract.called
 
     def test_generate_goal_missing_deadline_returns_400(self, auth_client):
         """Test error when deadline is missing"""
@@ -224,7 +263,7 @@ class TestGoalCreate:
 
     def test_create_goal_success(self, auth_client, sample_goal_data):
         """Test successful goal creation with tasks"""
-        response = auth_client.post('/v1/goals/', sample_goal_data, format='json')
+        response = auth_client.post('/v1/goals', sample_goal_data, format='json')
 
         assert response.status_code == 201
         assert response.data['name'] == sample_goal_data['name']
@@ -240,7 +279,7 @@ class TestGoalCreate:
             "deadline": future_deadline,
             "tag": []
         }
-        response = auth_client.post('/v1/goals/', data, format='json')
+        response = auth_client.post('/v1/goals', data, format='json')
 
         assert response.status_code == 201
         assert response.data['task_count'] == 0
@@ -252,7 +291,7 @@ class TestGoalList:
 
     def test_list_goals_success(self, auth_client, created_goal):
         """Test listing all goals"""
-        response = auth_client.get('/v1/goals/')
+        response = auth_client.get('/v1/goals')
 
         assert response.status_code == 200
         assert len(response.data) == 1
@@ -264,7 +303,7 @@ class TestGoalList:
         Goal.objects.create(user=user, name="ToDo Goal", status="ToDo", deadline=future_deadline)
         Goal.objects.create(user=user, name="InProgress Goal", status="InProgress", deadline=future_deadline)
 
-        response = auth_client.get('/v1/goals/?status=InProgress')
+        response = auth_client.get('/v1/goals?status=InProgress')
 
         assert response.status_code == 200
         assert len(response.data) == 1
@@ -275,7 +314,7 @@ class TestGoalList:
         Goal.objects.create(user=user, name="Capstone Project", status="ToDo", deadline=future_deadline)
         Goal.objects.create(user=user, name="Other Goal", status="ToDo", deadline=future_deadline)
 
-        response = auth_client.get('/v1/goals/?search=capstone')
+        response = auth_client.get('/v1/goals?search=capstone')
 
         assert response.status_code == 200
         assert len(response.data) == 1
@@ -286,7 +325,7 @@ class TestGoalList:
         # Create goal for other user
         Goal.objects.create(user=other_user, name="Other User Goal", status="ToDo", deadline=future_deadline)
 
-        response = auth_client.get('/v1/goals/')
+        response = auth_client.get('/v1/goals')
 
         assert response.status_code == 200
         assert len(response.data) == 0  # Should not see other user's goals
@@ -298,7 +337,7 @@ class TestGoalDetail:
 
     def test_get_goal_by_id_success(self, auth_client, created_goal):
         """Test getting goal by ID with tasks"""
-        response = auth_client.get(f'/v1/goals/{created_goal.id}/')
+        response = auth_client.get(f'/v1/goals/{created_goal.id}')
 
         assert response.status_code == 200
         assert str(response.data['id']) == str(created_goal.id)
@@ -310,7 +349,7 @@ class TestGoalDetail:
         """Test 404 when goal doesn't exist"""
         import uuid
         fake_uuid = uuid.uuid4()
-        response = auth_client.get(f'/v1/goals/{fake_uuid}/')
+        response = auth_client.get(f'/v1/goals/{fake_uuid}')
 
         assert response.status_code == 404
 
@@ -325,7 +364,7 @@ class TestGoalUpdate:
             "name": "Updated Goal Name",
             "status": "InProgress"
         }
-        response = auth_client.patch(f'/v1/goals/{created_goal.id}/', update_data, format='json')
+        response = auth_client.patch(f'/v1/goals/{created_goal.id}', update_data, format='json')
 
         assert response.status_code == 200
         assert response.data['name'] == "Updated Goal Name"
@@ -341,7 +380,7 @@ class TestGoalUpdate:
                 {"name": "New Task", "status": "ToDo", "deadline": future_deadline}
             ]
         }
-        response = auth_client.patch(f'/v1/goals/{created_goal.id}/', update_data, format='json')
+        response = auth_client.patch(f'/v1/goals/{created_goal.id}', update_data, format='json')
 
         assert response.status_code == 200
 
@@ -352,7 +391,7 @@ class TestGoalDelete:
 
     def test_delete_goal_success(self, auth_client, created_goal):
         """Test successful goal deletion"""
-        response = auth_client.delete(f'/v1/goals/{created_goal.id}/')
+        response = auth_client.delete(f'/v1/goals/{created_goal.id}')
 
         assert response.status_code == 204
         assert not Goal.objects.filter(id=created_goal.id).exists()
@@ -360,7 +399,7 @@ class TestGoalDelete:
     def test_delete_goal_cascades_tasks(self, auth_client, created_goal):
         """Test that deleting goal also deletes tasks"""
         task_ids = list(created_goal.tasks.values_list('id', flat=True))
-        auth_client.delete(f'/v1/goals/{created_goal.id}/')
+        auth_client.delete(f'/v1/goals/{created_goal.id}')
 
         assert Task.objects.filter(id__in=task_ids).count() == 0
 
@@ -375,7 +414,7 @@ class TestTaskUpdate:
         """Test updating task status"""
         task = created_goal.tasks.first()
         response = auth_client.patch(
-            f'/v1/tasks/{task.id}/',
+            f'/v1/tasks/{task.id}',
             {"status": "InProgress"},
             format='json'
         )
@@ -387,7 +426,7 @@ class TestTaskUpdate:
         """Test that completing task auto-sets complete_date"""
         task = created_goal.tasks.first()
         response = auth_client.patch(
-            f'/v1/tasks/{task.id}/',
+            f'/v1/tasks/{task.id}',
             {"status": "Completed"},
             format='json'
         )
@@ -401,7 +440,7 @@ class TestTaskUpdate:
         """Test updating task name"""
         task = created_goal.tasks.first()
         response = auth_client.patch(
-            f'/v1/tasks/{task.id}/',
+            f'/v1/tasks/{task.id}',
             {"name": "Renamed Task"},
             format='json'
         )
@@ -420,7 +459,7 @@ class TestTaskDelete:
         """Test successful task deletion"""
         task = created_goal.tasks.first()
         task_id = task.id
-        response = auth_client.delete(f'/v1/tasks/{task_id}/')
+        response = auth_client.delete(f'/v1/tasks/{task_id}')
 
         assert response.status_code == 204
         assert not Task.objects.filter(id=task_id).exists()
@@ -429,9 +468,65 @@ class TestTaskDelete:
         """Test 404 when task doesn't exist"""
         import uuid
         fake_uuid = uuid.uuid4()
-        response = auth_client.delete(f'/v1/tasks/{fake_uuid}/')
+        response = auth_client.delete(f'/v1/tasks/{fake_uuid}')
 
         assert response.status_code == 404
+
+
+# ============ TASK CREATE TESTS ============
+
+@pytest.mark.django_db
+class TestTaskCreate:
+    """Tests for POST /v1/tasks/"""
+
+    def test_create_task_success(self, auth_client, created_goal, future_deadline):
+        """Test successful task creation"""
+        data = {
+            "goal_id": str(created_goal.id),
+            "name": "New Task Name",
+            "deadline": future_deadline
+        }
+        response = auth_client.post('/v1/tasks', data, format='json')
+
+        assert response.status_code == 201
+        assert response.data['name'] == "New Task Name"
+        assert 'id' in response.data
+
+    def test_create_task_missing_goal_id_returns_400(self, auth_client, future_deadline):
+        """Test error when goal_id is missing"""
+        data = {
+            "name": "New Task Name",
+            "deadline": future_deadline
+        }
+        response = auth_client.post('/v1/tasks', data, format='json')
+
+        assert response.status_code == 400
+        assert "goal_id" in response.data
+
+    def test_create_task_other_users_goal_returns_404(self, auth_client, other_user, future_deadline):
+        """Test cannot create task for someone else's goal"""
+        other_goal = Goal.objects.create(
+            user=other_user, name="Other Goal", status="ToDo", deadline=future_deadline
+        )
+        data = {
+            "goal_id": str(other_goal.id),
+            "name": "Sneaky Task",
+            "deadline": future_deadline
+        }
+        response = auth_client.post('/v1/tasks', data, format='json')
+
+        assert response.status_code == 404
+
+    def test_create_task_missing_required_fields_returns_400(self, auth_client, created_goal):
+        """Test error when required fields like name are missing"""
+        data = {
+            "goal_id": str(created_goal.id)
+            # missing name and deadline
+        }
+        response = auth_client.post('/v1/tasks', data, format='json')
+
+        assert response.status_code == 400
+        assert "name" in response.data
 
 
 # ============ TASK LIST TESTS ============
@@ -442,7 +537,7 @@ class TestTaskList:
 
     def test_list_tasks_success(self, auth_client, created_goal):
         """Test listing all tasks"""
-        response = auth_client.get('/v1/tasks/')
+        response = auth_client.get('/v1/tasks')
 
         assert response.status_code == 200
         assert len(response.data) == 2  # created_goal has 2 tasks
@@ -457,7 +552,7 @@ class TestTaskList:
         task.status = "InProgress"
         task.save()
 
-        response = auth_client.get('/v1/tasks/?status=InProgress')
+        response = auth_client.get('/v1/tasks?status=InProgress')
 
         assert response.status_code == 200
         assert len(response.data) == 1
@@ -471,7 +566,7 @@ class TestTaskList:
         Task.objects.create(goal=goal1, name="Task for Goal 1", status="ToDo", deadline=future_deadline)
         Task.objects.create(goal=goal2, name="Task for Goal 2", status="ToDo", deadline=future_deadline)
 
-        response = auth_client.get(f'/v1/tasks/?goalId={goal1.id}')
+        response = auth_client.get(f'/v1/tasks?goalId={goal1.id}')
 
         assert response.status_code == 200
         assert len(response.data) == 1
@@ -479,7 +574,7 @@ class TestTaskList:
 
     def test_list_tasks_search(self, auth_client, created_goal):
         """Test searching tasks by name"""
-        response = auth_client.get('/v1/tasks/?search=Task 1')
+        response = auth_client.get('/v1/tasks?search=Task 1')
 
         assert response.status_code == 200
         assert len(response.data) == 1
@@ -500,7 +595,7 @@ class TestTaskList:
             deadline=timezone.now().date() + timedelta(days=5)
         )
 
-        response = auth_client.get('/v1/tasks/')
+        response = auth_client.get('/v1/tasks')
 
         assert response.status_code == 200
         # Earlier deadline should come first
@@ -517,7 +612,7 @@ class TestTaskList:
             goal=other_goal, name="Other User Task", status="ToDo", deadline=future_deadline
         )
 
-        response = auth_client.get('/v1/tasks/')
+        response = auth_client.get('/v1/tasks')
 
         assert response.status_code == 200
         assert len(response.data) == 0  # Should not see other user's tasks

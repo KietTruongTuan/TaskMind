@@ -220,7 +220,7 @@ AUTHENTICATION_BACKENDS = [
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),  # Short-lived
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),    # Long-lived
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=2),    # Long-lived
     
     # Enable token blacklisting
     'ROTATE_REFRESH_TOKENS': True, # Rotate refresh tokens on each use

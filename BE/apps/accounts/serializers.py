@@ -2,6 +2,7 @@ from django.contrib.auth import authenticate
 from rest_framework import serializers
 from .models import User
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.utils import timezone
 
 class RegisterSerializer(serializers.ModelSerializer):
     """Serializer for user registration
@@ -71,5 +72,8 @@ class CustomTokenSerializer:
         # Add custom claims
         token['username'] = user.username
         token['email'] = user.email
+
+        # ADD: rotation window start timestamp
+        token['rotation_issued_at'] = timezone.now().timestamp()
         
         return token

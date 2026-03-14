@@ -170,7 +170,7 @@ class TestEndToEndGoalFlow:
             })
         
         save_response = api_client.post(
-            '/v1/goals/',
+            '/v1/goals',
             save_request,
             format='json'
         )
@@ -190,7 +190,7 @@ class TestEndToEndGoalFlow:
         print("="*60)
         
         goal_id = saved_goal.get('id')
-        verify_response = api_client.get(f'/v1/goals/{goal_id}/')
+        verify_response = api_client.get(f'/v1/goals/{goal_id}')
         
         assert verify_response.status_code == 200, f"Verify failed: {verify_response.data}"
         

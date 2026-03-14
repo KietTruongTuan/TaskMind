@@ -16,6 +16,8 @@ from django.conf import settings
 from .models import User
 from drf_spectacular.utils import extend_schema
 import logging
+from datetime import timedelta, datetime, timezone as dt_timezone
+from django.utils import timezone
 
 logger = logging.getLogger(__name__)
 
@@ -136,27 +138,26 @@ class RefreshTokenView(APIView):
         # Get refresh token from HttpOnly cookie
         
         refresh_token = request.COOKIES.get('refresh_token')
-        print(refresh_token)
 
         if not refresh_token:
             return Response(
                 {'error': 'Refresh token not found'},
                 status=status.HTTP_401_UNAUTHORIZED
             )
+
+        ROTATION_THRESHOLD = timedelta(hours=24)
+
         try:
             # Verify refresh token
             refresh = RefreshToken(refresh_token)
             
             # Get user ID from the token payload
             user_id = refresh.get('user_id')  # or refresh['user_id']
-            
             if not user_id:
-                
                 return Response(
                     {'error': 'Invalid token payload'}, 
                     status=status.HTTP_401_UNAUTHORIZED
                 )
-            
             
             # Fetch the user from database
             try:
@@ -167,33 +168,56 @@ class RefreshTokenView(APIView):
                     status=status.HTTP_401_UNAUTHORIZED
                 )
 
+            # Read rotation_issued_at from token payload
+            rotation_issued_at = refresh.get('rotation_issued_at')
+            should_rotate = True
+            if rotation_issued_at:
+                try:
+                    issued_at = datetime.fromtimestamp(rotation_issued_at, tz=dt_timezone.utc)
+                    should_rotate = (timezone.now() - issued_at) > ROTATION_THRESHOLD
+                except (TypeError, ValueError):
+                    pass
+
             # Blacklist the old refresh token (if rotation is enabled)
-            try: 
-                refresh.blacklist()
-            except AttributeError:
-                pass  # Blacklisting not enabled
-            except (TokenError, Exception) as e:
-                logger.warning(f"Failed to blacklist token: {e}")
+            if should_rotate:
+                try: 
+                    refresh.blacklist()
+                except AttributeError:
+                    pass  # Blacklisting not enabled
+                except (TokenError, Exception) as e:
+                    logger.warning(f"Failed to blacklist token: {e}")
             
-            # Create new refresh token
-            new_refresh = CustomTokenSerializer.get_token(user)
-            access_token = str(new_refresh.access_token)
+                # Create new refresh token
+                new_refresh = CustomTokenSerializer.get_token(user)
+                access_token = str(new_refresh.access_token)
+            else:
+                access_token = str(refresh.access_token)
 
             response = Response({
                 'access': access_token
             }, status=status.HTTP_200_OK)
             
             # Set new refresh token as HttpOnly cookie
+            if should_rotate:
+                cookie_max_age = settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME'].total_seconds()
+            else:
+                # Use the token's actual remaining lifetime so the cookie doesn't outlive the token
+                exp = refresh.get('exp')
+                if exp:
+                    remaining = datetime.fromtimestamp(exp, tz=dt_timezone.utc) - datetime.now(tz=dt_timezone.utc)
+                    cookie_max_age = max(int(remaining.total_seconds()), 0)
+                else:
+                    cookie_max_age = settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME'].total_seconds()
+
             response.set_cookie(
                 key='refresh_token',
-                value=str(new_refresh),
+                value=refresh_token if not should_rotate else str(new_refresh),
                 httponly=True,
-                secure=True,     # Required for HTTPS (production)
-                samesite='None', # Required for cross-origin requests (FE and BE on different domains)
-                max_age=settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME'].total_seconds(),
+                secure=False, # Set to True in production
+                samesite='Lax',
+                max_age=cookie_max_age,
                 path='/',
             )
-            print(response)
             return response
             
             
