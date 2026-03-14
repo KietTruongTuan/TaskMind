@@ -5,7 +5,11 @@ import { DraftTask, DraftTaskRequestBody, Task } from "@/app/constants";
 
 export class TaskService extends HttpService {
   constructor() {
-    super(process.env.NEXT_PUBLIC_API_BASE_URL);
+    super(
+      typeof window === "undefined"
+        ? process.env.INTERNAL_API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL
+        : process.env.NEXT_PUBLIC_API_BASE_URL
+    );
   }
 
   async update(id: string, data: DraftTaskRequestBody) {

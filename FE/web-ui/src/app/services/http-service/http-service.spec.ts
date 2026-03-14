@@ -1,3 +1,6 @@
+/**
+ * @jest-environment node
+ */
 import axios, { AxiosInstance, AxiosResponse } from "axios";
 import { HttpService } from "./http-service";
 
@@ -55,13 +58,13 @@ describe("HttpService", () => {
 
       const res = await httpService.post<typeof output, typeof input>(
         "/users",
-        input
+        input,
       );
 
       expect(mockAxiosInstance.post).toHaveBeenCalledWith(
         "/users",
         input,
-        undefined
+        undefined,
       );
       expect(res).toEqual(output);
     });
@@ -76,13 +79,13 @@ describe("HttpService", () => {
 
       const res = await httpService.patch<typeof output, typeof patchData>(
         "/users/1",
-        patchData
+        patchData,
       );
 
       expect(mockAxiosInstance.patch).toHaveBeenCalledWith(
         "/users/1",
         patchData,
-        undefined
+        undefined,
       );
       expect(res).toEqual(output);
     });
@@ -98,13 +101,13 @@ describe("HttpService", () => {
 
       const res = await httpService.put<typeof output, typeof updateData>(
         "/users/1",
-        updateData
+        updateData,
       );
 
       expect(mockAxiosInstance.put).toHaveBeenCalledWith(
         "/users/1",
         updateData,
-        undefined
+        undefined,
       );
       expect(res).toEqual(output);
     });
@@ -121,7 +124,7 @@ describe("HttpService", () => {
 
       expect(mockAxiosInstance.delete).toHaveBeenCalledWith(
         "/users/1",
-        undefined
+        undefined,
       );
       expect(res).toEqual(deleted);
     });
@@ -175,4 +178,42 @@ describe("HttpService", () => {
       });
     });
   });
+  describe("Base URL Resolution (window environment)", () => {
+    const originalFrontendUrl = process.env.FRONTEND_URL;
+
+    beforeEach(() => {
+      jest.clearAllMocks();
+    });
+
+    afterAll(() => {
+      process.env.FRONTEND_URL = originalFrontendUrl;
+    });
+
+    it("should use process.env.FRONTEND_URL when window is undefined (Server-side)", () => {
+      process.env.FRONTEND_URL = "https://server-side.test";
+
+      new HttpService();
+
+      expect(mockedAxios.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          baseURL: "https://server-side.test",
+        })
+      );
+    });
+
+    it("should use empty string when window is defined but no URL is passed (Client-side)", () => {
+      global.window = {} as any;
+
+      new HttpService();
+
+      expect(mockedAxios.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          baseURL: "",
+        })
+      );
+
+      delete (global as any).window;
+    });
+  });
 });
+

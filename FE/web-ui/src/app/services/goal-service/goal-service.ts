@@ -11,7 +11,11 @@ import { buildUrl } from "@/app/tm/utils";
 
 export class GoalService extends HttpService {
   constructor() {
-    super(process.env.NEXT_PUBLIC_API_BASE_URL);
+    super(
+      typeof window === "undefined"
+        ? process.env.INTERNAL_API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL
+        : process.env.NEXT_PUBLIC_API_BASE_URL
+    );
   }
 
   async save(data: SaveGoalRequestBody) {

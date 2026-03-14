@@ -5,36 +5,39 @@ const BACKEND_URL = process.env.BACKEND_URL;
 
 export async function POST(request: NextRequest) {
   if (!BACKEND_URL) {
+    return NextResponse.json({ error: "Backend URL not configured" }, { status: 500 });
+  }
+
+  const bodyText = await request.text();
+  const targetUrl = new URL(`${BACKEND_URL}${ApiUrl.RefreshToken}`);
+  const cookieHeader = request.headers.get("cookie") ?? "";
+
+  try {
+    const res = await fetch(targetUrl.toString(), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Cookie: cookieHeader,
+      },
+      body: bodyText || JSON.stringify({}),
+    });
+
+    const data = await res.json();
+    const response = NextResponse.json(data, { status: res.status });
+
+    const setCookies = res.headers.getSetCookie();
+    for (const cookie of setCookies) {
+      response.headers.append("set-cookie", cookie);
+    }
+
+    return response;
+
+  } catch (error) {
+  
+    console.error("Next.js API Route failed to reach Django:", error);
     return NextResponse.json(
-      { error: "Backend URL not configured" },
-      { status: 500 },
+      { error: "Failed to connect to backend." },
+      { status: 502 } 
     );
   }
-
-  const searchParams = request.nextUrl.searchParams;
-  const noRotation = searchParams.get("no_rotation");
-
-  const targetUrl = new URL(`${BACKEND_URL}${ApiUrl.RefreshToken}`);
-
-  if (noRotation) {
-    targetUrl.searchParams.set("no_rotation", noRotation);
-  }
-  const cookieHeader = request.headers.get("cookie") ?? "";
-  const res = await fetch(targetUrl.toString(), {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Cookie: cookieHeader,
-    },
-  });
-
-  const data = await res.json();
-  const response = NextResponse.json(data, { status: res.status });
-
-  const setCookie = res.headers.get("set-cookie");
-  if (setCookie) {
-    response.headers.set("set-cookie", setCookie);
-  }
-
-  return response;
 }

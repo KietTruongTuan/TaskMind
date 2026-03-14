@@ -134,9 +134,7 @@ class RefreshTokenView(APIView):
     Reads refresh token from HttpOnly cookie and returns a new access token.
     """
 
-    def post(self, request):
-        # Get refresh token from HttpOnly cookie
-        
+    def post(self, request):     
         refresh_token = request.COOKIES.get('refresh_token')
         if not refresh_token:
             return Response(
@@ -171,7 +169,7 @@ class RefreshTokenView(APIView):
                     status=status.HTTP_401_UNAUTHORIZED
                 )
             
-            if no_rotation:
+            if str(no_rotation).lower() == "true":
                 access_token = str(refresh.access_token)
                 
                 return Response({
@@ -239,6 +237,7 @@ class RefreshTokenView(APIView):
             
             
         except TokenError as e:
+           
             return Response(
                 {'error': 'Invalid or expired refresh token'},
                 status=status.HTTP_401_UNAUTHORIZED

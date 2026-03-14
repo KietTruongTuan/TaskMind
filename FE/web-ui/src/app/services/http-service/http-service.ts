@@ -28,17 +28,15 @@ export class HttpService {
   }
 
   private resolveBaseUrl(passedURL?: string): string {
-    if (typeof window === "undefined") {
-      if (process.env.INTERNAL_API_BASE_URL) {
-        return process.env.INTERNAL_API_BASE_URL;
-      }
-    }
-
     if (passedURL) {
       return passedURL;
     }
 
-    return process.env.NEXT_PUBLIC_API_BASE_URL || "";
+    if (typeof window === "undefined") {
+      return process.env.FRONTEND_URL || "";
+    }
+
+    return "";
   }
 
   setAccessToken(token: string) {
@@ -110,6 +108,7 @@ export class HttpService {
         status: error.response.status,
       };
     } else if (error.request) {
+      console.error(`🚨 "No response received" for URL: ${error.config?.url}`, error.config?.data);
       return {
         message: "No response received.",
         status: 0,

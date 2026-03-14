@@ -32,10 +32,14 @@ export class AuthenticationService extends HttpService {
   }
 
   async refresh(options?: { noRotation?: boolean }) {
-    const url = options?.noRotation
-      ? `${ApiUrl.LocalRefreshToken}?no_rotation=true`
-      : ApiUrl.LocalRefreshToken;
-    const res = await this.refreshInstance.post<RefreshTokenResponseBody>(url);
+    const payload =
+      typeof options?.noRotation !== "undefined"
+        ? { no_rotation: options.noRotation }
+        : undefined;
+    const res = await this.refreshInstance.post<RefreshTokenResponseBody>(
+      ApiUrl.LocalRefreshToken,
+      payload,
+    );
     return res;
   }
 
