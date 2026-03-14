@@ -169,14 +169,6 @@ class RefreshTokenView(APIView):
                     status=status.HTTP_401_UNAUTHORIZED
                 )
             
-            if str(no_rotation).lower() == "true":
-                access_token = str(refresh.access_token)
-                
-                return Response({
-                    'access': access_token,
-                }, status=status.HTTP_200_OK)
-
-            # Skip rotation entirely for server-side requests
             if is_server_side:
                 access_token = str(refresh.access_token)
                 return Response({
