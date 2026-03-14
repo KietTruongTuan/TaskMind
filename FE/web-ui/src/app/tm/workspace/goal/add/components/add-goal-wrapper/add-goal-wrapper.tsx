@@ -12,7 +12,14 @@ export function AddGoalWrapper() {
   const stepComponents = {
     [AddStep.FillInformation]: <GoalAdd setStep={setStep} />,
     [AddStep.ReviewDetail]: draftGoal ? (
-      <GoalReview setStep={setStep} goalData={draftGoal} />
+      <GoalReview
+        setStep={setStep}
+        goalData={{
+          ...draftGoal,
+          completedCount: draftGoal.completedCount || 0,
+        }}
+        isDraft
+      />
     ) : null,
   };
   return stepComponents[step];
