@@ -8,18 +8,23 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Backend URL not configured" }, { status: 500 });
   }
 
-  const bodyText = await request.text();
   const targetUrl = new URL(`${BACKEND_URL}${ApiUrl.RefreshToken}`);
   const cookieHeader = request.headers.get("cookie") ?? "";
+  const xServerSide = request.headers.get("x-server-side");
 
   try {
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      Cookie: cookieHeader,
+    };
+
+    if (xServerSide) {
+      headers["X-Server-Side"] = xServerSide;
+    }
+
     const res = await fetch(targetUrl.toString(), {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Cookie: cookieHeader,
-      },
-      body: bodyText || JSON.stringify({}),
+      headers: headers,
     });
 
     const data = await res.json();

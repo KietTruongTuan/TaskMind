@@ -14,7 +14,12 @@ export async function useServerSideService() {
   authenticationService["refreshInstance"].defaults.headers.common["Cookie"] =
     `${REFRESH_COOKIE_NAME}=${refreshToken}`;
 
-  const res = await authenticationService.refresh({ noRotation: true });
+  authenticationService["refreshInstance"].defaults.headers.common[
+    "X-Server-Side"
+  ] = "true";
+
+  const res = await authenticationService.refresh();
+
   const accessToken = res.data.access;
 
   if (accessToken) {

@@ -141,7 +141,7 @@ class RefreshTokenView(APIView):
                 {'error': 'Refresh token not found'},
                 status=status.HTTP_401_UNAUTHORIZED
             )
-
+    
         ROTATION_THRESHOLD = timedelta(hours=24)
 
         # Check if request comes from server-side (Next.js SSR)
@@ -170,6 +170,7 @@ class RefreshTokenView(APIView):
                 )
             
             if is_server_side:
+                logger.warning("Attempting to refresh token")
                 access_token = str(refresh.access_token)
                 return Response({
                     'access': access_token
