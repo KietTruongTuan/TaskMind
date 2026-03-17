@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -H 0.0.0.0 -p ${PORT:-3000}",
+    "dev": "next dev --webpack -H 0.0.0.0 -p ${PORT:-3000}",
     "build": "next build",
     "start": "next start",
     "build:tokens": "cd ./FE/web-ui/ && style-dictionary build --config ./style-dictionary.config.js --verbose   # build .scss styles from .json tokens",
