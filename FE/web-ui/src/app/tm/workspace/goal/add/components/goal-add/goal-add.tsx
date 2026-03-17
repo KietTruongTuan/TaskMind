@@ -39,7 +39,13 @@ export function GoalAdd({
     const data = getValues();
     const draftGoalData: CreateGoalResponseBody =
       await aiService.createGoal(data);
-    setDraftGoal(draftGoalData);
+    setDraftGoal({
+      ...draftGoalData,
+      tasks: draftGoalData.tasks?.map((t, index) => ({
+        ...t,
+        index: index,
+      })),
+    });
     setStep(AddStep.ReviewDetail);
   };
 

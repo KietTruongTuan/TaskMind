@@ -9,6 +9,7 @@ import { GoalCompletedCard } from "@/app/components/goal-completed-card/goal-com
 import { Crown, TrendingUp } from "lucide-react";
 import { GreetingText } from "@/app/components/greeting-text/greeting-text";
 import { Status } from "@/app/enum/status.enum";
+import { GoalProvider } from "@/app/contexts/goal-context/goal-context";
 
 export default function DashboardPage() {
   const recentGoals: GoalCardPropsData[] = [
@@ -92,41 +93,43 @@ export default function DashboardPage() {
   const tasksDueSoon: GoalCardPropsData[] = [];
 
   return (
-    <Flex width="100%" justify="center" height="100%">
-      <Flex
-        width={{ initial: "90%", xs: "85%" }}
-        direction="column"
-        py="5"
-        gap="5"
-      >
-        <GreetingText />
-        <Grid rows="1fr auto auto" gap="5">
-          <StatusCardList />
-          <Grid columns={{ initial: "1", md: "2fr 1fr" }} gap="5">
+    <GoalProvider>
+      <Flex width="100%" justify="center" height="100%">
+        <Flex
+          width={{ initial: "90%", xs: "85%" }}
+          direction="column"
+          py="5"
+          gap="5"
+        >
+          <GreetingText />
+          <Grid rows="1fr auto auto" gap="5">
+            <StatusCardList />
+            <Grid columns={{ initial: "1", md: "2fr 1fr" }} gap="5">
+              <RecentGoalList
+                header="Recent Goals"
+                subHeader="Track the progress of current goals"
+                icon={TrendingUp}
+                data={recentGoals}
+                cardTypeComponent={GoalCard}
+              />
+              <RecentGoalList
+                header="Due soon (will do when we have the design of tasks checklist)"
+                subHeader="Tasks Nearing Deadline"
+                data={tasksDueSoon}
+                cardTypeComponent={GoalCard}
+              />
+            </Grid>
             <RecentGoalList
-              header="Recent Goals"
-              subHeader="Track the progress of current goals"
-              icon={TrendingUp}
-              data={recentGoals}
-              cardTypeComponent={GoalCard}
-            />
-            <RecentGoalList
-              header="Due soon (will do when we have the design of tasks checklist)"
-              subHeader="Tasks Nearing Deadline"
-              data={tasksDueSoon}
-              cardTypeComponent={GoalCard}
+              header="Recent Achievements"
+              subHeader="The goals you have completed"
+              icon={Crown}
+              data={recentCompletedGoals}
+              cardTypeComponent={GoalCompletedCard}
+              isFlexible
             />
           </Grid>
-          <RecentGoalList
-            header="Recent Achievements"
-            subHeader="The goals you have completed"
-            icon={Crown}
-            data={recentCompletedGoals}
-            cardTypeComponent={GoalCompletedCard}
-            isFlexible
-          />
-        </Grid>
+        </Flex>
       </Flex>
-    </Flex>
+    </GoalProvider>
   );
 }

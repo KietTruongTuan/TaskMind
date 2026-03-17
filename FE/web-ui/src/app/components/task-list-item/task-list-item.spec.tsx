@@ -9,6 +9,7 @@ import {
 } from "@/app/constants";
 import { ToastProvider } from "@/app/contexts/toast-context/toast-context";
 import userEvent from "@testing-library/user-event";
+import { GoalProvider } from "@/app/contexts/goal-context/goal-context";
 
 jest.mock("@/app/constants", () => {
   const originalModule = jest.requireActual("@/app/constants");
@@ -60,7 +61,9 @@ describe("Task list item", () => {
     render(
       <ThemeProvider>
         <ToastProvider>
-          <TaskListItem task={mockTask} />
+          <GoalProvider>
+            <TaskListItem task={mockTask} />
+          </GoalProvider>
         </ToastProvider>
       </ThemeProvider>,
     );
@@ -79,7 +82,9 @@ describe("Task list item", () => {
     render(
       <ThemeProvider>
         <ToastProvider>
-          <TaskListItem task={MOCK_TASK_RESPONSE_DATA} />
+          <GoalProvider>
+            <TaskListItem task={MOCK_TASK_RESPONSE_DATA} />
+          </GoalProvider>
         </ToastProvider>
       </ThemeProvider>,
     );
@@ -114,7 +119,9 @@ describe("Task list item", () => {
     render(
       <ThemeProvider>
         <ToastProvider>
-          <TaskListItem task={MOCK_TASK_RESPONSE_DATA} />
+          <GoalProvider>
+            <TaskListItem task={MOCK_TASK_RESPONSE_DATA} />
+          </GoalProvider>
         </ToastProvider>
       </ThemeProvider>,
     );
@@ -149,7 +156,9 @@ describe("Task list item", () => {
     render(
       <ThemeProvider>
         <ToastProvider>
-          <TaskListItem task={MOCK_TASK_RESPONSE_DATA} />
+          <GoalProvider>
+            <TaskListItem task={MOCK_TASK_RESPONSE_DATA} />
+          </GoalProvider>
         </ToastProvider>
       </ThemeProvider>,
     );

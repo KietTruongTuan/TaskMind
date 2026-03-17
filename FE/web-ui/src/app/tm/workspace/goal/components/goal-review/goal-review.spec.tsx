@@ -12,6 +12,7 @@ import { RouteLoadingProvider } from "@/app/contexts/route-loading-context/route
 import { ToastProvider } from "@/app/contexts/toast-context/toast-context";
 import { ThemeProvider } from "@/app/contexts/theme-context/theme-context";
 import { Status } from "@/app/enum/status.enum";
+import { GoalProvider } from "@/app/contexts/goal-context/goal-context";
 
 jest.mock("@/app/constants", () => ({
   ...jest.requireActual("@/app/constants"),
@@ -59,10 +60,12 @@ describe("GoalReview", () => {
       <ThemeProvider>
         <ToastProvider>
           <RouteLoadingProvider>
-            <GoalReview
-              setStep={mockSetStep}
-              goalData={MOCK_GOAL_RESPONSE_DATA}
-            />
+            <GoalProvider>
+              <GoalReview
+                setStep={mockSetStep}
+                goalData={MOCK_GOAL_RESPONSE_DATA}
+              />
+            </GoalProvider>
           </RouteLoadingProvider>
         </ToastProvider>
       </ThemeProvider>,
@@ -84,11 +87,13 @@ describe("GoalReview", () => {
       <ThemeProvider>
         <ToastProvider>
           <RouteLoadingProvider>
-            <GoalReview
-              setStep={mockSetStep}
-              goalData={MOCK_BLANK_GOAL_RESPONSE_DATA}
-              isDraft
-            />
+            <GoalProvider>
+              <GoalReview
+                setStep={mockSetStep}
+                goalData={MOCK_BLANK_GOAL_RESPONSE_DATA}
+                isDraft
+              />
+            </GoalProvider>
           </RouteLoadingProvider>
         </ToastProvider>
       </ThemeProvider>,
@@ -103,11 +108,13 @@ describe("GoalReview", () => {
       <ThemeProvider>
         <ToastProvider>
           <RouteLoadingProvider>
-            <GoalReview
-              setStep={mockSetStep}
-              goalData={MOCK_GOAL_RESPONSE_DATA}
-              isDraft
-            />
+            <GoalProvider>
+              <GoalReview
+                setStep={mockSetStep}
+                goalData={MOCK_GOAL_RESPONSE_DATA}
+                isDraft
+              />
+            </GoalProvider>
           </RouteLoadingProvider>
         </ToastProvider>
       </ThemeProvider>,
@@ -128,11 +135,13 @@ describe("GoalReview", () => {
       <ThemeProvider>
         <ToastProvider>
           <RouteLoadingProvider>
-            <GoalReview
-              setStep={mockSetStep}
-              goalData={MOCK_GOAL_RESPONSE_DATA}
-              isDraft
-            />
+            <GoalProvider>
+              <GoalReview
+                setStep={mockSetStep}
+                goalData={MOCK_GOAL_RESPONSE_DATA}
+                isDraft
+              />
+            </GoalProvider>
           </RouteLoadingProvider>
         </ToastProvider>
       </ThemeProvider>,
@@ -156,10 +165,12 @@ describe("GoalReview", () => {
       <ThemeProvider>
         <ToastProvider>
           <RouteLoadingProvider>
-            <GoalReview
-              setStep={mockSetStep}
-              goalData={MOCK_GOAL_RESPONSE_DATA}
-            />
+            <GoalProvider>
+              <GoalReview
+                setStep={mockSetStep}
+                goalData={MOCK_GOAL_RESPONSE_DATA}
+              />
+            </GoalProvider>
           </RouteLoadingProvider>
         </ToastProvider>
       </ThemeProvider>,

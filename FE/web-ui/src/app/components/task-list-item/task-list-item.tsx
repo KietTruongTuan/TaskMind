@@ -4,19 +4,27 @@ import { Status } from "@/app/enum/status.enum";
 import { StatusDropDown } from "../status-dropdown/status-dropdown";
 import { Calendar } from "lucide-react";
 import styles from "./task-list-item.module.scss";
-import { DraftTask, DraftTaskRequestBody, taskService } from "@/app/constants";
+import {
+  CreateGoalResponseBody,
+  DraftTask,
+  DraftTaskRequestBody,
+  taskService,
+} from "@/app/constants";
 import { useRef, useState } from "react";
 import { useToast } from "@/app/contexts/toast-context/toast-context";
 import { EditField } from "../edit-field/edit-field";
-import { useRouter } from "next/navigation";
+import { useGoalContext } from "@/app/contexts/goal-context/goal-context";
 
 export function TaskListItem({
   task,
   onTaskStatusChange,
+  index,
 }: {
   task: DraftTask;
   onTaskStatusChange?: (oldStatus: Status, newStatus: Status) => void;
+  index?: number;
 }) {
+  const { draftGoal, setDraftGoal } = useGoalContext();
   const initialDetail: DraftTask = {
     ...task,
     deadline: new Date(task.deadline),
@@ -45,16 +53,24 @@ export function TaskListItem({
 
     setDetail(detailRef.current);
     setEditingField(null);
-    if (task.id) {
-      try {
+
+    try {
+      if (task.id) {
         await taskService.update(task.id, updateData);
         setEditingField(null);
-      } catch (error) {
-        setIsSuccess(false);
-        showToast(`Failed to update ${field}`);
-        setDetail({ ...detail, [field]: originalValue });
-        setEditingField(null);
+      } else {
+        setDraftGoal({
+          ...draftGoal,
+          tasks: draftGoal?.tasks?.map((t) =>
+            t.index === index ? { ...t, ...updateData } : t,
+          ),
+        } as CreateGoalResponseBody);
       }
+    } catch (error) {
+      setIsSuccess(false);
+      showToast(`Failed to update ${field}`);
+      setDetail({ ...detail, [field]: originalValue });
+      setEditingField(null);
     }
   };
   return (

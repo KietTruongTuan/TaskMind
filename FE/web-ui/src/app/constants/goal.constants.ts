@@ -27,7 +27,7 @@ export interface DraftGoalRequestBody {
 }
 
 export interface CreateGoalResponseBody extends GoalResponseBody {
-  tasks: DraftTask[];
+  tasks?: DraftTask[];
 }
 
 export interface GoalDetailResponseBody extends GoalResponseBody {

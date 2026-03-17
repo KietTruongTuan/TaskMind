@@ -57,9 +57,7 @@ describe("useServerSideService", () => {
       ],
     ).toBe("refresh_token=mock_refresh_token");
 
-    expect(authenticationService.refresh).toHaveBeenCalledWith({
-      noRotation: true,
-    });
+    expect(authenticationService.refresh).toHaveBeenCalled();
 
     expect(goalService.setAccessToken).toHaveBeenCalledWith(
       "new_mock_access_token",

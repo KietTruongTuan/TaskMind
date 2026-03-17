@@ -6,6 +6,7 @@ import { Status } from "@/app/enum/status.enum";
 import { ToastProvider } from "@/app/contexts/toast-context/toast-context";
 import { ThemeProvider } from "@/app/contexts/theme-context/theme-context";
 import { RouteLoadingProvider } from "@/app/contexts/route-loading-context/route-loading-context";
+import { GoalProvider } from "@/app/contexts/goal-context/goal-context";
 
 jest.mock("@/app/constants", () => {
   const originalModule = jest.requireActual("@/app/constants");
@@ -62,16 +63,18 @@ describe("GoalCard - handleStatusChange", () => {
       <RouteLoadingProvider>
         <ThemeProvider>
           <ToastProvider>
-            <GoalCard
-              id={id}
-              name={name}
-              description={description}
-              status={MOCK_GOAL_DETAIL_RESPONSE_DATA.status}
-              deadline={deadline}
-              tag={tag || []}
-              completedCount={completedCount}
-              taskCount={taskCount}
-            />
+            <GoalProvider>
+              <GoalCard
+                id={id}
+                name={name}
+                description={description}
+                status={MOCK_GOAL_DETAIL_RESPONSE_DATA.status}
+                deadline={deadline}
+                tag={tag || []}
+                completedCount={completedCount}
+                taskCount={taskCount}
+              />
+            </GoalProvider>
           </ToastProvider>
         </ThemeProvider>
       </RouteLoadingProvider>,
@@ -107,17 +110,19 @@ describe("GoalCard - handleStatusChange", () => {
       <RouteLoadingProvider>
         <ThemeProvider>
           <ToastProvider>
-            <GoalCard
-              id={id}
-              name={name}
-              description={description}
-              status={MOCK_GOAL_DETAIL_RESPONSE_DATA.status}
-              deadline={deadline}
-              tag={tag || []}
-              completedCount={completedCount}
-              taskCount={taskCount}
-              isDetailCard
-            />
+            <GoalProvider>
+              <GoalCard
+                id={id}
+                name={name}
+                description={description}
+                status={MOCK_GOAL_DETAIL_RESPONSE_DATA.status}
+                deadline={deadline}
+                tag={tag || []}
+                completedCount={completedCount}
+                taskCount={taskCount}
+                isDetailCard
+              />
+            </GoalProvider>
           </ToastProvider>
         </ThemeProvider>
       </RouteLoadingProvider>,
@@ -149,17 +154,19 @@ describe("GoalCard - handleStatusChange", () => {
       <RouteLoadingProvider>
         <ThemeProvider>
           <ToastProvider>
-            <GoalCard
-              id={id}
-              name={name}
-              description={description}
-              status={MOCK_GOAL_DETAIL_RESPONSE_DATA.status}
-              deadline={deadline}
-              tag={tag || []}
-              completedCount={completedCount}
-              taskCount={taskCount}
-              isDetailCard
-            />
+            <GoalProvider>
+              <GoalCard
+                id={id}
+                name={name}
+                description={description}
+                status={MOCK_GOAL_DETAIL_RESPONSE_DATA.status}
+                deadline={deadline}
+                tag={tag || []}
+                completedCount={completedCount}
+                taskCount={taskCount}
+                isDetailCard
+              />
+            </GoalProvider>
           </ToastProvider>
         </ThemeProvider>
       </RouteLoadingProvider>,
@@ -193,17 +200,19 @@ describe("GoalCard - handleStatusChange", () => {
       <RouteLoadingProvider>
         <ThemeProvider>
           <ToastProvider>
-            <GoalCard
-              id={id}
-              name={name}
-              description={description}
-              status={MOCK_GOAL_DETAIL_RESPONSE_DATA.status}
-              deadline={deadline}
-              tag={tag || []}
-              completedCount={completedCount}
-              taskCount={taskCount}
-              isDetailCard
-            />
+            <GoalProvider>
+              <GoalCard
+                id={id}
+                name={name}
+                description={description}
+                status={MOCK_GOAL_DETAIL_RESPONSE_DATA.status}
+                deadline={deadline}
+                tag={tag || []}
+                completedCount={completedCount}
+                taskCount={taskCount}
+                isDetailCard
+              />
+            </GoalProvider>
           </ToastProvider>
         </ThemeProvider>
       </RouteLoadingProvider>,
@@ -236,17 +245,19 @@ describe("GoalCard - handleStatusChange", () => {
       <RouteLoadingProvider>
         <ThemeProvider>
           <ToastProvider>
-            <GoalCard
-              id={id}
-              name={name}
-              description={description}
-              status={MOCK_GOAL_DETAIL_RESPONSE_DATA.status}
-              deadline={deadline}
-              tag={tag || []}
-              completedCount={completedCount}
-              taskCount={taskCount}
-              isDetailCard
-            />
+            <GoalProvider>
+              <GoalCard
+                id={id}
+                name={name}
+                description={description}
+                status={MOCK_GOAL_DETAIL_RESPONSE_DATA.status}
+                deadline={deadline}
+                tag={tag || []}
+                completedCount={completedCount}
+                taskCount={taskCount}
+                isDetailCard
+              />
+            </GoalProvider>
           </ToastProvider>
         </ThemeProvider>
       </RouteLoadingProvider>,
@@ -282,17 +293,19 @@ describe("GoalCard - handleStatusChange", () => {
       <RouteLoadingProvider>
         <ThemeProvider>
           <ToastProvider>
-            <GoalCard
-              id={id}
-              name={name}
-              description={description}
-              status={MOCK_GOAL_DETAIL_RESPONSE_DATA.status}
-              deadline={deadline}
-              tag={tag || []}
-              completedCount={completedCount}
-              taskCount={taskCount}
-              isDetailCard
-            />
+            <GoalProvider>
+              <GoalCard
+                id={id}
+                name={name}
+                description={description}
+                status={MOCK_GOAL_DETAIL_RESPONSE_DATA.status}
+                deadline={deadline}
+                tag={tag || []}
+                completedCount={completedCount}
+                taskCount={taskCount}
+                isDetailCard
+              />
+            </GoalProvider>
           </ToastProvider>
         </ThemeProvider>
       </RouteLoadingProvider>,
@@ -330,17 +343,19 @@ describe("GoalCard - handleStatusChange", () => {
       <RouteLoadingProvider>
         <ThemeProvider>
           <ToastProvider>
-            <GoalCard
-              id={id}
-              name={name}
-              description={description}
-              status={MOCK_GOAL_DETAIL_RESPONSE_DATA.status}
-              deadline={deadline}
-              tag={tag || []}
-              completedCount={completedCount}
-              taskCount={taskCount}
-              isDetailCard
-            />
+            <GoalProvider>
+              <GoalCard
+                id={id}
+                name={name}
+                description={description}
+                status={MOCK_GOAL_DETAIL_RESPONSE_DATA.status}
+                deadline={deadline}
+                tag={tag || []}
+                completedCount={completedCount}
+                taskCount={taskCount}
+                isDetailCard
+              />
+            </GoalProvider>
           </ToastProvider>
         </ThemeProvider>
       </RouteLoadingProvider>,
@@ -369,17 +384,19 @@ describe("GoalCard - handleStatusChange", () => {
       <RouteLoadingProvider>
         <ThemeProvider>
           <ToastProvider>
-            <GoalCard
-              id={id}
-              name={name}
-              description={description}
-              status={MOCK_GOAL_DETAIL_RESPONSE_DATA.status}
-              deadline={deadline}
-              tag={tag || []}
-              completedCount={completedCount}
-              taskCount={taskCount}
-              isDetailCard
-            />
+            <GoalProvider>
+              <GoalCard
+                id={id}
+                name={name}
+                description={description}
+                status={MOCK_GOAL_DETAIL_RESPONSE_DATA.status}
+                deadline={deadline}
+                tag={tag || []}
+                completedCount={completedCount}
+                taskCount={taskCount}
+                isDetailCard
+              />
+            </GoalProvider>
           </ToastProvider>
         </ThemeProvider>
       </RouteLoadingProvider>,

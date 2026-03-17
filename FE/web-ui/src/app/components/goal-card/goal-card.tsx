@@ -18,6 +18,7 @@ import { CustomButton } from "../custom-button/custom-button";
 import { ButtonType } from "@/app/enum/button-type.enum";
 import {
   ApiError,
+  CreateGoalResponseBody,
   DraftGoalRequestBody,
   GoalResponseBody,
   goalService,
@@ -28,6 +29,8 @@ import { EditField } from "../edit-field/edit-field";
 import { AlertDialogPopUp } from "../alert-dialog-pop-up/alert-dialog-pop-up";
 import { WebUrl } from "@/app/enum/web-url.enum";
 import { useRouteLoadingContext } from "@/app/contexts/route-loading-context/route-loading-context";
+import { useGoalContext } from "@/app/contexts/goal-context/goal-context";
+import { set } from "date-fns";
 
 export function GoalCard({
   id,
@@ -56,6 +59,7 @@ export function GoalCard({
   >(null);
   const [detail, setDetail] = useState<GoalResponseBody>(initialDetail);
   const { route, setIsRouteLoading } = useRouteLoadingContext();
+  const { draftGoal, setDraftGoal } = useGoalContext();
   const detailRef = useRef<GoalResponseBody>(initialDetail);
   const currentDate: Date = new Date();
 
@@ -128,16 +132,19 @@ export function GoalCard({
     const updateData: DraftGoalRequestBody = { [field]: newValue };
     setDetail(detailRef.current);
     setEditingField(null);
-    if (id) {
-      try {
+
+    try {
+      if (id) {
         await goalService.update(id, updateData);
         setEditingField(null);
-      } catch (error) {
-        setIsSuccess(false);
-        showToast(`Failed to update ${field}`);
-        setDetail({ ...detail, [field]: originalValue });
-        setEditingField(null);
+      } else {
+        setDraftGoal({ ...draftGoal, ...updateData } as CreateGoalResponseBody);
       }
+    } catch (error) {
+      setIsSuccess(false);
+      showToast(`Failed to update ${field}`);
+      setDetail({ ...detail, [field]: originalValue });
+      setEditingField(null);
     }
   };
 

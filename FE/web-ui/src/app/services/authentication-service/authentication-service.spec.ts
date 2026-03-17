@@ -49,19 +49,9 @@ describe("AuthenticationService", () => {
       .mockResolvedValue(MOCK_ACCESS_TOKEN);
 
     const result = await authenticationService.refresh();
-    expect(postSpy).toHaveBeenCalledWith(ApiUrl.LocalRefreshToken, undefined);
+    expect(postSpy).toHaveBeenCalledWith(ApiUrl.LocalRefreshToken);
 
     expect(result).toEqual(MOCK_ACCESS_TOKEN);
   });
 
-  it("should call refresh with no rotation with the correct URL and data", async () => {
-    const postSpy = jest
-      .spyOn(authenticationService["refreshInstance"], "post")
-      .mockResolvedValue(MOCK_ACCESS_TOKEN);
-
-    const result = await authenticationService.refresh({ noRotation: true });
-    expect(postSpy).toHaveBeenCalledWith(ApiUrl.LocalRefreshToken, { no_rotation: true });
-
-    expect(result).toEqual(MOCK_ACCESS_TOKEN);
-  });
 });

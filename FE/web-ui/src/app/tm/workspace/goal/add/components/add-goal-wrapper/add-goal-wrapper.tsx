@@ -8,7 +8,7 @@ import { useGoalContext } from "@/app/contexts/goal-context/goal-context";
 export function AddGoalWrapper() {
   const [step, setStep] = useState<AddStep>(AddStep.FillInformation);
   const { draftGoal } = useGoalContext();
-
+  
   const stepComponents = {
     [AddStep.FillInformation]: <GoalAdd setStep={setStep} />,
     [AddStep.ReviewDetail]: draftGoal ? (

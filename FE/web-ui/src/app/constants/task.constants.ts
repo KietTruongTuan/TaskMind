@@ -2,6 +2,7 @@ import { Status } from "../enum/status.enum";
 
 export interface DraftTask {
   id?: string;
+  index?: number;
   name: string;
   status: Status;
   deadline: Date;

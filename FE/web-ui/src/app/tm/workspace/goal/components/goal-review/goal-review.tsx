@@ -14,6 +14,7 @@ import {
   SaveGoalRequestBody,
   Task,
 } from "@/app/constants";
+import { useGoalContext } from "@/app/contexts/goal-context/goal-context";
 import { useRouteLoadingContext } from "@/app/contexts/route-loading-context/route-loading-context";
 import { useToast } from "@/app/contexts/toast-context/toast-context";
 import { ButtonType } from "@/app/enum/button-type.enum";
@@ -44,9 +45,11 @@ export function GoalReview({
     tag,
     deadline,
   } = goalData;
-
+  console.log(goalData)
   const { route } = useRouteLoadingContext();
   const { showToast, setIsSuccess } = useToast();
+  const { clearDraftGoal } = useGoalContext();
+
   const [localCompletedCount, setLocalCompletedCount] =
     useState(completedCount);
   const [localTaskCount, setLocalTaskCount] = useState(taskCount);
@@ -66,6 +69,7 @@ export function GoalReview({
   };
 
   const handleCancel = () => {
+    clearDraftGoal();
     setStep && setStep(AddStep.FillInformation);
   };
 
@@ -84,18 +88,17 @@ export function GoalReview({
   const tabList: TabListProps[] = [
     {
       label: "List",
-      component:
-        tasks.length > 0 ? (
-          <TaskList
-            tasks={tasks}
-            onTaskStatusChange={handleTaskStatusChange}
-            onTaskCountChange={handleTaskCountChange}
-          />
-        ) : (
-          <Flex height="100%" align="center" justify="center" p="5">
-            No tasks exists
-          </Flex>
-        ),
+      component: tasks ? (
+        <TaskList
+          tasks={tasks}
+          onTaskStatusChange={handleTaskStatusChange}
+          onTaskCountChange={handleTaskCountChange}
+        />
+      ) : (
+        <Flex height="100%" align="center" justify="center" p="5">
+          No tasks exists
+        </Flex>
+      ),
       icon: <ListChecks size={15} />,
     },
     {
