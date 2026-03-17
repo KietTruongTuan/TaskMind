@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --webpack -H 0.0.0.0 -p ${PORT:-3000}",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start",
     "build:tokens": "cd ./FE/web-ui/ && style-dictionary build --config ./style-dictionary.config.js --verbose   # build .scss styles from .json tokens",
     "lint": "next lint",
