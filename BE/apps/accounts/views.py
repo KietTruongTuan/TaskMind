@@ -138,7 +138,6 @@ class RefreshTokenView(APIView):
         # Get refresh token from HttpOnly cookie
         
         refresh_token = request.COOKIES.get('refresh_token')
-
         if not refresh_token:
             return Response(
                 {'error': 'Refresh token not found'},
@@ -171,6 +170,13 @@ class RefreshTokenView(APIView):
                     {'error': 'User not found'}, 
                     status=status.HTTP_401_UNAUTHORIZED
                 )
+            
+            if no_rotation:
+                access_token = str(refresh.access_token)
+                
+                return Response({
+                    'access': access_token,
+                }, status=status.HTTP_200_OK)
 
             # Skip rotation entirely for server-side requests
             if is_server_side:

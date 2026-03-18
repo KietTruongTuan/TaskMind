@@ -4,7 +4,7 @@ import styles from "./logo-icon.module.scss";
 
 export function LogoIcon({ size }: { size: string }) {
   return (
-    <Flex className={styles.gradientBox} justify="center" align="center" p="2">
+    <Flex className={styles.gradientBox} justify="center" align="center" p="1">
       <Target color="white" size={size}/>
     </Flex>
   );

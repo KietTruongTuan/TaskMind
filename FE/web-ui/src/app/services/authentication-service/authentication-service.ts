@@ -31,10 +31,11 @@ export class AuthenticationService extends HttpService {
     );
   }
 
-  async refresh() {
-    const res = await this.refreshInstance.post<RefreshTokenResponseBody>(
-      ApiUrl.LocalRefreshToken,
-    );
+  async refresh(options?: { noRotation?: boolean }) {
+    const url = options?.noRotation
+      ? `${ApiUrl.LocalRefreshToken}?no_rotation=true`
+      : ApiUrl.LocalRefreshToken;
+    const res = await this.refreshInstance.post<RefreshTokenResponseBody>(url);
     return res;
   }
 

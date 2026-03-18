@@ -1,6 +1,13 @@
-import { GoalDetailResponseBody, SaveGoalRequestBody } from "@/app/constants";
+import {
+  DraftGoalRequestBody,
+  GoalDetailResponseBody,
+  GoalListItemResponseBody,
+  SaveGoalRequestBody,
+} from "@/app/constants";
 import { HttpService } from "../http-service/http-service";
 import { ApiUrl } from "@/app/enum/api-url.enum";
+import { GoalSearchParams } from "@/app/enum/search-params.enum";
+import { buildUrl } from "@/app/tm/utils";
 
 export class GoalService extends HttpService {
   constructor() {
@@ -12,6 +19,33 @@ export class GoalService extends HttpService {
       ApiUrl.Goal,
       data,
     );
+    return res;
+  }
+
+  async getAll(params: Record<GoalSearchParams, string | null | undefined>) {
+    const url = buildUrl(ApiUrl.Goal, undefined, params);
+    const res = await this.get<GoalListItemResponseBody[]>(url);
+    return res;
+  }
+
+  async getById(id: string) {
+    const url = buildUrl(ApiUrl.Goal, id, undefined);
+    const res = await this.get<GoalDetailResponseBody>(url);
+    return res;
+  }
+
+  async update(id: string, data: DraftGoalRequestBody) {
+    const url = buildUrl(ApiUrl.Goal, id, undefined);
+    const res = await this.patch<GoalDetailResponseBody, DraftGoalRequestBody>(
+      url,
+      data,
+    );
+    return res;
+  }
+
+  async remove(id: string) {
+    const url = buildUrl(ApiUrl.Goal, id, undefined);
+    const res = await this.delete(url);
     return res;
   }
 }

@@ -14,9 +14,16 @@
   color: var(--button-secondary);
 }
 
+.warningOutlineButton {
+  background: var(--button-secondary);
+  border: 1px solid var(--status-cancel);
+  color: var(--status-cancel);
+}
+
 .tabButton {
   background: none;
   color: var(--navbar-text-secondary);
+
   &:hover {
     background-color: var(--button-hover);
     color: var(--text-primary);

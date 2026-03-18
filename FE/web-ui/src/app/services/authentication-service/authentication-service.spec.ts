@@ -1,4 +1,5 @@
 import {
+  MOCK_ACCESS_TOKEN,
   MOCK_LOGIN_REQUEST_DATA,
   MOCK_LOGIN_RESPONSE_DATA,
   MOCK_REGISTER_REQUEST_DATA,
@@ -40,5 +41,29 @@ describe("AuthenticationService", () => {
     expect(postSpy).toHaveBeenCalled();
 
     expect(result).toEqual(MOCK_REGISTER_RESPONSE_DATA);
+  });
+
+  it("should call refresh with the correct URL and data", async () => {
+    const postSpy = jest
+      .spyOn(authenticationService["refreshInstance"], "post")
+      .mockResolvedValue(MOCK_ACCESS_TOKEN);
+
+    const result = await authenticationService.refresh();
+    expect(postSpy).toHaveBeenCalledWith(ApiUrl.LocalRefreshToken);
+
+    expect(result).toEqual(MOCK_ACCESS_TOKEN);
+  });
+
+  it("should call refresh with no rotation with the correct URL and data", async () => {
+    const postSpy = jest
+      .spyOn(authenticationService["refreshInstance"], "post")
+      .mockResolvedValue(MOCK_ACCESS_TOKEN);
+
+    const result = await authenticationService.refresh({ noRotation: true });
+    expect(postSpy).toHaveBeenCalledWith(
+      `${ApiUrl.LocalRefreshToken}?no_rotation=true`,
+    );
+
+    expect(result).toEqual(MOCK_ACCESS_TOKEN);
   });
 });

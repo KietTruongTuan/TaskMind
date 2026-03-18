@@ -4,7 +4,7 @@ import { Header } from "../header/header";
 
 export interface StatusCardProps {
   label: string;
-  value: string;
+  value: React.ReactNode;
   icon: React.ReactNode;
   isPrimary?: boolean;
 }
@@ -25,7 +25,7 @@ export function StatusCard({
       >
         <Flex direction="column-reverse">
           <Header
-            text={value.toString()}
+            text={value}
             subText={label}
             textSize="5"
             subTextSize="1"

@@ -1,13 +1,36 @@
+"use client";
 import { CardNoPadding } from "../card-no-padding/card-no-padding";
-import { Flex, Progress, Text } from "@radix-ui/themes";
-import { Calendar, CheckCircle, Clock, Target } from "lucide-react";
-import styles from "./goal-card.module.scss";
+import React, { Fragment, KeyboardEvent, useRef, useState } from "react";
+import { AlertDialog, Flex, Progress, Text, TextField } from "@radix-ui/themes";
+
+import {
+  Calendar,
+  CheckCircle,
+  Clock,
+  Pen,
+  Trash2,
+  TrendingUp,
+} from "lucide-react";
 import { GoalCardPropsData } from "@/app/tm/workspace/dashboard/components/recent-goal-list/recent-goal-list";
 import { StatusDropDown } from "../status-dropdown/status-dropdown";
 import { StatusCard, StatusCardProps } from "../status-card/status-card";
-import React from "react";
+import { CustomButton } from "../custom-button/custom-button";
+import { ButtonType } from "@/app/enum/button-type.enum";
+import {
+  ApiError,
+  DraftGoalRequestBody,
+  GoalResponseBody,
+  goalService,
+} from "@/app/constants";
+import { useToast } from "@/app/contexts/toast-context/toast-context";
+import styles from "./goal-card.module.scss";
+import { EditField } from "../edit-field/edit-field";
+import { AlertDialogPopUp } from "../alert-dialog-pop-up/alert-dialog-pop-up";
+import { WebUrl } from "@/app/enum/web-url.enum";
+import { useRouteLoadingContext } from "@/app/contexts/route-loading-context/route-loading-context";
 
 export function GoalCard({
+  id,
   name,
   status,
   description,
@@ -17,15 +40,34 @@ export function GoalCard({
   deadline,
   isDetailCard = false,
   isPrimary = false,
+  isDraft = false,
 }: GoalCardPropsData) {
+  const initialDetail: GoalResponseBody = {
+    name,
+    status,
+    description,
+    tag,
+    deadline,
+    completedCount,
+    taskCount,
+  };
+  const [editingField, setEditingField] = useState<
+    keyof DraftGoalRequestBody | null
+  >(null);
+  const [detail, setDetail] = useState<GoalResponseBody>(initialDetail);
+  const { route, setIsRouteLoading } = useRouteLoadingContext();
+  const detailRef = useRef<GoalResponseBody>(initialDetail);
   const currentDate: Date = new Date();
-  const progress: number =
-    taskCount === 0 ? 0 : (completedCount * 100) / taskCount;
+
+  const progress: number = Math.round(
+    taskCount === 0 ? 0 : (completedCount * 100) / taskCount,
+  );
+  const { showToast, setIsSuccess } = useToast();
   const cardContent: StatusCardProps[] = [
     {
       label: "Progress",
       value: `${progress}%`,
-      icon: <Target size="30" className={styles.inProgress} />,
+      icon: <TrendingUp size="30" className={styles.inProgress} />,
     },
     {
       label: "Completed",
@@ -34,66 +76,256 @@ export function GoalCard({
     },
     {
       label: "Deadline",
-      value: `${deadline.toISOString().split("T")[0]}`,
+      value: (
+        <EditField
+          fieldName="goal-deadline"
+          iconSize={14}
+          type="date"
+          value={detail.deadline.toISOString().split("T")[0]}
+          isEditing={editingField === "deadline"}
+          onEditStart={() => setEditingField("deadline")}
+          onChange={(newValue) => {
+            if (!newValue) return;
+            detailRef.current = {
+              ...detailRef.current,
+              deadline: new Date(newValue),
+            };
+          }}
+          onSave={() => handleUpdate("deadline")}
+          onCancel={() => {
+            setDetail(initialDetail);
+            setEditingField(null);
+          }}
+          isDetailCard={isDetailCard}
+        >
+          {detail.deadline.toISOString().split("T")[0]}
+        </EditField>
+      ),
       icon: <Calendar size="30" className={styles.cancel} />,
     },
     {
       label: "Estimated time remaining",
       value: `${Math.ceil(
-        (deadline.getTime() - currentDate.getTime()) / (1000 * 60 * 60 * 24)
+        (detail.deadline.getTime() - currentDate.getTime()) /
+          (1000 * 60 * 60 * 24),
       )} days`,
       icon: <Clock size="30" className={styles.onHold} />,
     },
   ];
 
+  const handleUpdate = async (field: keyof GoalResponseBody) => {
+    const newValue =
+      detailRef.current[field] instanceof Date
+        ? detailRef.current[field].toISOString().split("T")[0]
+        : detailRef.current[field];
+    const originalValue = initialDetail[field];
+
+    if (newValue === originalValue) {
+      setEditingField(null);
+      return;
+    }
+
+    const updateData: DraftGoalRequestBody = { [field]: newValue };
+    setDetail(detailRef.current);
+    setEditingField(null);
+    if (id) {
+      try {
+        await goalService.update(id, updateData);
+        setEditingField(null);
+      } catch (error) {
+        setIsSuccess(false);
+        showToast(`Failed to update ${field}`);
+        setDetail({ ...detail, [field]: originalValue });
+        setEditingField(null);
+      }
+    }
+  };
+
+  const handleDelete = async () => {
+    if (id) {
+      setIsRouteLoading(true);
+      try {
+        await goalService.remove(id);
+        route(WebUrl.GoalList);
+      } catch (err) {
+        setIsSuccess(false);
+        const error = err as ApiError;
+        showToast(error.message);
+      } finally {
+        setIsRouteLoading(false);
+      }
+    }
+  };
+
   return (
-    <CardNoPadding p={isDetailCard ? "5" : "3"} isPrimary={isPrimary}>
-      <Flex direction="column" width="100%" height="100%" gap="3">
-        <Flex
-          width="100%"
-          height="100%"
-          direction="column"
-          gap={isDetailCard ? "2" : "1"}
-        >
-          <Text size={isDetailCard ? "6" : "2"} weight="regular">
-            {name}
-          </Text>
-          <Flex justify="between" className={styles.subText}>
-            <Flex gap="5" align="center">
-              <Flex gap="1" align="center">
-                {tag?.map((value, index) => (
-                  <React.Fragment key={index}>
-                    {index > 0 && (
-                      <Text size={isDetailCard ? "2" : "1"} weight="bold">
-                        {" "}
-                        ·{" "}
-                      </Text>
+    <>
+      <CardNoPadding p={isDetailCard ? "5" : "3"} isPrimary={isPrimary}>
+        <Flex direction="column" width="100%" height="100%" gap="4">
+          <Flex width="100%" height="100%" justify="between" gap="2">
+            <Flex direction="column" width="100%" height="100%" gap="3">
+              <Flex
+                width="100%"
+                height="100%"
+                direction="column"
+                gap={isDetailCard ? "2" : "1"}
+              >
+                <EditField
+                  iconSize={14}
+                  fieldName="goal-name"
+                  fieldSize="2"
+                  fieldLength="50%"
+                  type="text"
+                  value={detail.name}
+                  isEditing={editingField === "name"}
+                  onEditStart={() => setEditingField("name")}
+                  onChange={(newValue) => {
+                    if (!newValue) return;
+                    detailRef.current = {
+                      ...detailRef.current,
+                      name: newValue,
+                    };
+                  }}
+                  onSave={() => handleUpdate("name")}
+                  onCancel={() => {
+                    setDetail(initialDetail);
+                    setEditingField(null);
+                  }}
+                  isDetailCard={isDetailCard}
+                >
+                  <Text size={isDetailCard ? "6" : "2"} weight="regular">
+                    {detail.name}
+                  </Text>
+                </EditField>
+
+                <Flex justify="between" className={styles.subText}>
+                  <Flex gap="4" align="start">
+                    <EditField
+                      iconSize={14}
+                      fieldSize="1"
+                      type="text"
+                      fieldName="goal-tag"
+                      isMultiInput
+                      value={(detail.tag || []).join(", ")}
+                      isEditing={editingField === "tag"}
+                      onEditStart={() => setEditingField("tag")}
+                      onChange={(newValue) => {
+                        const tags = Array.isArray(newValue)
+                          ? newValue
+                          : (newValue || "")
+                              .toString()
+                              .split(",")
+                              .map((s) => s.trim())
+                              .filter(Boolean);
+                        detailRef.current = {
+                          ...detailRef.current,
+                          tag: tags,
+                        };
+                      }}
+                      onSave={() => handleUpdate("tag")}
+                      onCancel={() => {
+                        setDetail(initialDetail);
+                        setEditingField(null);
+                      }}
+                      isDetailCard={isDetailCard}
+                    >
+                      <Flex gap="2" align="center">
+                        {(detail.tag || []).map((value, index) => (
+                          <Fragment key={index}>
+                            {index > 0 && (
+                              <Text
+                                size={isDetailCard ? "2" : "1"}
+                                weight="bold"
+                              >
+                                {" "}
+                                ·{" "}
+                              </Text>
+                            )}
+                            <Text size={isDetailCard ? "2" : "1"}>{value}</Text>
+                          </Fragment>
+                        ))}
+                      </Flex>
+                    </EditField>
+                    {detail.status && (
+                      <Flex mt="1">
+                        <StatusDropDown
+                          status={detail.status}
+                          onStatusChange={(newValue) => {
+                            detailRef.current = {
+                              ...detailRef.current,
+                              status: newValue,
+                            };
+                            setDetail(detailRef.current);
+                            handleUpdate("status");
+                          }}
+                          isDropdown
+                        />
+                      </Flex>
                     )}
-                    <Text size={isDetailCard ? "2" : "1"}>{value}</Text>
-                  </React.Fragment>
-                ))}
+                  </Flex>
+                  {!isDetailCard && (
+                    <Text size="1">{deadline.toISOString().split("T")[0]}</Text>
+                  )}
+                </Flex>
+                {!isDetailCard && (
+                  <Progress value={progress} size="2" highContrast />
+                )}
               </Flex>
-              {status && <StatusDropDown status={status} />}
+              {description && (
+                <EditField
+                  iconSize={14}
+                  fieldName="goal-description"
+                  fieldSize="2"
+                  fieldLength="50%"
+                  type="text"
+                  value={detail.description}
+                  isEditing={editingField === "description"}
+                  onEditStart={() => setEditingField("description")}
+                  onChange={(newValue) => {
+                    if (!newValue) return;
+                    detailRef.current = {
+                      ...detailRef.current,
+                      description: newValue,
+                    };
+                  }}
+                  onSave={() => handleUpdate("description")}
+                  onCancel={() => {
+                    setDetail(initialDetail);
+                    setEditingField(null);
+                  }}
+                  isMultiLine
+                  isDetailCard={isDetailCard}
+                >
+                  <Text size="2" className={styles.subText}>
+                    {detail.description}
+                  </Text>
+                </EditField>
+              )}
             </Flex>
-            {!isDetailCard && (
-              <Text size="1">{deadline.toISOString().split("T")[0]}</Text>
+            {isDetailCard && !isDraft && (
+              <AlertDialogPopUp
+                title="Are you sure"
+                description="This action will delete your goal permanently"
+                actionText="Delete"
+                action={handleDelete}
+              >
+                <Trash2
+                  size={16}
+                  cursor="pointer"
+                  className={styles.overdue}
+                  data-testid="delete-goal-button"
+                />
+              </AlertDialogPopUp>
             )}
           </Flex>
-          {!isDetailCard && <Progress value={progress} size="2" highContrast />}
+          {isDetailCard && (
+            <Flex align="stretch" gap="3">
+              {cardContent.map((value, index) => (
+                <StatusCard key={index} {...value} />
+              ))}
+            </Flex>
+          )}
         </Flex>
-        {description && (
-          <Text size="2" className={styles.subText}>
-            {description}
-          </Text>
-        )}
-        {isDetailCard && (
-          <Flex gap="3" align="center">
-            {cardContent.map((value, index) => (
-              <StatusCard key={index} {...value} />
-            ))}
-          </Flex>
-        )}
-      </Flex>
-    </CardNoPadding>
+      </CardNoPadding>
+    </>
   );
 }

@@ -2,8 +2,9 @@ import { Flex, Text } from "@radix-ui/themes";
 import { CustomButton } from "../custom-button/custom-button";
 import { WebUrl } from "@/app/enum/web-url.enum";
 import { usePathname, useRouter } from "next/navigation";
-import { Home, Kanban, List, Plus} from "lucide-react";
+import { Home, Kanban, List, Plus } from "lucide-react";
 import { ButtonType } from "@/app/enum/button-type.enum";
+import { useRouteLoadingContext } from "@/app/contexts/route-loading-context/route-loading-context";
 
 interface BarItem {
   icon: React.ElementType;
@@ -20,7 +21,7 @@ export function BarItems({
   isSideItem?: boolean;
 }) {
   const currentUrl = usePathname();
-  const route = useRouter();
+  const { route } = useRouteLoadingContext();
   const navBarItems: BarItem[] = [
     {
       icon: Home,
@@ -32,11 +33,11 @@ export function BarItems({
     {
       icon: List,
       label: "My Goals",
-      url: WebUrl.GoalBoard,
+      url: WebUrl.GoalList,
       testId: "goal-board",
     },
     {
-      icon: Kanban  ,
+      icon: Kanban,
       label: "All Tasks",
       url: WebUrl.TaskBoard,
       testId: "task-board",
@@ -55,7 +56,7 @@ export function BarItems({
             variant="ghost"
             onClick={() => {
               onItemClick?.();
-              route.push(value.url);
+              route(value.url);
             }}
             buttonType={ButtonType.Tab}
             isActive={isActive}

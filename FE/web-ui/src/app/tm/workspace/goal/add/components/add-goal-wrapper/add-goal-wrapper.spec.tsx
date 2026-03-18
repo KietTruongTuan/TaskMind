@@ -25,7 +25,7 @@ jest.mock("../goal-add/goal-add", () => ({
   ),
 }));
 
-jest.mock("../goal-review/goal-review", () => ({
+jest.mock("../../../components/goal-review/goal-review", () => ({
   GoalReview: ({ goalData }: { goalData: GoalDetailResponseBody }) => (
     <div data-testid="goal-review">Goal Review Component - {goalData.name}</div>
   ),

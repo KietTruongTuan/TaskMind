@@ -3,6 +3,6 @@ export enum Status {
   InProgress = "InProgress",
   Completed = "Completed",
   OnHold = "OnHold",
-  Cancel = "Cancel",
+  Cancelled = "Cancelled",
   Overdue = "Overdue",
 }

@@ -11,9 +11,16 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const cookieHeader = request.headers.get("cookie") ?? "";
+  const searchParams = request.nextUrl.searchParams;
+  const noRotation = searchParams.get("no_rotation");
 
-  const res = await fetch(`${BACKEND_URL}${ApiUrl.RefreshToken}`, {
+  const targetUrl = new URL(`${BACKEND_URL}${ApiUrl.RefreshToken}`);
+
+  if (noRotation) {
+    targetUrl.searchParams.set("no_rotation", noRotation);
+  }
+  const cookieHeader = request.headers.get("cookie") ?? "";
+  const res = await fetch(targetUrl.toString(), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

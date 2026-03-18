@@ -10,7 +10,7 @@ export class AIService extends HttpService {
   async createGoal(data: CreateGoalRequestBody) {
     const res = await this.post<CreateGoalResponseBody, CreateGoalRequestBody>(
       ApiUrl.GoalGenerate,
-      data
+      data,
     );
     return res;
   }

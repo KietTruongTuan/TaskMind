@@ -1,7 +1,7 @@
 import { Status } from "../enum/status.enum";
 
 export interface DraftTask {
-  id?: number;
+  id?: string;
   name: string;
   status: Status;
   deadline: Date;
@@ -9,11 +9,15 @@ export interface DraftTask {
 }
 
 export interface Task {
-  id: number;
+  id: string;
   name: string;
   status: Status;
   deadline: Date;
   completedDate?: Date;
 }
 
-
+export interface DraftTaskRequestBody {
+  name?: string;
+  status?: Status;
+  deadline?: Date;
+}
