@@ -1,12 +1,16 @@
 import {
-  Given,
   Then,
   setWorldConstructor,
   World,
   IWorldOptions,
   When,
+  DataTable
 } from "@cucumber/cucumber";
 import { expect, Browser, Page, chromium } from "@playwright/test";
+
+const PAGE_ROUTES: {[key: string]: string} = {
+  'Dashboard': '/dashboard',
+}
 
 export class CustomWorld extends World {
   browser!: Browser;
@@ -27,23 +31,45 @@ export class CustomWorld extends World {
   }
 }
 
+
 setWorldConstructor(CustomWorld);
 
-Given("I am on the homepage", async function (this: CustomWorld) {
-  await this.page.goto("http://localhost:3000/");
+When('I click the {string} button', async function (this: CustomWorld, buttonName) {
+    await this.page.getByRole('button', { name: buttonName, exact: true }).click();
 });
 
-Then("I should see {string}", async function (this: CustomWorld, text: string) {
-  await expect(this.page.getByText(text)).toBeVisible();
+When('I enter {string} into the {string} field', async function (this: CustomWorld, inputString: string, fieldName: string) {
+    await this.page.getByLabel(fieldName).fill(inputString);
 });
 
-When(
-  "I clicks the button {string}",
-  async function (this: CustomWorld, buttonText: string) {
-    await this.page.getByText(buttonText).click();
-  }
-);
 
-Then("I should see the url {string}", async function (url: string) {
-  await expect(this.page).toHaveURL(url);
+
+
+
+Then('I should see the headline {string}', async function (this: CustomWorld, username: string) {
+    await expect(this.page.getByRole('heading', {name: username}).first()).toBeVisible();
+});
+
+Then('I should see the followings:', async function (this: CustomWorld, dataTable: DataTable) {
+    const metrics = dataTable.raw().flat();
+    for (const metric of metrics) {
+        await expect(this.page.getByText(metric).first()).toBeVisible();
+    }
+});
+
+Then('I should see the {string} page', async function (this: CustomWorld, pageName: string) {
+    const expectedPath = PAGE_ROUTES[pageName]
+    if (!expectedPath) {
+      throw new Error(`Path of page ${pageName} is not defined!`)
+    }
+
+    await expect(this.page).toHaveURL(new RegExp(`.*${expectedPath}`));
+  
+    // expect pages to have test id follows format "page-name-tab"
+    const pageTestId = `${pageName.toLowerCase().replace(/\s/g, '-')}`;
+    const tabLocator = this.page.getByTestId(`${pageTestId}-tab`);
+
+    // tab name must be visible but disabled (currently on that page)
+    await expect(tabLocator).toBeVisible();
+    await expect(tabLocator).toBeDisabled(); 
 });
