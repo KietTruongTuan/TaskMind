@@ -1,21 +1,19 @@
 "use client";
 import { CardNoPadding } from "../card-no-padding/card-no-padding";
-import React, { Fragment, KeyboardEvent, useRef, useState } from "react";
-import { AlertDialog, Flex, Progress, Text, TextField } from "@radix-ui/themes";
+import { Fragment, useRef, useState } from "react";
+import { Flex, Progress, Text } from "@radix-ui/themes";
 
 import {
   Calendar,
   CheckCircle,
   Clock,
-  Pen,
   Trash2,
   TrendingUp,
 } from "lucide-react";
 import { GoalCardPropsData } from "@/app/tm/workspace/dashboard/components/recent-goal-list/recent-goal-list";
 import { StatusDropDown } from "../status-dropdown/status-dropdown";
 import { StatusCard, StatusCardProps } from "../status-card/status-card";
-import { CustomButton } from "../custom-button/custom-button";
-import { ButtonType } from "@/app/enum/button-type.enum";
+
 import {
   ApiError,
   CreateGoalResponseBody,
@@ -30,7 +28,6 @@ import { AlertDialogPopUp } from "../alert-dialog-pop-up/alert-dialog-pop-up";
 import { WebUrl } from "@/app/enum/web-url.enum";
 import { useRouteLoadingContext } from "@/app/contexts/route-loading-context/route-loading-context";
 import { useGoalContext } from "@/app/contexts/goal-context/goal-context";
-import { set } from "date-fns";
 
 export function GoalCard({
   id,

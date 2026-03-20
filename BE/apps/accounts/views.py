@@ -170,7 +170,6 @@ class RefreshTokenView(APIView):
                 )
             
             if is_server_side:
-                logger.warning("Attempting to refresh token")
                 access_token = str(refresh.access_token)
                 return Response({
                     'access': access_token

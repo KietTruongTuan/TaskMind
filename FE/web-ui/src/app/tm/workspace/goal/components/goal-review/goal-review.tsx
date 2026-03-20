@@ -95,7 +95,7 @@ export function GoalReview({
         />
       ) : (
         <Flex height="100%" align="center" justify="center" p="5">
-          No tasks exists
+          No tasks exist
         </Flex>
       ),
       icon: <ListChecks size={15} />,
