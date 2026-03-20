@@ -134,17 +134,14 @@ class RefreshTokenView(APIView):
     Reads refresh token from HttpOnly cookie and returns a new access token.
     """
 
-    def post(self, request):
-        # Get refresh token from HttpOnly cookie
-        
+    def post(self, request):     
         refresh_token = request.COOKIES.get('refresh_token')
-
         if not refresh_token:
             return Response(
                 {'error': 'Refresh token not found'},
                 status=status.HTTP_401_UNAUTHORIZED
             )
-
+    
         ROTATION_THRESHOLD = timedelta(hours=24)
 
         # Check if request comes from server-side (Next.js SSR)
@@ -171,8 +168,7 @@ class RefreshTokenView(APIView):
                     {'error': 'User not found'}, 
                     status=status.HTTP_401_UNAUTHORIZED
                 )
-
-            # Skip rotation entirely for server-side requests
+            
             if is_server_side:
                 access_token = str(refresh.access_token)
                 return Response({
@@ -233,6 +229,7 @@ class RefreshTokenView(APIView):
             
             
         except TokenError as e:
+           
             return Response(
                 {'error': 'Invalid or expired refresh token'},
                 status=status.HTTP_401_UNAUTHORIZED

@@ -13,4 +13,7 @@ export enum ApiUrl {
 
   //Goal Generate
   GoalGenerate = "/v1/goals/generate",
+
+  // Tasks
+  Task = "/v1/tasks",
 }

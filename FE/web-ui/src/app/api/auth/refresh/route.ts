@@ -5,29 +5,44 @@ const BACKEND_URL = process.env.BACKEND_URL;
 
 export async function POST(request: NextRequest) {
   if (!BACKEND_URL) {
-    return NextResponse.json(
-      { error: "Backend URL not configured" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Backend URL not configured" }, { status: 500 });
   }
 
+  const targetUrl = new URL(`${BACKEND_URL}${ApiUrl.RefreshToken}`);
   const cookieHeader = request.headers.get("cookie") ?? "";
+  const xServerSide = request.headers.get("x-server-side");
 
-  const res = await fetch(`${BACKEND_URL}${ApiUrl.RefreshToken}`, {
-    method: "POST",
-    headers: {
+  try {
+    const headers: Record<string, string> = {
       "Content-Type": "application/json",
       Cookie: cookieHeader,
-    },
-  });
+    };
 
-  const data = await res.json();
-  const response = NextResponse.json(data, { status: res.status });
+    if (xServerSide) {
+      headers["X-Server-Side"] = xServerSide;
+    }
 
-  const setCookie = res.headers.get("set-cookie");
-  if (setCookie) {
-    response.headers.set("set-cookie", setCookie);
+    const res = await fetch(targetUrl.toString(), {
+      method: "POST",
+      headers: headers,
+    });
+
+    const data = await res.json();
+    const response = NextResponse.json(data, { status: res.status });
+
+    const setCookies = res.headers.getSetCookie();
+    for (const cookie of setCookies) {
+      response.headers.append("set-cookie", cookie);
+    }
+
+    return response;
+
+  } catch (error) {
+  
+    console.error("Next.js API Route failed to reach Django:", error);
+    return NextResponse.json(
+      { error: "Failed to connect to backend." },
+      { status: 502 } 
+    );
   }
-
-  return response;
 }

@@ -3,13 +3,16 @@ import userEvent from "@testing-library/user-event";
 import { SideBarDialog } from "./side-bar-dialog";
 import { ThemeProvider } from "@/app/contexts/theme-context/theme-context";
 import { MOCK_ROUTER_PUSH } from "../../../../jest.setup";
+import { RouteLoadingProvider } from "@/app/contexts/route-loading-context/route-loading-context";
 
 describe("Side bar dialog", () => {
   it("should go to New goal page when click item", async () => {
     render(
-      <ThemeProvider>
-        <SideBarDialog />
-      </ThemeProvider>,
+      <RouteLoadingProvider>
+        <ThemeProvider>
+          <SideBarDialog />
+        </ThemeProvider>
+      </RouteLoadingProvider>,
     );
     await userEvent.click(await screen.findByTestId("sidebar-button"));
     await userEvent.click(await screen.findByText("New Goal"));
@@ -18,9 +21,11 @@ describe("Side bar dialog", () => {
 
   it("executes onEscapeKeyDown and prevents closing", async () => {
     render(
-      <ThemeProvider>
-        <SideBarDialog />
-      </ThemeProvider>,
+      <RouteLoadingProvider>
+        <ThemeProvider>
+          <SideBarDialog />
+        </ThemeProvider>
+      </RouteLoadingProvider>,
     );
     await userEvent.click(await screen.findByTestId("sidebar-button"));
     await userEvent.keyboard("{Escape}");

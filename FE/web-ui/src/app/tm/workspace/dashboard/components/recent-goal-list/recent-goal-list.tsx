@@ -5,16 +5,18 @@ import { Flex } from "@radix-ui/themes";
 import { ElementType } from "react";
 
 export interface GoalCardPropsData {
+  id?: string;
   name: string;
   status: Status;
-  description?: string;
-  tag: string[];
+  description: string;
+  tag?: string[];
   deadline: Date;
   completedDate?: Date;
   completedCount: number;
   taskCount: number;
   isDetailCard?: boolean;
   isPrimary?: boolean;
+  isDraft?: boolean;
 }
 
 export function RecentGoalList({

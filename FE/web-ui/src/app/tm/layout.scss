@@ -63,35 +63,6 @@
   --border-width-default: #{tokens.$border-width-default};
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #{tokens.$dark-color-background};
-    --foreground: #{tokens.$dark-color-foreground};
-    --gray-rgb: #{tokens.$dark-color-gray-rgb};
-    --gray-alpha-200: #{tokens.$dark-color-gray-alpha-200};
-    --gray-alpha-100: #{tokens.$dark-color-gray-alpha-100};
-    --button-primary-hover: #{tokens.$dark-color-button-primary-hover};
-    --button-secondary-hover: #{tokens.$dark-color-button-secondary-hover};
-    --font-family-sans: #{tokens.$typography-font-family-sans};
-    --font-family-mono: #{tokens.$typography-font-family-mono};
-    --font-size-base: #{tokens.$typography-font-size-base};
-    --line-height-base: #{tokens.$typography-line-height-base};
-    --spacing-small: #{tokens.$spacing-small};
-    --spacing-medium: #{tokens.$spacing-medium};
-    --spacing-large: #{tokens.$spacing-large};
-    --spacing-xlarge: #{tokens.$spacing-xlarge};
-    --border-radius-pill: #{tokens.$border-radius-pill};
-    --border-radius-small: #{tokens.$border-radius-small};
-    --border-width-default: #{tokens.$border-width-default};
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
-}
-
 html,
 body {
   min-height: 100vh;

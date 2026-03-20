@@ -2,7 +2,6 @@
 import { ApiError, authenticationService, UserPayload } from "@/app/constants";
 import { jwtDecode } from "jwt-decode";
 import { createContext, useContext, useEffect, useState } from "react";
-import { isAxiosError } from "axios";
 
 const TokenRefresherContext = createContext<{
   user?: UserPayload;

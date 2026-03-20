@@ -1,7 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import { WebUrl } from "./app/enum/web-url.enum";
 
-// This function can be marked `async` if using `await` inside
 export async function middleware(request: NextRequest) {
   const refreshToken = request.cookies.get("refresh_token")?.value;
   const url = request.nextUrl.clone();

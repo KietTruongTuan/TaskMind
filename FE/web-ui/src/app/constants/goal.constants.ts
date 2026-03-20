@@ -1,5 +1,5 @@
 import { Status } from "../enum/status.enum";
-import { DraftTask, Task } from "./task.constants";
+import { DraftTask, DraftTaskRequestBody, Task } from "./task.constants";
 
 export interface CreateGoalRequestBody {
   name: string;
@@ -17,8 +17,17 @@ export interface SaveGoalRequestBody {
   tasks: DraftTask[];
 }
 
+export interface DraftGoalRequestBody {
+  name?: string;
+  description?: string;
+  status?: Status;
+  deadline?: Date;
+  tag?: string[];
+  tasks?: DraftTaskRequestBody[];
+}
+
 export interface CreateGoalResponseBody extends GoalResponseBody {
-  tasks: DraftTask[];
+  tasks?: DraftTask[];
 }
 
 export interface GoalDetailResponseBody extends GoalResponseBody {
@@ -36,7 +45,7 @@ export interface GoalResponseBody {
   status: Status;
   deadline: Date;
   tag?: string[];
-  completeCount: number;
+  completedCount: number;
   taskCount: number;
   completedDate?: Date;
 }

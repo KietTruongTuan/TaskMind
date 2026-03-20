@@ -7,8 +7,9 @@ export class HttpService {
   private accessToken: string | null = null;
 
   constructor(baseURL?: string) {
+    const finalBaseUrl = this.resolveBaseUrl(baseURL);
     this.instance = axios.create({
-      baseURL,
+      baseURL: finalBaseUrl,
       timeout: 60000,
       headers: {
         "Content-Type": "application/json",
@@ -17,13 +18,25 @@ export class HttpService {
     });
 
     this.refreshInstance = axios.create({
-      baseURL,
+      baseURL: finalBaseUrl,
       timeout: 30000,
       headers: { "Content-Type": "application/json" },
       withCredentials: true,
     });
 
     this.setUpInterceptor();
+  }
+
+  private resolveBaseUrl(passedURL?: string): string {
+    if (passedURL) {
+      return passedURL;
+    }
+
+    if (typeof window === "undefined") {
+      return process.env.FRONTEND_URL || "";
+    }
+
+    return "";
   }
 
   setAccessToken(token: string) {
@@ -52,7 +65,7 @@ export class HttpService {
       },
       (error) => {
         return Promise.reject(this.handleError(error));
-      }
+      },
     );
 
     this.instance.interceptors.response.use(
@@ -83,7 +96,7 @@ export class HttpService {
         }
 
         return Promise.reject(this.handleError(error));
-      }
+      },
     );
   }
 
@@ -95,6 +108,7 @@ export class HttpService {
         status: error.response.status,
       };
     } else if (error.request) {
+      console.error(`🚨 "No response received" for URL: ${error.config?.url}`, error.config?.data);
       return {
         message: "No response received.",
         status: 0,
@@ -116,7 +130,7 @@ export class HttpService {
   async post<Res, Req = undefined>(
     url: string,
     data?: Req,
-    request?: AxiosRequestConfig
+    request?: AxiosRequestConfig,
   ): Promise<Res> {
     const response = await this.instance.post<Res>(url, data, request);
     return response.data;
@@ -126,7 +140,7 @@ export class HttpService {
   async put<Res, Req>(
     url: string,
     data?: Req,
-    request?: AxiosRequestConfig
+    request?: AxiosRequestConfig,
   ): Promise<Res> {
     const response = await this.instance.put<Res>(url, data, request);
     return response.data;
@@ -136,7 +150,7 @@ export class HttpService {
   async patch<Res, Req>(
     url: string,
     data?: Req,
-    request?: AxiosRequestConfig
+    request?: AxiosRequestConfig,
   ): Promise<Res> {
     const response = await this.instance.patch<Res>(url, data, request);
     return response.data;

@@ -3,26 +3,79 @@
     border-radius: var(--spacing-medium);
 }
 
-.ToDo {
+.statusTrigger {
+    all: unset;
+    display: inline-flex;
+
+    & :global(.rt-SelectIcon) {
+        display: none !important;
+    }
+}
+
+.selectItem :global(.rt-SelectItemIndicator) {
+    display: none !important;
+}
+
+.statusContent {
+    background-color: var(--background);
+    color: var(--text-secondary);
+    border-radius: var(--spacing-small);
+}
+
+.selectItem {
+    cursor: pointer;
+    color: var(--text-secondary);
+
+    &[data-highlighted],
+    &[data-state="checked"] {
+        color: var(--button-secondary);
+
+        &.ToDo {
+            background-color: var(--status-to-do);
+        }
+
+        &.InProgress {
+            background-color: var(--status-in-progress);
+        }
+
+        &.Completed {
+            background-color: var(--status-completed);
+        }
+
+        &.OnHold {
+            background-color: var(--status-on-hold);
+        }
+
+        &.Cancelled {
+            background-color: var(--status-cancel);
+        }
+
+        &.Overdue {
+            background-color: var(--status-overdue);
+        }
+    }
+}
+
+.status.ToDo {
     background-color: var(--status-to-do);
 }
 
-.InProgress {
+.status.InProgress {
     background-color: var(--status-in-progress);
 }
 
-.OnHold {
+.status.OnHold {
     background-color: var(--status-on-hold);
 }
 
-.Completed {
+.status.Completed {
     background-color: var(--status-completed);
 }
 
-.Cancel {
+.status.Cancelled {
     background-color: var(--status-cancel);
 }
 
-.Overdue {
+.status.Overdue {
     background-color: var(--status-overdue);
 }
