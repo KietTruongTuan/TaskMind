@@ -1,14 +1,19 @@
 import { buildUrl } from "@/app/tm/utils";
 import { HttpService } from "../http-service/http-service";
 import { ApiUrl } from "@/app/enum/api-url.enum";
-import { CreateTaskRequestBody, DraftTask, DraftTaskRequestBody, Task } from "@/app/constants";
+import {
+  CreateTaskRequestBody,
+  DraftTaskRequestBody,
+  Task,
+} from "@/app/constants";
 
 export class TaskService extends HttpService {
   constructor() {
     super(
       typeof window === "undefined"
-        ? process.env.INTERNAL_API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL
-        : process.env.NEXT_PUBLIC_API_BASE_URL
+        ? process.env.INTERNAL_API_BASE_URL ||
+            process.env.NEXT_PUBLIC_API_BASE_URL
+        : process.env.NEXT_PUBLIC_API_BASE_URL,
     );
   }
 

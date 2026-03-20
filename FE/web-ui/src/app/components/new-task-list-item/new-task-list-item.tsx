@@ -15,11 +15,11 @@ export function NewTaskListItem({
   onSave: (task: DraftTask) => void;
   onCancel: () => void;
 }) {
-  const [detail, setDetail] = useState<DraftTask>({
+  const detail: DraftTask = {
     name: "",
     status: Status.ToDo,
     deadline: new Date(),
-  });
+  };
   const [editingField, setEditingField] = useState<"name" | "deadline" | null>(
     "name",
   );

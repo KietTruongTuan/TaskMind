@@ -1,7 +1,7 @@
 import { Flex, Text } from "@radix-ui/themes";
 import { CustomButton } from "../custom-button/custom-button";
 import { WebUrl } from "@/app/enum/web-url.enum";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { Home, Kanban, List, Plus } from "lucide-react";
 import { ButtonType } from "@/app/enum/button-type.enum";
 import { useRouteLoadingContext } from "@/app/contexts/route-loading-context/route-loading-context";

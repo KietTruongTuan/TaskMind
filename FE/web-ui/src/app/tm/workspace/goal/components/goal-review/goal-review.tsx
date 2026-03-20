@@ -12,7 +12,6 @@ import {
   GoalDetailResponseBody,
   goalService,
   SaveGoalRequestBody,
-  Task,
 } from "@/app/constants";
 import { useGoalContext } from "@/app/contexts/goal-context/goal-context";
 import { useRouteLoadingContext } from "@/app/contexts/route-loading-context/route-loading-context";
@@ -22,7 +21,7 @@ import { Status } from "@/app/enum/status.enum";
 import { AddStep } from "@/app/enum/step.enum";
 import { WebUrl } from "@/app/enum/web-url.enum";
 import { Flex } from "@radix-ui/themes";
-import { Clock, Kanban, ListCheck, ListChecks } from "lucide-react";
+import { Clock, Kanban, ListChecks } from "lucide-react";
 import { Dispatch, SetStateAction, useState } from "react";
 
 export function GoalReview({

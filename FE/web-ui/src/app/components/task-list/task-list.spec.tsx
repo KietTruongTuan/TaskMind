@@ -2,7 +2,6 @@ import {
   MOCK_DRAFT_TASK_LIST_RESPONSE_DATA,
   MOCK_GOAL_DETAIL_RESPONSE_DATA,
   MOCK_TASK_LIST_RESPONSE_DATA,
-  MOCK_TASK_RESPONSE_DATA,
   taskService,
 } from "@/app/constants";
 import { render, screen } from "@testing-library/react";

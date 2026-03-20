@@ -1,6 +1,6 @@
 import { renderHook, act } from "@testing-library/react";
 import { GoalProvider, useGoalContext } from "./goal-context";
-import { CreateGoalResponseBody, MOCK_GOAL_RESPONSE_DATA } from "@/app/constants";
+import { MOCK_GOAL_RESPONSE_DATA } from "@/app/constants";
 
 describe("GoalContext", () => {
   it("should throw an error when used outside of GoalProvider", () => {

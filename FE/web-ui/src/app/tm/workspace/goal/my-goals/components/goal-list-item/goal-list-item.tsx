@@ -1,10 +1,10 @@
 "use client";
 import { CardNoPadding } from "@/app/components/card-no-padding/card-no-padding";
 import { GoalListItemResponseBody } from "@/app/constants";
-import { DropdownMenu, Flex, Progress, Text } from "@radix-ui/themes";
+import { Flex, Progress, Text } from "@radix-ui/themes";
 import { Fragment } from "react";
 import styles from "./goal-list-item.module.scss";
-import { Clock, Ellipsis, Pen, Trash2 } from "lucide-react";
+import { Clock } from "lucide-react";
 import { StatusDropDown } from "@/app/components/status-dropdown/status-dropdown";
 
 import { buildUrl } from "@/app/tm/utils";
