@@ -4,6 +4,7 @@ import { TaskListItem } from "../task-list-item/task-list-item";
 import {
   ApiError,
   CreateGoalResponseBody,
+  CreateTaskRequestBody,
   DraftTask,
   Task,
   taskService,
@@ -14,21 +15,28 @@ import styles from "./task-list.module.scss";
 import { useEffect, useState } from "react";
 import { useToast } from "@/app/contexts/toast-context/toast-context";
 import { useGoalContext } from "@/app/contexts/goal-context/goal-context";
+import { CustomButton } from "../custom-button/custom-button";
+import { ButtonType } from "@/app/enum/button-type.enum";
+import { NewTaskListItem } from "../new-task-list-item/new-task-list-item";
 
 export function TaskList({
   tasks,
+  goalId,
   onTaskStatusChange,
   onTaskCountChange,
 }: {
   tasks?: Task[] | DraftTask[];
+  goalId?: string;
   onTaskStatusChange?: (oldStatus: Status, newStatus: Status) => void;
   onTaskCountChange?: (isDelete?: boolean) => void;
 }) {
   const [localTasks, setLocalTasks] = useState<
     Task[] | DraftTask[] | undefined
   >(tasks);
+  const [isAddingTask, setIsAddingTask] = useState(false);
   const { showToast, setIsSuccess } = useToast();
   const { draftGoal, setDraftGoal } = useGoalContext();
+
   useEffect(() => {
     setLocalTasks(tasks);
   }, [tasks]);
@@ -38,7 +46,7 @@ export function TaskList({
 
     const oldTasks = localTasks;
     onTaskCountChange && onTaskCountChange(true);
-    setLocalTasks((prev) => prev?.filter((t) => t.id !== id));
+    setLocalTasks((prev) => prev?.filter((t) => (t as Task).id !== id));
     try {
       await taskService.remove(id);
     } catch (err) {
@@ -50,9 +58,78 @@ export function TaskList({
     }
   };
 
+  const handleAddNewTask = async (newTask: DraftTask) => {
+    setIsAddingTask(false);
+
+    if (goalId) {
+      const optimisticId = `temp-${Date.now()}`;
+      const optimisticTask = { ...newTask, id: optimisticId };
+
+      const updatedTasks = [...(localTasks || []), optimisticTask];
+      const oldTasks = localTasks;
+      setLocalTasks(updatedTasks);
+      onTaskCountChange && onTaskCountChange(false);
+
+      const formattedDeadline = (
+        newTask.deadline instanceof Date
+          ? newTask.deadline
+          : new Date(newTask.deadline)
+      )
+        .toISOString()
+        .split("T")[0];
+
+      const newTaskData: CreateTaskRequestBody = {
+        name: newTask.name,
+        status: newTask.status,
+        deadline: formattedDeadline as unknown as Date,
+        goalId: goalId,
+      };
+
+      try {
+        const createdTask = await taskService.create(newTaskData);
+
+        setLocalTasks((prev) =>
+          prev?.map((t) => ((t as Task).id === optimisticId ? createdTask : t)),
+        );
+      } catch (err) {
+        setIsSuccess(false);
+        const error = err as ApiError;
+        showToast(error.message);
+        setLocalTasks(oldTasks);
+        onTaskCountChange && onTaskCountChange(true);
+      }
+    } else {
+      const maxIndex = localTasks?.length
+        ? Math.max(...localTasks.map((t) => (t as DraftTask).index || 0))
+        : 0;
+      const draftTask = { ...newTask, index: maxIndex + 1 };
+
+      const updatedTasks = [...(localTasks || []), draftTask];
+      setLocalTasks(updatedTasks);
+      onTaskCountChange && onTaskCountChange(false);
+
+      if (draftGoal) {
+        setDraftGoal({
+          ...draftGoal,
+          tasks: [...(draftGoal.tasks || []), draftTask],
+        } as CreateGoalResponseBody);
+      }
+    }
+  };
+
   return (
     <CardNoPadding p="5" isPrimary>
       <Flex direction="column" width="100%" height="100%" gap="3">
+        <Flex width="100%" height="100%" justify="end">
+          <CustomButton
+            buttonType={ButtonType.Primary}
+            onClick={() => setIsAddingTask(true)}
+            size="1"
+            data-testid={`add-task-button`}
+          >
+            Add Task
+          </CustomButton>
+        </Flex>
         {localTasks?.map((value, index) => {
           const isRealTask = "id" in value && value.id;
           const taskKey = isRealTask ? value.id : (value as DraftTask).index;
@@ -75,12 +152,14 @@ export function TaskList({
                     setLocalTasks((prev) =>
                       prev?.filter((t: DraftTask) => t.index !== value.index),
                     );
-                    setDraftGoal({
-                      ...draftGoal,
-                      tasks: draftGoal?.tasks?.filter(
-                        (t: DraftTask) => t.index !== value.index,
-                      ),
-                    } as CreateGoalResponseBody);
+                    if (draftGoal) {
+                      setDraftGoal({
+                        ...draftGoal,
+                        tasks: draftGoal.tasks?.filter(
+                          (t: DraftTask) => t.index !== value.index,
+                        ),
+                      } as CreateGoalResponseBody);
+                    }
                   }
                 }}
                 data-testid={`delete-task-${index}-button`}
@@ -88,6 +167,15 @@ export function TaskList({
             </Flex>
           );
         })}
+
+        {isAddingTask && (
+          <Flex align="center" gap="1">
+            <NewTaskListItem
+              onSave={handleAddNewTask}
+              onCancel={() => setIsAddingTask(false)}
+            />
+          </Flex>
+        )}
       </Flex>
     </CardNoPadding>
   );

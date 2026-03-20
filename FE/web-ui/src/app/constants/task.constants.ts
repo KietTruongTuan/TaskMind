@@ -22,3 +22,10 @@ export interface DraftTaskRequestBody {
   status?: Status;
   deadline?: Date;
 }
+
+export interface CreateTaskRequestBody {
+  goalId: string;
+  name: string;
+  status: Status;
+  deadline: Date;
+} 

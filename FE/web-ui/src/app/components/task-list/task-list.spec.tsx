@@ -1,5 +1,6 @@
 import {
   MOCK_DRAFT_TASK_LIST_RESPONSE_DATA,
+  MOCK_GOAL_DETAIL_RESPONSE_DATA,
   MOCK_TASK_LIST_RESPONSE_DATA,
   MOCK_TASK_RESPONSE_DATA,
   taskService,
@@ -10,6 +11,7 @@ import { TaskList } from "./task-list";
 import { ToastProvider } from "@/app/contexts/toast-context/toast-context";
 import { ThemeProvider } from "@/app/contexts/theme-context/theme-context";
 import { GoalProvider } from "@/app/contexts/goal-context/goal-context";
+import { Status } from "@/app/enum/status.enum";
 
 jest.mock("@/app/constants", () => {
   const originalModule = jest.requireActual("@/app/constants");
@@ -18,6 +20,7 @@ jest.mock("@/app/constants", () => {
     ...originalModule,
     taskService: {
       remove: jest.fn(),
+      create: jest.fn(),
     },
   };
 });
@@ -59,7 +62,10 @@ describe("Task list", () => {
       <ThemeProvider>
         <ToastProvider>
           <GoalProvider>
-            <TaskList tasks={MOCK_TASK_LIST_RESPONSE_DATA} />
+            <TaskList
+              tasks={MOCK_TASK_LIST_RESPONSE_DATA}
+              onTaskCountChange={() => {}}
+            />
           </GoalProvider>
         </ToastProvider>
       </ThemeProvider>,
@@ -98,5 +104,67 @@ describe("Task list", () => {
     await user.click(deleteButton);
 
     expect(taskService.remove).not.toHaveBeenCalled();
+  });
+
+  it("should add new task", async () => {
+    render(
+      <ThemeProvider>
+        <ToastProvider>
+          <GoalProvider>
+            <TaskList
+              tasks={MOCK_TASK_LIST_RESPONSE_DATA}
+              onTaskCountChange={() => {}}
+              goalId={MOCK_GOAL_DETAIL_RESPONSE_DATA.id}
+            />
+          </GoalProvider>
+        </ToastProvider>
+      </ThemeProvider>,
+    );
+
+    const user = userEvent.setup();
+
+    const addButton = await screen.findByTestId("add-task-button");
+
+    await user.click(addButton);
+
+    const editField = await screen.findByTestId("edit-new-task-name-input");
+
+    await user.type(editField, "New Task");
+
+    editField.blur();
+    expect(taskService.create).toHaveBeenCalledTimes(1);
+    expect(taskService.create).toHaveBeenCalledWith({
+      name: "New Task",
+      status: Status.ToDo,
+      deadline: new Date().toISOString().split("T")[0],
+      goalId: MOCK_GOAL_DETAIL_RESPONSE_DATA.id,
+    });
+  });
+
+  it("should cancel add new task", async () => {
+    render(
+      <ThemeProvider>
+        <ToastProvider>
+          <GoalProvider>
+            <TaskList
+              tasks={MOCK_TASK_LIST_RESPONSE_DATA}
+              onTaskCountChange={() => {}}
+              goalId={MOCK_GOAL_DETAIL_RESPONSE_DATA.id}
+            />
+          </GoalProvider>
+        </ToastProvider>
+      </ThemeProvider>,
+    );
+
+    const user = userEvent.setup();
+
+    const addButton = await screen.findByTestId("add-task-button");
+
+    await user.click(addButton);
+
+    const editField = await screen.findByTestId("edit-new-task-name-input");
+
+    editField.blur();
+    expect(taskService.create).toHaveBeenCalledTimes(0);
   });
 });

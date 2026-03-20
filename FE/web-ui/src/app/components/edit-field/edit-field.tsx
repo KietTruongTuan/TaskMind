@@ -15,10 +15,10 @@ interface EditFieldProps {
   isEditing: boolean;
   isMultiLine?: boolean;
   isMultiInput?: boolean;
-  onEditStart: () => void;
-  onChange: (newValue: string) => void;
-  onSave: () => void;
-  onCancel: () => void;
+  onEditStart?: () => void;
+  onChange?: (newValue: string) => void;
+  onSave?: () => void;
+  onCancel?: () => void;
   isDetailCard?: boolean;
 }
 export function EditField({
@@ -30,10 +30,10 @@ export function EditField({
   type,
   value,
   isEditing,
-  onEditStart,
-  onChange,
-  onSave,
-  onCancel,
+  onEditStart = () => {},
+  onChange = () => {},
+  onSave = () => {},
+  onCancel = () => {},
   isMultiLine = false,
   isMultiInput = false,
   isDetailCard = false,

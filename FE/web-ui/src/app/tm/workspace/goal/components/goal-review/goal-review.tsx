@@ -45,7 +45,6 @@ export function GoalReview({
     tag,
     deadline,
   } = goalData;
-  console.log(goalData)
   const { route } = useRouteLoadingContext();
   const { showToast, setIsSuccess } = useToast();
   const { clearDraftGoal } = useGoalContext();
@@ -91,6 +90,7 @@ export function GoalReview({
       component: tasks ? (
         <TaskList
           tasks={tasks}
+          goalId={(goalData as GoalDetailResponseBody).id}
           onTaskStatusChange={handleTaskStatusChange}
           onTaskCountChange={handleTaskCountChange}
         />

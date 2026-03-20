@@ -1,7 +1,7 @@
 import { buildUrl } from "@/app/tm/utils";
 import { HttpService } from "../http-service/http-service";
 import { ApiUrl } from "@/app/enum/api-url.enum";
-import { DraftTask, DraftTaskRequestBody, Task } from "@/app/constants";
+import { CreateTaskRequestBody, DraftTask, DraftTaskRequestBody, Task } from "@/app/constants";
 
 export class TaskService extends HttpService {
   constructor() {
@@ -10,6 +10,11 @@ export class TaskService extends HttpService {
         ? process.env.INTERNAL_API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL
         : process.env.NEXT_PUBLIC_API_BASE_URL
     );
+  }
+
+  async create(data: CreateTaskRequestBody) {
+    const res = await this.post<Task, CreateTaskRequestBody>(ApiUrl.Task, data);
+    return res;
   }
 
   async update(id: string, data: DraftTaskRequestBody) {
