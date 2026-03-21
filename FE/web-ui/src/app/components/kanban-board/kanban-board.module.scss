@@ -1,13 +1,11 @@
-.kanbanBoard {
+.columnWrapper {
     display: flex;
-    gap: 1rem;
-    width: 100%;
-    overflow-x: auto;
-    padding: 1rem;
-    padding-right: 2rem;
+    flex-direction: column;
+    height: fit-content;
+}
 
-    @media (max-width: 768px) {
-        overflow-x: scroll;
-        scroll-behavior: smooth;
-    }
+.badgeCount {
+    background-color: var(--card-border);
+    color: var(--text-primary);
+    border-radius: var(--spacing-small);
 }

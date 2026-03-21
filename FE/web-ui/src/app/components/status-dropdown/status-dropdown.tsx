@@ -1,6 +1,7 @@
 import { Status } from "@/app/enum/status.enum";
 import { Flex, Select, Text } from "@radix-ui/themes";
 import styles from "./status-dropdown.module.scss";
+import { StatusDisplay } from "@/app/constants";
 
 export function StatusDropDown({
   status,
@@ -30,7 +31,7 @@ export function StatusDropDown({
           justify="center"
         >
           <Text size="1" trim="both">
-            {status}
+            {StatusDisplay[status].title}
           </Text>
         </Flex>
       </Select.Trigger>
@@ -43,7 +44,7 @@ export function StatusDropDown({
                 value={value}
                 className={`${styles.selectItem} ${styles[value]}`}
               >
-                {value}
+                {StatusDisplay[value].title}
               </Select.Item>
             ))}
           </Flex>

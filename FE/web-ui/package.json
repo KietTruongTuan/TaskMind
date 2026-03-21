@@ -13,9 +13,12 @@
     "test:e2e": "(cucumber-js e2e/  features  || true) && tsx e2e/helper/report/report.ts"
   },
   "dependencies": {
+    "@dnd-kit/utilities": "3.2.2",
+    "@emotion/react": "11.14.0",
+    "@emotion/styled": "11.14.1",
+    "@saas-ui/react": "2.11.4",
     "geist": "1.4.2",
     "next": "16.1.6",
-    "@dnd-kit/utilities": "^3.2.2",
     "non.geist": "1.0.4",
     "pnpm": "10.14.0",
     "react": "19.2.4",
@@ -36,6 +39,7 @@
     "@radix-ui/react-label": "2.1.8",
     "@radix-ui/react-toast": "1.2.15",
     "@radix-ui/themes": "3.2.1",
+    "@saas-ui-pro/kanban": "^0.8.0",
     "@testing-library/dom": "10.4.0",
     "@testing-library/jest-dom": "6.6.3",
     "@testing-library/react": "16.3.0",

@@ -1,137 +1,99 @@
 "use client";
-import { useCallback, useMemo, useState } from "react";
 import {
-  DndContext,
-  DragEndEvent,
-  DragOverEvent,
-  closestCorners,
-} from "@dnd-kit/core";
-import { arrayMove } from "@dnd-kit/sortable";
-import { Flex } from "@radix-ui/themes";
+  Kanban,
+  KanbanColumn,
+  KanbanColumnHeader,
+  KanbanColumnBody,
+  KanbanCard,
+  KanbanDragOverlay,
+} from "@saas-ui-pro/kanban";
+import { DraftTask, StatusDisplay } from "@/app/constants";
 import { Status } from "@/app/enum/status.enum";
-import { DraftTask } from "@/app/constants";
-import { KanbanColumn } from "../kanban-column/kanban-column";
+import { KanbanItem } from "../kanban-item/kanban-item";
+import { Badge, Box, Flex, Inset, Separator, Text } from "@radix-ui/themes";
+import { CardNoPadding } from "../card-no-padding/card-no-padding";
 import styles from "./kanban-board.module.scss";
+export function KanbanBoard({ tasks }: { tasks?: DraftTask[] }) {
+  const kanbanItems = tasks
+    ? Object.values(Status).reduce(
+        (acc, status) => {
+          acc[status] = tasks
+            .filter((task) => task.status === status)
+            .map((task) => String(task.id));
+          return acc;
+        },
+        {} as Record<Status, string[]>,
+      )
+    : {};
 
-export interface KanbanBoardProps {
-  tasks: DraftTask[];
-  onTaskStatusChange?: (taskId: number | undefined, newStatus: Status) => void;
-  onTasksReorder?: (updatedTasks: DraftTask[]) => void;
-  isLoading?: boolean;
-}
+  return !tasks || tasks.length === 0 ? (
+    <Box>No tasks</Box>
+  ) : (
+    <Kanban defaultItems={kanbanItems}>
+      {(kanbanState) => (
+        <>
+          <Flex gap="4" align="start" mb="4">
+            {kanbanState.columns.map((columnId) => (
+              <Flex key={columnId} className={styles.columnWrapper}>
+                <CardNoPadding key={columnId} p="2">
+                  <KanbanColumn id={columnId}>
+                    <Flex direction="column" gap="3">
+                      <KanbanColumnHeader>
+                        <Flex>
+                          <Text size="3" weight="medium">
+                            {StatusDisplay[columnId as Status]?.title}
+                          </Text>
+                        </Flex>
 
-const STATUS_ORDER = [
-  Status.ToDo,
-  Status.InProgress,
-  Status.OnHold,
-  Status.Completed,
-  Status.Cancel,
-  Status.Overdue,
-];
+                        <Flex
+                          px="2"
+                          justify="center"
+                          align="center"
+                          className={styles.badgeCount}
+                        >
+                          <Text size="1" weight="medium">
+                            {kanbanState.items[columnId]?.length}
+                          </Text>
+                        </Flex>
+                      </KanbanColumnHeader>
+                      <Inset mx="-4">
+                        <Separator size="4" />
+                      </Inset>
 
-export function KanbanBoard({
-  tasks,
-  onTaskStatusChange,
-  onTasksReorder,
-  isLoading = false,
-}: KanbanBoardProps) {
-  const [localTasks, setLocalTasks] = useState<DraftTask[]>(tasks);
+                      <KanbanColumnBody>
+                        {kanbanState.items[columnId]?.map((itemId) => {                          const task: DraftTask | undefined = tasks.find(
+                            (t) => String(t.id) === itemId,
+                          );
+                          return task ? (
+                            <KanbanCard key={itemId} id={itemId}>
+                              <KanbanItem task={task} />
+                            </KanbanCard>
+                          ) : null;
+                        })}
+                      </KanbanColumnBody>
+                    </Flex>
+                  </KanbanColumn>
+                </CardNoPadding>
+              </Flex>
+            ))}
+          </Flex>
 
-  const tasksByStatus = useMemo(() => {
-    const grouped: Record<Status, DraftTask[]> = {
-      [Status.ToDo]: [],
-      [Status.InProgress]: [],
-      [Status.OnHold]: [],
-      [Status.Completed]: [],
-      [Status.Cancel]: [],
-      [Status.Overdue]: [],
-    };
-
-    localTasks.forEach((task) => {
-      grouped[task.status].push(task);
-    });
-
-    return grouped;
-  }, [localTasks]);
-
-  const handleDragOver = useCallback(
-    (event: DragOverEvent) => {
-      const { active, over } = event;
-
-      if (!over) return;
-
-      const activeTask = localTasks.find((t) => t.id === active.id);
-      const targetStatus = over.data?.current?.status as Status;
-
-      if (!activeTask || !targetStatus) return;
-
-      if (activeTask.status === targetStatus) return;
-
-      setLocalTasks((prevTasks) => {
-        const updatedTasks = prevTasks.map((task) =>
-          task.id === activeTask.id ? { ...task, status: targetStatus } : task,
-        );
-        return updatedTasks;
-      });
-
-      onTaskStatusChange?.(activeTask.id, targetStatus);
-    },
-    [localTasks, onTaskStatusChange],
-  );
-
-  const handleDragEnd = useCallback(
-    (event: DragEndEvent) => {
-      const { active, over } = event;
-
-      if (!over || active.id === over.id) return;
-
-      const activeTask = localTasks.find((t) => t.id === active.id);
-      const overTask = localTasks.find((t) => t.id === over.id);
-
-      if (!activeTask || !overTask) return;
-
-      // If reordering within the same status
-      if (activeTask.status === overTask.status) {
-        const statusTasks = tasksByStatus[activeTask.status];
-        const oldIndex = statusTasks.findIndex((t) => t.id === active.id);
-        const newIndex = statusTasks.findIndex((t) => t.id === over.id);
-
-        if (oldIndex !== -1 && newIndex !== -1) {
-          const reorderedStatusTasks = arrayMove(
-            statusTasks,
-            oldIndex,
-            newIndex,
-          );
-          const updatedTasks = localTasks.map((task) => {
-            const reorderedTask = reorderedStatusTasks.find(
-              (t) => t.id === task.id,
-            );
-            return reorderedTask || task;
-          });
-          setLocalTasks(updatedTasks);
-          onTasksReorder?.(updatedTasks);
-        }
-      }
-    },
-    [localTasks, tasksByStatus, onTasksReorder],
-  );
-
-  return (
-    <DndContext
-      collisionDetection={closestCorners}
-      onDragOver={handleDragOver}
-      onDragEnd={handleDragEnd}
-    >
-      <Flex gap="4" className={styles.kanbanBoard} width="100%">
-        {STATUS_ORDER.map((status) => (
-          <KanbanColumn
-            key={status}
-            status={status}
-            tasks={tasksByStatus[status]}
-            isLoading={isLoading}
-          />
-        ))}
-      </Flex>
-    </DndContext>
+          <KanbanDragOverlay>
+            {kanbanState.activeId
+              ? (() => {
+                  const task = tasks?.find(
+                    (t) => String(t.id) === kanbanState.activeId,
+                  );
+                  return task ? (
+                    <KanbanCard id={kanbanState.activeId}>
+                      <KanbanItem task={task} />
+                    </KanbanCard>
+                  ) : null;
+                })()
+              : null}
+          </KanbanDragOverlay>
+        </>
+      )}
+    </Kanban>
   );
 }
