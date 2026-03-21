@@ -17,6 +17,8 @@ export interface Task {
   status: Status;
   deadline: Date;
   completedDate?: Date;
+  goalId?: number;
+  goalName?: string;
 }
 
 export interface DraftTaskRequestBody {

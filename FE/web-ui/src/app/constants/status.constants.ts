@@ -10,7 +10,7 @@ export const StatusDisplay: Record<Status, { title: string }> = {
   [Status.Completed]: {
     title: "Completed",
   },
-  [Status.OnHold]: { title: "On Hold" },
-  [Status.Cancel]: { title: "Cancelled" },
+  [Status.OnHold]: { title: "On hold" },
+  [Status.Cancelled]: { title: "Cancelled" },
   [Status.Overdue]: { title: "Overdue" },
 };

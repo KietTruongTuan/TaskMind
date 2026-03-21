@@ -89,7 +89,7 @@ export function AuthenticationForm() {
   }, [activeForm, reset]);
   return (
     <>
-      <LoadingOverlay isLoading={isSubmitting} />
+      <LoadingOverlay isLoading={isSubmitting} isGlobal />
       <Box width="100%">
         <AnimatePresence mode="wait">
           <motion.div

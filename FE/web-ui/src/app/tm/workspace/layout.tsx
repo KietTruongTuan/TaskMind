@@ -10,7 +10,7 @@ export default function Layout({
 }) {
   return (
     <TokenRefresherProvider>
-        <LoadingOverlay />
+        <LoadingOverlay isGlobal />
         <NavigationBar />
         <Box pt="9" height="100%">{children}</Box>
       </TokenRefresherProvider>

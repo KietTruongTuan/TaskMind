@@ -25,6 +25,7 @@ import styles from "./kanban-board.module.scss";
 import { useCallback, useState } from "react";
 import { useToast } from "@/app/contexts/toast-context/toast-context";
 import { ThemeProvider } from "@/app/contexts/theme-context/theme-context";
+
 export function KanbanBoard({ tasks: initialTasks }: { tasks?: DraftTask[] }) {
   const [tasks, setTasks] = useState(initialTasks);
   const [key, setKey] = useState(0);
