@@ -5,7 +5,7 @@
     "formatOptions": {
       "snippetInterface": "synchronous"
     },
-    "requireModule": ["ts-node/register"],
+    "requireModule": ["tsx/cjs"],
     "publishQuiet": true,
     "dryRun": false,
     "format": [
