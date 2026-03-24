@@ -165,7 +165,8 @@ class GoalView(APIView):
         end_date_filter = request.query_params.get('endDate', None)
 
         if status_filter:
-            goals = goals.filter(status=status_filter)
+            status_list = [s.strip() for s in status_filter.split(',')]
+            goals = goals.filter(status__in=status_list)
 
         # Search by keyword
         if search_query:
@@ -175,7 +176,8 @@ class GoalView(APIView):
             )
         
         if tag_filter:
-            goals = goals.filter(tag__contains=[tag_filter])
+            tag_list = [t.strip() for t in tag_filter.split(',')]
+            goals = goals.filter(tag__contains=tag_list)
 
         if start_date_filter:
             goals = goals.filter(created_at__date__gte=start_date_filter)
@@ -382,7 +384,8 @@ class TaskListView(APIView):
         search_query = request.query_params.get('search', None)
 
         if status_filter:
-            tasks = tasks.filter(status=status_filter)
+            status_list = [s.strip() for s in status_filter.split(',')]
+            tasks = tasks.filter(status__in=status_list)
 
         if goal_id_filter:
             tasks = tasks.filter(goal_id=goal_id_filter)
