@@ -35,7 +35,7 @@ export default async function MyGoalPage({
     (acc, key) => {
       const val = params[key];
       acc[key] = Array.isArray(val)
-        ? val.flatMap(v => v.split(","))
+        ? val.flatMap((v) => v.split(","))
         : typeof val === "string"
           ? val.split(",")
           : [];
@@ -44,7 +44,6 @@ export default async function MyGoalPage({
     {} as Record<SearchParams, string[]>,
   );
 
-  console.log(filterParams);
   return (
     <Flex width="100%" justify="center" height="92vh">
       <Flex width="100%" direction="column" py="5" px="7" gap="5">
@@ -57,10 +56,7 @@ export default async function MyGoalPage({
           />
         </Box>
         <Flex width="50%" gap="2">
-          <SearchBar
-            url={WebUrl.GoalList}
-            value={params[SearchParams.Search] || ""}
-          />
+          <SearchBar value={params[SearchParams.Search] || ""} />
           <FilterDropDown filterOptions={filterOptions} value={filterParams} />
         </Flex>
 

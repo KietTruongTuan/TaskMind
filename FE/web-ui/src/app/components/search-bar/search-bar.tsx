@@ -2,17 +2,20 @@
 import { TextField } from "@radix-ui/themes";
 import { Search } from "lucide-react";
 import styles from "./search-bar.module.scss";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { WebUrl } from "@/app/enum/web-url.enum";
 import { SearchParams } from "@/app/enum/search-params.enum";
 import { buildUrl } from "@/app/tm/utils";
 import { useCallback, useRef, useState } from "react";
 
-export function SearchBar({ url, value }: { url: WebUrl; value: string }) {
+export function SearchBar({ value }: { value: string }) {
   const router = useRouter();
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastPushedRef = useRef<string | null>(null);
-  const [search, setSearch] = useState(value);
+  const [search, setSearch] = useState<string>(value);
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+
   const onSearch = useCallback(
     (searchValue: string) => {
       setSearch(searchValue);
@@ -30,18 +33,21 @@ export function SearchBar({ url, value }: { url: WebUrl; value: string }) {
 
         lastPushedRef.current = trimmedSearch;
 
-        const params: Record<SearchParams, string | null | undefined> = {
+        const params: Record<
+          SearchParams,
+          string | string[] | null | undefined
+        > = {
           [SearchParams.Search]: trimmedSearch,
-          [SearchParams.Status]: undefined,
-          [SearchParams.StartDate]: undefined,
-          [SearchParams.EndDate]: undefined,
-          [SearchParams.Tag]: undefined,
+          [SearchParams.Status]: searchParams?.getAll(SearchParams.Status),
+          [SearchParams.StartDate]: searchParams?.get(SearchParams.StartDate),
+          [SearchParams.EndDate]: searchParams?.get(SearchParams.EndDate),
+          [SearchParams.Tag]: searchParams?.getAll(SearchParams.Tag),
         };
 
-        router.push(buildUrl(url, undefined, params));
+        router.push(buildUrl(pathname, undefined, params));
       }, 500);
     },
-    [router, url],
+    [router, pathname, searchParams],
   );
   return (
     <TextField.Root
