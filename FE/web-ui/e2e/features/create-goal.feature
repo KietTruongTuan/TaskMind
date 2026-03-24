@@ -11,11 +11,13 @@ Feature: User creates Goal
         And I enter "2026-12-12" into the "Deadline" field
         And I click the "Create your plan" button
         Then I should see generated tasks
-        And I should see the text "Learn JavaScript"
         And I should see the followings:
-            | Progress  |
-            | Completed |
-            | Deadline  |
+            # the goal itself should appear as title
+            | Learn JavaScript          |
+            # the goal metrics
+            | Progress                  |
+            | Completed                 |
+            | Deadline                  |
             | Estimated time remaining  |
         And I should see the "Save" button
 
