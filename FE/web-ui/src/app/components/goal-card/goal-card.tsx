@@ -162,8 +162,7 @@ export function GoalCard({
   };
 
   return (
-    <>
-      <CardNoPadding p={isDetailCard ? "5" : "3"} isPrimary={isPrimary}>
+    <CardNoPadding p={isDetailCard ? "5" : "3"} isPrimary={isPrimary}>
         <Flex direction="column" width="100%" height="100%" gap="4">
           <Flex width="100%" height="100%" justify="between" gap="2">
             <Flex direction="column" width="100%" height="100%" gap="3">
@@ -330,6 +329,5 @@ export function GoalCard({
           )}
         </Flex>
       </CardNoPadding>
-    </>
   );
 }

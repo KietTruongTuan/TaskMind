@@ -3,7 +3,6 @@ import { TextField } from "@radix-ui/themes";
 import { Search } from "lucide-react";
 import styles from "./search-bar.module.scss";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { WebUrl } from "@/app/enum/web-url.enum";
 import { SearchParams } from "@/app/enum/search-params.enum";
 import { buildUrl } from "@/app/tm/utils";
 import { useCallback, useRef, useState } from "react";

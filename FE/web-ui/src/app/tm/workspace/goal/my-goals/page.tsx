@@ -4,7 +4,6 @@ import { Header } from "@/app/components/header/header";
 import { GoalListItem } from "./components/goal-list-item/goal-list-item";
 import { useServerSideService } from "@/app/hooks/useServerSideService/useServerSideService";
 import { SearchBar } from "@/app/components/search-bar/search-bar";
-import { WebUrl } from "@/app/enum/web-url.enum";
 import {
   FilterDropDown,
   FilterOption,
@@ -14,7 +13,9 @@ import { Status } from "@/app/enum/status.enum";
 export default async function MyGoalPage({
   searchParams,
 }: {
-  searchParams: Promise<Record<SearchParams, string | null | undefined>>;
+  searchParams: Promise<
+    Record<SearchParams, string | string[] | null | undefined>
+  >;
 }) {
   const params = await searchParams;
   const { goalService } = await useServerSideService();
@@ -56,7 +57,7 @@ export default async function MyGoalPage({
           />
         </Box>
         <Flex width="50%" gap="2">
-          <SearchBar value={params[SearchParams.Search] || ""} />
+          <SearchBar value={(params[SearchParams.Search] as string) || ""} />
           <FilterDropDown filterOptions={filterOptions} value={filterParams} />
         </Flex>
 

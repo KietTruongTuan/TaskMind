@@ -4,16 +4,17 @@ import {
   IconButton,
   DropdownMenu,
   Flex,
-  Button,
   Grid,
 } from "@radix-ui/themes";
 import { Filter } from "lucide-react";
 import styles from "./filter-dropdown.module.scss";
-import { useState, useCallback, useEffect } from "react";
+import { useState } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { SearchParams } from "@/app/enum/search-params.enum";
 import { buildUrl } from "@/app/tm/utils";
 import React from "react";
+import { CustomButton } from "../custom-button/custom-button";
+import { ButtonType } from "@/app/enum/button-type.enum";
 
 const RCTCheckboxGroupRoot = CheckboxGroup.Root as React.FC<
   React.ComponentProps<typeof CheckboxGroup.Root> & {
@@ -66,14 +67,27 @@ export function FilterDropDown({
   };
 
   return (
-    <DropdownMenu.Root open={open} onOpenChange={setOpen}>
-      <DropdownMenu.Trigger>
+    <DropdownMenu.Root
+      open={open}
+      onOpenChange={(newOpen) => {
+        setOpen(newOpen);
+        if (newOpen) {
+          setSelectedOptions(value);
+        }
+      }}
+    >
+      <DropdownMenu.Trigger data-testid="filter-dropdown-trigger">
         <IconButton className={styles.filterDropDown} size="2">
           <Filter size={16} />
         </IconButton>
       </DropdownMenu.Trigger>
 
-      <DropdownMenu.Content variant="soft" align="end" sideOffset={5}>
+      <DropdownMenu.Content
+        variant="soft"
+        align="end"
+        sideOffset={5}
+        className={styles.filterDropDownContent}
+      >
         <Flex direction="column" gap="4" p="3">
           {filterOptions?.map((filterOption) => (
             <DropdownMenu.Group key={filterOption.label}>
@@ -82,7 +96,7 @@ export function FilterDropDown({
               </DropdownMenu.Label>
               <RCTCheckboxGroupRoot
                 size="2"
-                color="indigo"
+                color="gray"
                 value={selectedOptions[filterOption.searchParamKey] || []}
                 onValueChange={(newSelection: string[]) => {
                   setSelectedOptions((prev) => ({
@@ -90,6 +104,7 @@ export function FilterDropDown({
                     [filterOption.searchParamKey]: newSelection,
                   }));
                 }}
+                highContrast
               >
                 <Grid columns="2" gapX="4" gapY="3" width="100%">
                   {filterOption.options.map((option) => (
@@ -102,9 +117,13 @@ export function FilterDropDown({
             </DropdownMenu.Group>
           ))}
 
-          <Button onClick={handleSubmit} size="2">
-            Submit
-          </Button>
+          <CustomButton
+            onClick={handleSubmit}
+            buttonType={ButtonType.Primary}
+            size="1"
+          >
+            Filter
+          </CustomButton>
         </Flex>
       </DropdownMenu.Content>
     </DropdownMenu.Root>

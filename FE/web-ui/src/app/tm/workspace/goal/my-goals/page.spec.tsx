@@ -8,6 +8,8 @@ import { ThemeProvider } from "@/app/contexts/theme-context/theme-context";
 import userEvent from "@testing-library/user-event";
 import { MOCK_ROUTER_PUSH } from "../../../../../../jest.setup";
 import { WebUrl } from "@/app/enum/web-url.enum";
+import { useSearchParams } from "next/navigation";
+import { Status } from "@/app/enum/status.enum";
 
 jest.mock("@/app/hooks/useServerSideService/useServerSideService", () => ({
   useServerSideService: jest.fn(),
@@ -26,19 +28,29 @@ describe("MyGoalPage", () => {
     });
   });
   it("should render message when there is no goal", async () => {
+    (useSearchParams as jest.Mock).mockImplementation(
+      () => new URLSearchParams(),
+    );
     mockGetAll.mockResolvedValueOnce([]);
     const mockSearchParams = Promise.resolve(
-      {} as Record<SearchParams, string | null | undefined>,
+      {} as Record<SearchParams, string | string[] | null | undefined>,
     );
 
     const page = await MyGoalPage({ searchParams: mockSearchParams });
-    render(page);
+    render(
+      <ThemeProvider>
+        <RouteLoadingProvider>{page}</RouteLoadingProvider>
+      </ThemeProvider>,
+    );
     expect(await screen.findByText("No goal found")).toBeInTheDocument();
   });
   it("should render list of goals", async () => {
+    (useSearchParams as jest.Mock).mockImplementation(
+      () => new URLSearchParams(),
+    );
     mockGetAll.mockResolvedValueOnce(MOCK_GOAL_LIST_DATA);
     const mockSearchParams = Promise.resolve(
-      {} as Record<SearchParams, string | null | undefined>,
+      {} as Record<SearchParams, string | string[] | null | undefined>,
     );
 
     const page = await MyGoalPage({ searchParams: mockSearchParams });
@@ -51,10 +63,32 @@ describe("MyGoalPage", () => {
     expect(await screen.findByText("Test Goal 2")).toBeInTheDocument();
   });
 
+  it("should render list of filtered goals", async () => {
+    (useSearchParams as jest.Mock).mockImplementation(
+      () => new URLSearchParams(),
+    );
+    mockGetAll.mockResolvedValueOnce(MOCK_GOAL_LIST_DATA);
+    const mockSearchParams = Promise.resolve({
+      [SearchParams.Status]: [Status.ToDo, Status.OnHold],
+    } as Record<SearchParams, string | string[] | null | undefined>);
+
+    const page = await MyGoalPage({ searchParams: mockSearchParams });
+    render(
+      <ThemeProvider>
+        <RouteLoadingProvider>{page}</RouteLoadingProvider>
+      </ThemeProvider>,
+    );
+    expect(await screen.findByText("Test Goal 1")).toBeInTheDocument();
+    expect(await screen.findByText("Test Goal 2")).toBeInTheDocument();
+  });
+
   it("should go to goal detail when click the goal name", async () => {
+    (useSearchParams as jest.Mock).mockImplementation(
+      () => new URLSearchParams(),
+    );
     mockGetAll.mockResolvedValueOnce(MOCK_GOAL_LIST_DATA);
     const mockSearchParams = Promise.resolve(
-      {} as Record<SearchParams, string | null | undefined>,
+      {} as Record<SearchParams, string | string[] | null | undefined>,
     );
 
     const page = await MyGoalPage({ searchParams: mockSearchParams });
