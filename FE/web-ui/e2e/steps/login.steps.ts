@@ -15,10 +15,16 @@ Given('I am logged in', async function (this: CustomWorld) {
 
 
 
-Then('I should see the error toast {string}', async function (this:CustomWorld, expectedErrMsg: string) {
-    // expect a toast notification
-    const toastLocator = await this.page.getByRole('alert').filter({ hasText: expectedErrMsg });
-    // expect the error message to be in red
+Then('I should see the error toast {string}', async function (this: CustomWorld, expectedErrMsg: string) {
+    // scan for the toast error
+    const toastLocator = this.page.getByRole('status').filter({ hasText: expectedErrMsg });
     await expect(toastLocator).toBeVisible();
-    await expect(toastLocator).toHaveClass(/.*red*/)
-})
+    // expect the error message text to be red
+    const textErrLocator = this.page.getByText(expectedErrMsg, { exact: true });
+    await expect(textErrLocator).toHaveCSS('color', 'rgb(214, 0, 0)')
+});
+
+Then('The {string} button should be disabled', async function (this: CustomWorld, buttonName: string) {
+    const buttonLocator = this.page.getByRole('button', { name: buttonName, exact: true });
+    await expect(buttonLocator).toBeDisabled();
+});
