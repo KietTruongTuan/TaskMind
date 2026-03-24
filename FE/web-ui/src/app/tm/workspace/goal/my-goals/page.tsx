@@ -5,6 +5,11 @@ import { GoalListItem } from "./components/goal-list-item/goal-list-item";
 import { useServerSideService } from "@/app/hooks/useServerSideService/useServerSideService";
 import { SearchBar } from "@/app/components/search-bar/search-bar";
 import { WebUrl } from "@/app/enum/web-url.enum";
+import {
+  FilterDropDown,
+  FilterOption,
+} from "@/app/components/filter-dropdown/filter-dropdown";
+import { Status } from "@/app/enum/status.enum";
 
 export default async function MyGoalPage({
   searchParams,
@@ -14,7 +19,32 @@ export default async function MyGoalPage({
   const params = await searchParams;
   const { goalService } = await useServerSideService();
   const goalListData = await goalService.getAll(params);
+  const filterOptions: FilterOption[] = [
+    {
+      label: "Status",
+      searchParamKey: SearchParams.Status,
+      options: Object.values(Status),
+    },
+    {
+      label: "Tag",
+      searchParamKey: SearchParams.Tag,
+      options: ["FE", "Study"],
+    },
+  ];
+  const filterParams = Object.values(SearchParams).reduce(
+    (acc, key) => {
+      const val = params[key];
+      acc[key] = Array.isArray(val)
+        ? val.flatMap(v => v.split(","))
+        : typeof val === "string"
+          ? val.split(",")
+          : [];
+      return acc;
+    },
+    {} as Record<SearchParams, string[]>,
+  );
 
+  console.log(filterParams);
   return (
     <Flex width="100%" justify="center" height="92vh">
       <Flex width="100%" direction="column" py="5" px="7" gap="5">
@@ -26,8 +56,12 @@ export default async function MyGoalPage({
             subTextSize="2"
           />
         </Box>
-        <Flex width="50%">
-          <SearchBar url={WebUrl.GoalList} value={params[SearchParams.Search] || ""} />
+        <Flex width="50%" gap="2">
+          <SearchBar
+            url={WebUrl.GoalList}
+            value={params[SearchParams.Search] || ""}
+          />
+          <FilterDropDown filterOptions={filterOptions} value={filterParams} />
         </Flex>
 
         <ScrollArea type="auto" scrollbars="vertical">

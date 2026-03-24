@@ -35,6 +35,7 @@ export function SearchBar({ url, value }: { url: WebUrl; value: string }) {
           [SearchParams.Status]: undefined,
           [SearchParams.StartDate]: undefined,
           [SearchParams.EndDate]: undefined,
+          [SearchParams.Tag]: undefined,
         };
 
         router.push(buildUrl(url, undefined, params));
