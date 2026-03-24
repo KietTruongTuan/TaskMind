@@ -14,6 +14,7 @@ import { useRef, useState } from "react";
 import { useToast } from "@/app/contexts/toast-context/toast-context";
 import { EditField } from "../edit-field/edit-field";
 import { useGoalContext } from "@/app/contexts/goal-context/goal-context";
+import { useRouter } from "next/navigation";
 
 export function TaskListItem({
   task,
@@ -36,6 +37,7 @@ export function TaskListItem({
   const detailRef = useRef<DraftTask>(initialDetail);
   const isCompleted = detail.status === Status.Completed;
   const { showToast, setIsSuccess } = useToast();
+  const router = useRouter();
 
   const handleUpdate = async (field: keyof DraftTask) => {
     const newValue =
@@ -57,6 +59,7 @@ export function TaskListItem({
     try {
       if (task.id) {
         await taskService.update(task.id, updateData);
+        router.refresh();
         setEditingField(null);
       } else {
         setDraftGoal({

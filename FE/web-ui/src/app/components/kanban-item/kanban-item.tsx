@@ -8,7 +8,13 @@ import { useRouteLoadingContext } from "@/app/contexts/route-loading-context/rou
 import { buildUrl } from "@/app/tm/utils";
 import { WebUrl } from "@/app/enum/web-url.enum";
 
-export function KanbanItem({ task }: { task: DraftTask }) {
+export function KanbanItem({
+  task,
+  isLocal,
+}: {
+  task: DraftTask;
+  isLocal?: boolean;
+}) {
   const { route } = useRouteLoadingContext();
   return (
     <CardNoPadding py="3" px="4">
@@ -34,17 +40,19 @@ export function KanbanItem({ task }: { task: DraftTask }) {
             </Flex>
           </Flex>
 
-          <Flex
-            gap="1"
-            align="start"
-            onClick={() =>
-              route(buildUrl(WebUrl.GoalDetail, task.goalId, undefined))
-            }
-            className={styles.buttonText}
-          >
-            <Target size={14} />
-            <Text size="1">{task.goalName}</Text>
-          </Flex>
+          {!isLocal && (
+            <Flex
+              gap="1"
+              align="start"
+              className={styles.buttonText}
+              onClick={() =>
+                route(buildUrl(WebUrl.GoalDetail, task.goalId, undefined))
+              }
+            >
+              <Target size={14} />
+              <Text size="1">{task.goalName}</Text>
+            </Flex>
+          )}
         </Flex>
       </Flex>
     </CardNoPadding>

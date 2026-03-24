@@ -2,6 +2,10 @@
     color: var(--text-secondary)
 }
 
-.buttonText{
+.buttonText {
     cursor: pointer;
+
+    &:hover {
+        color: var(--text-primary)
+    }
 }

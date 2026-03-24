@@ -1,6 +1,7 @@
 "use client";
 import { CustomButton } from "@/app/components/custom-button/custom-button";
 import { GoalCard } from "@/app/components/goal-card/goal-card";
+import { KanbanBoard } from "@/app/components/kanban-board/kanban-board";
 import {
   TabContainer,
   TabListProps,
@@ -12,6 +13,7 @@ import {
   GoalDetailResponseBody,
   goalService,
   SaveGoalRequestBody,
+  Task,
 } from "@/app/constants";
 import { useGoalContext } from "@/app/contexts/goal-context/goal-context";
 import { useRouteLoadingContext } from "@/app/contexts/route-loading-context/route-loading-context";
@@ -107,7 +109,17 @@ export function GoalReview({
     },
     {
       label: "Board",
-      component: <div>Board View Coming Soon!</div>,
+      component: tasks ? (
+        <KanbanBoard
+          tasks={tasks as Task[]}
+          onTaskStatusChange={handleTaskStatusChange}
+          isLocal
+        />
+      ) : (
+        <Flex height="100%" align="center" justify="center" p="5">
+          No tasks exist
+        </Flex>
+      ),
       icon: <Kanban size={15} />,
     },
   ];

@@ -1,10 +1,8 @@
 import { Header } from "@/app/components/header/header";
 import { KanbanBoard } from "@/app/components/kanban-board/kanban-board";
-import { DraftTask, MOCK_GOAL_RESPONSE_DATA } from "@/app/constants";
 import { SearchParams } from "@/app/enum/search-params.enum";
-import { Status } from "@/app/enum/status.enum";
 import { useServerSideService } from "@/app/hooks/useServerSideService/useServerSideService";
-import { Flex, ScrollArea } from "@radix-ui/themes";
+import { Flex } from "@radix-ui/themes";
 
 export default async function AllTaskPage({
   searchParams,
@@ -24,9 +22,8 @@ export default async function AllTaskPage({
           textSize="7"
           subTextSize="2"
         />
-        <ScrollArea size="1" type="hover" scrollbars="horizontal">
-          <KanbanBoard tasks={taskListData} />
-        </ScrollArea>
+
+        <KanbanBoard tasks={taskListData} />
       </Flex>
     </Flex>
   );

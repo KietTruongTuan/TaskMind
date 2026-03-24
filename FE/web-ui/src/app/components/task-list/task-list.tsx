@@ -18,6 +18,7 @@ import { useGoalContext } from "@/app/contexts/goal-context/goal-context";
 import { CustomButton } from "../custom-button/custom-button";
 import { ButtonType } from "@/app/enum/button-type.enum";
 import { NewTaskListItem } from "../new-task-list-item/new-task-list-item";
+import { useRouter } from "next/navigation";
 
 export function TaskList({
   tasks,
@@ -36,6 +37,7 @@ export function TaskList({
   const [isAddingTask, setIsAddingTask] = useState(false);
   const { showToast, setIsSuccess } = useToast();
   const { draftGoal, setDraftGoal } = useGoalContext();
+  const router = useRouter();
 
   useEffect(() => {
     setLocalTasks(tasks);
@@ -49,6 +51,7 @@ export function TaskList({
     setLocalTasks((prev) => prev?.filter((t) => (t as Task).id !== id));
     try {
       await taskService.remove(id);
+      router.refresh();
     } catch (err) {
       setIsSuccess(false);
       const error = err as ApiError;
@@ -87,10 +90,10 @@ export function TaskList({
 
       try {
         const createdTask = await taskService.create(newTaskData);
-
         setLocalTasks((prev) =>
           prev?.map((t) => ((t as Task).id === optimisticId ? createdTask : t)),
         );
+        router.refresh();
       } catch (err) {
         setIsSuccess(false);
         const error = err as ApiError;
