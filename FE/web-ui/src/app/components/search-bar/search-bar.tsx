@@ -8,9 +8,9 @@ import { SearchParams } from "@/app/enum/search-params.enum";
 import { buildUrl } from "@/app/tm/utils";
 import { useCallback, useRef, useState } from "react";
 
-export function SearchBar({ url, value }: { url: WebUrl, value: string }) {
+export function SearchBar({ url, value }: { url: WebUrl; value: string }) {
   const router = useRouter();
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastPushedRef = useRef<string | null>(null);
   const [search, setSearch] = useState(value);
   const onSearch = useCallback(
@@ -23,11 +23,11 @@ export function SearchBar({ url, value }: { url: WebUrl, value: string }) {
 
       timeoutRef.current = setTimeout(() => {
         const trimmedSearch = searchValue.trim();
-        
+
         if (lastPushedRef.current === trimmedSearch) {
           return;
         }
-        
+
         lastPushedRef.current = trimmedSearch;
 
         const params: Record<SearchParams, string | null | undefined> = {
