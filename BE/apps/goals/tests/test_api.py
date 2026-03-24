@@ -309,6 +309,33 @@ class TestGoalList:
         assert len(response.data) == 1
         assert response.data[0]['name'] == "InProgress Goal"
 
+    def test_list_goals_filter_by_multiple_statuses(self, auth_client, user, future_deadline):
+        """Test filtering goals by multiple statuses using comma separated values"""
+        Goal.objects.create(user=user, name="ToDo Goal", status="ToDo", deadline=future_deadline)
+        Goal.objects.create(user=user, name="InProgress Goal", status="InProgress", deadline=future_deadline)
+        Goal.objects.create(user=user, name="Completed Goal", status="Completed", deadline=future_deadline)
+
+        response = auth_client.get('/v1/goals?status=ToDo,InProgress')
+
+        assert response.status_code == 200
+        assert len(response.data) == 2
+        names = [g['name'] for g in response.data]
+        assert "ToDo Goal" in names
+        assert "InProgress Goal" in names
+        assert "Completed Goal" not in names
+
+    def test_list_goals_filter_by_multiple_tags(self, auth_client, user, future_deadline):
+        """Test filtering goals by multiple tags"""
+        Goal.objects.create(user=user, name="Goal 1", status="ToDo", deadline=future_deadline, tag=["work", "urgent"])
+        Goal.objects.create(user=user, name="Goal 2", status="ToDo", deadline=future_deadline, tag=["work", "low-priority"])
+        Goal.objects.create(user=user, name="Goal 3", status="ToDo", deadline=future_deadline, tag=["personal"])
+
+        response = auth_client.get('/v1/goals?tag=work,urgent')
+
+        assert response.status_code == 200
+        assert len(response.data) == 1
+        assert response.data[0]['name'] == "Goal 1"
+
     def test_list_goals_search(self, auth_client, user, future_deadline):
         """Test searching goals by keyword"""
         Goal.objects.create(user=user, name="Capstone Project", status="ToDo", deadline=future_deadline)
@@ -557,6 +584,27 @@ class TestTaskList:
         assert response.status_code == 200
         assert len(response.data) == 1
         assert response.data[0]['status'] == "InProgress"
+
+    def test_list_tasks_filter_by_multiple_statuses(self, auth_client, created_goal, future_deadline):
+        """Test filtering tasks by multiple statuses using comma separated values"""
+        task1 = created_goal.tasks.all()[0]
+        task2 = created_goal.tasks.all()[1]
+        task1.status = "ToDo"
+        task1.save()
+        task2.status = "InProgress"
+        task2.save()
+        
+        # Create a third completed task
+        Task.objects.create(goal=created_goal, name="Task 3", status="Completed", deadline=future_deadline)
+
+        response = auth_client.get('/v1/tasks?status=ToDo,InProgress')
+
+        assert response.status_code == 200
+        assert len(response.data) == 2
+        statuses = [t['status'] for t in response.data]
+        assert "ToDo" in statuses
+        assert "InProgress" in statuses
+        assert "Completed" not in statuses
 
     def test_list_tasks_filter_by_goal_id(self, auth_client, user, future_deadline):
         """Test filtering tasks by goalId"""
