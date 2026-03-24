@@ -6,15 +6,16 @@ import {
 } from "@/app/constants";
 import { HttpService } from "../http-service/http-service";
 import { ApiUrl } from "@/app/enum/api-url.enum";
-import { GoalSearchParams } from "@/app/enum/search-params.enum";
+import { SearchParams } from "@/app/enum/search-params.enum";
 import { buildUrl } from "@/app/tm/utils";
 
 export class GoalService extends HttpService {
   constructor() {
     super(
       typeof window === "undefined"
-        ? process.env.INTERNAL_API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL
-        : process.env.NEXT_PUBLIC_API_BASE_URL
+        ? process.env.INTERNAL_API_BASE_URL ||
+            process.env.NEXT_PUBLIC_API_BASE_URL
+        : process.env.NEXT_PUBLIC_API_BASE_URL,
     );
   }
 
@@ -26,7 +27,7 @@ export class GoalService extends HttpService {
     return res;
   }
 
-  async getAll(params: Record<GoalSearchParams, string | null | undefined>) {
+  async getAll(params: Record<SearchParams, string | null | undefined>) {
     const url = buildUrl(ApiUrl.Goal, undefined, params);
     const res = await this.get<GoalListItemResponseBody[]>(url);
     return res;

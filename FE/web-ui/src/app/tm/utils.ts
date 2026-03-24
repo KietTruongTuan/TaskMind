@@ -1,9 +1,9 @@
-import { GoalSearchParams } from "../enum/search-params.enum";
+import { SearchParams } from "../enum/search-params.enum";
 
 export function buildUrl(
   baseUrl: string,
   params?: string | string[],
-  searchParams?: Record<GoalSearchParams, string | null | undefined>,
+  searchParams?: Record<SearchParams, string | null | undefined>,
 ): string {
   let url = baseUrl;
   if (params) {

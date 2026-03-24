@@ -9,7 +9,7 @@ import {
 import { ApiUrl } from "@/app/enum/api-url.enum";
 import { GoalService } from "./goal-service";
 import { Status } from "@/app/enum/status.enum";
-import { GoalSearchParams } from "@/app/enum/search-params.enum";
+import { SearchParams } from "@/app/enum/search-params.enum";
 
 describe("GoalService", () => {
   let goalService: GoalService;
@@ -38,7 +38,7 @@ describe("GoalService", () => {
       .mockResolvedValue(MOCK_GOAL_LIST_DATA);
 
     const result = await goalService.getAll(
-      {} as Record<GoalSearchParams, string | null | undefined>,
+      {} as Record<SearchParams, string | null | undefined>,
     );
     expect(postSpy).toHaveBeenCalledWith(ApiUrl.Goal);
 
@@ -54,8 +54,8 @@ describe("GoalService", () => {
       .mockResolvedValue(mockStatusFilterGoalListData);
 
     const result = await goalService.getAll({
-      [GoalSearchParams.Status]: Status.ToDo,
-    } as Record<GoalSearchParams, string | null | undefined>);
+      [SearchParams.Status]: Status.ToDo,
+    } as Record<SearchParams, string | null | undefined>);
     expect(postSpy).toHaveBeenCalledWith(
       `${ApiUrl.Goal}?status=${Status.ToDo}`,
     );

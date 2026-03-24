@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import MyGoalPage from "./page";
 import { useServerSideService } from "@/app/hooks/useServerSideService/useServerSideService";
-import { GoalSearchParams } from "@/app/enum/search-params.enum";
+import { SearchParams } from "@/app/enum/search-params.enum";
 import { MOCK_GOAL_LIST_DATA } from "@/app/constants";
 import { RouteLoadingProvider } from "@/app/contexts/route-loading-context/route-loading-context";
 import { ThemeProvider } from "@/app/contexts/theme-context/theme-context";
@@ -28,7 +28,7 @@ describe("MyGoalPage", () => {
   it("should render message when there is no goal", async () => {
     mockGetAll.mockResolvedValueOnce([]);
     const mockSearchParams = Promise.resolve(
-      {} as Record<GoalSearchParams, string | null | undefined>,
+      {} as Record<SearchParams, string | null | undefined>,
     );
 
     const page = await MyGoalPage({ searchParams: mockSearchParams });
@@ -38,7 +38,7 @@ describe("MyGoalPage", () => {
   it("should render list of goals", async () => {
     mockGetAll.mockResolvedValueOnce(MOCK_GOAL_LIST_DATA);
     const mockSearchParams = Promise.resolve(
-      {} as Record<GoalSearchParams, string | null | undefined>,
+      {} as Record<SearchParams, string | null | undefined>,
     );
 
     const page = await MyGoalPage({ searchParams: mockSearchParams });
@@ -54,7 +54,7 @@ describe("MyGoalPage", () => {
   it("should go to goal detail when click the goal name", async () => {
     mockGetAll.mockResolvedValueOnce(MOCK_GOAL_LIST_DATA);
     const mockSearchParams = Promise.resolve(
-      {} as Record<GoalSearchParams, string | null | undefined>,
+      {} as Record<SearchParams, string | null | undefined>,
     );
 
     const page = await MyGoalPage({ searchParams: mockSearchParams });
