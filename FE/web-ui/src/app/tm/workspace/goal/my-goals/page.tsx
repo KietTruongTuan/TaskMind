@@ -1,13 +1,15 @@
-import { GoalSearchParams } from "@/app/enum/search-params.enum";
+import { SearchParams } from "@/app/enum/search-params.enum";
 import { Box, Flex, ScrollArea, Text } from "@radix-ui/themes";
 import { Header } from "@/app/components/header/header";
 import { GoalListItem } from "./components/goal-list-item/goal-list-item";
 import { useServerSideService } from "@/app/hooks/useServerSideService/useServerSideService";
+import { SearchBar } from "@/app/components/search-bar/search-bar";
+import { WebUrl } from "@/app/enum/web-url.enum";
 
 export default async function MyGoalPage({
   searchParams,
 }: {
-  searchParams: Promise<Record<GoalSearchParams, string | null | undefined>>;
+  searchParams: Promise<Record<SearchParams, string | null | undefined>>;
 }) {
   const params = await searchParams;
   const { goalService } = await useServerSideService();
@@ -24,6 +26,9 @@ export default async function MyGoalPage({
             subTextSize="2"
           />
         </Box>
+        <Flex width="50%">
+          <SearchBar url={WebUrl.GoalList} value={params[SearchParams.Search] || ""} />
+        </Flex>
 
         <ScrollArea type="auto" scrollbars="vertical">
           <Flex gap="3" wrap="wrap">
