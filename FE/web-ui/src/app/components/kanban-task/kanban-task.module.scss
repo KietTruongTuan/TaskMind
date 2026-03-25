@@ -1,0 +1,60 @@
+.taskCard {
+    cursor: grab;
+    transition: all 0.15s ease;
+    border-left: 4px solid var(--text-secondary);
+    background: var(--gray-2);
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    &:active {
+        cursor: grabbing;
+    }
+
+    .dragHandle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-secondary);
+        cursor: grab;
+        transition: color 0.2s ease;
+        flex-shrink: 0;
+        padding: 0 4px;
+
+        &:hover {
+            color: var(--text-primary);
+        }
+
+        &:active {
+            cursor: grabbing;
+            color: var(--accent-blue);
+        }
+    }
+
+    .taskContent {
+        flex: 1;
+        width: 100%;
+        word-break: break-word;
+        min-width: 0;
+    }
+
+    .taskName {
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .deadline {
+        color: var(--text-secondary);
+    }
+
+    .deadlineText {
+        color: var(--text-secondary);
+        font-size: 0.75rem;
+    }
+}

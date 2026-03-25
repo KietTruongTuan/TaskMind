@@ -1,0 +1,13 @@
+.kanbanBoard {
+    display: flex;
+    gap: 1rem;
+    width: 100%;
+    overflow-x: auto;
+    padding: 1rem;
+    padding-right: 2rem;
+
+    @media (max-width: 768px) {
+        overflow-x: scroll;
+        scroll-behavior: smooth;
+    }
+}

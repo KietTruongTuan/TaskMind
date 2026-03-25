@@ -4,5 +4,5 @@ export enum WebUrl {
   GoalAdd = "/tm/workspace/goal/add",
   GoalList = "/tm/workspace/goal/my-goals",
   GoalDetail = "/tm/workspace/goal",
-  TaskBoard = "/tm/workspace/task/kanban-board",
+  TaskBoard = "/tm/workspace/task/all-tasks",
 }
