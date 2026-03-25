@@ -38,7 +38,7 @@ describe("GoalService", () => {
       .mockResolvedValue(MOCK_GOAL_LIST_DATA);
 
     const result = await goalService.getAll(
-      {} as Record<SearchParams, string | null | undefined>,
+      {} as Record<SearchParams, string | string[] | null | undefined>,
     );
     expect(postSpy).toHaveBeenCalledWith(ApiUrl.Goal);
 
@@ -55,7 +55,7 @@ describe("GoalService", () => {
 
     const result = await goalService.getAll({
       [SearchParams.Status]: Status.ToDo,
-    } as Record<SearchParams, string | null | undefined>);
+    } as Record<SearchParams, string | string[] | null | undefined>);
     expect(postSpy).toHaveBeenCalledWith(
       `${ApiUrl.Goal}?status=${Status.ToDo}`,
     );

@@ -15,6 +15,7 @@ jest.mock("next/navigation", () => ({
     push: MOCK_ROUTER_PUSH,
   }),
   usePathname: jest.fn(),
+  useSearchParams: jest.fn(),
 }));
 
 const originalError = console.error;

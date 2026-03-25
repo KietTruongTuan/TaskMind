@@ -3,7 +3,7 @@ import { SearchParams } from "../enum/search-params.enum";
 export function buildUrl(
   baseUrl: string,
   params?: string | string[],
-  searchParams?: Record<SearchParams, string | null | undefined>,
+  searchParams?: Record<SearchParams, string | string[] | null | undefined>,
 ): string {
   let url = baseUrl;
   if (params) {
@@ -18,7 +18,13 @@ export function buildUrl(
 
     Object.entries(searchParams).forEach(([key, value]) => {
       if (value !== null && value !== undefined && value !== "") {
-        params.append(key, String(value));
+        if (Array.isArray(value)) {
+          if (value.length > 0) {
+            params.append(key, value.join(","));
+          }
+        } else {
+          params.append(key, String(value));
+        }
       }
     });
 

@@ -4,16 +4,46 @@ import { Header } from "@/app/components/header/header";
 import { GoalListItem } from "./components/goal-list-item/goal-list-item";
 import { useServerSideService } from "@/app/hooks/useServerSideService/useServerSideService";
 import { SearchBar } from "@/app/components/search-bar/search-bar";
-import { WebUrl } from "@/app/enum/web-url.enum";
+import {
+  FilterDropDown,
+  FilterOption,
+} from "@/app/components/filter-dropdown/filter-dropdown";
+import { Status } from "@/app/enum/status.enum";
 
 export default async function MyGoalPage({
   searchParams,
 }: {
-  searchParams: Promise<Record<SearchParams, string | null | undefined>>;
+  searchParams: Promise<
+    Record<SearchParams, string | string[] | null | undefined>
+  >;
 }) {
   const params = await searchParams;
   const { goalService } = await useServerSideService();
   const goalListData = await goalService.getAll(params);
+  const filterOptions: FilterOption[] = [
+    {
+      label: "Status",
+      searchParamKey: SearchParams.Status,
+      options: Object.values(Status),
+    },
+    {
+      label: "Tag",
+      searchParamKey: SearchParams.Tag,
+      options: ["FE", "Study"],
+    },
+  ];
+  const filterParams = Object.values(SearchParams).reduce(
+    (acc, key) => {
+      const val = params[key];
+      acc[key] = Array.isArray(val)
+        ? val.flatMap((v) => v.split(","))
+        : typeof val === "string"
+          ? val.split(",")
+          : [];
+      return acc;
+    },
+    {} as Record<SearchParams, string[]>,
+  );
 
   return (
     <Flex width="100%" justify="center" height="92vh">
@@ -26,8 +56,9 @@ export default async function MyGoalPage({
             subTextSize="2"
           />
         </Box>
-        <Flex width="50%">
-          <SearchBar url={WebUrl.GoalList} value={params[SearchParams.Search] || ""} />
+        <Flex width="50%" gap="2">
+          <SearchBar value={(params[SearchParams.Search] as string) || ""} />
+          <FilterDropDown filterOptions={filterOptions} value={filterParams} />
         </Flex>
 
         <ScrollArea type="auto" scrollbars="vertical">
