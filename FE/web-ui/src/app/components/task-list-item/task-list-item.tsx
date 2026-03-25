@@ -15,14 +15,18 @@ import { useToast } from "@/app/contexts/toast-context/toast-context";
 import { EditField } from "../edit-field/edit-field";
 import { useGoalContext } from "@/app/contexts/goal-context/goal-context";
 import { useRouter } from "next/navigation";
+import { Dispatch, SetStateAction } from "react";
+import { Task } from "@/app/constants";
 
 export function TaskListItem({
   task,
   onTaskStatusChange,
   index,
+  setTasksLocal,
 }: {
   task: DraftTask;
   onTaskStatusChange?: (oldStatus: Status, newStatus: Status) => void;
+  setTasksLocal?: Dispatch<SetStateAction<Task[] | DraftTask[] | undefined>>;
   index?: number;
 }) {
   const { draftGoal, setDraftGoal } = useGoalContext();
@@ -54,11 +58,19 @@ export function TaskListItem({
     const updateData: DraftTaskRequestBody = { [field]: newValue };
 
     setDetail(detailRef.current);
+
     setEditingField(null);
 
     try {
       if (task.id) {
         await taskService.update(task.id, updateData);
+        if (setTasksLocal) {
+          setTasksLocal((prev) =>
+            prev?.map((t) =>
+              (t as Task).id === task.id ? { ...t, ...updateData } : t,
+            ),
+          );
+        }
         router.refresh();
         setEditingField(null);
       } else {

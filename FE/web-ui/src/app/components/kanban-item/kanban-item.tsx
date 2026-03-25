@@ -17,7 +17,12 @@ export function KanbanItem({
 }) {
   const { route } = useRouteLoadingContext();
   return (
-    <CardNoPadding py="3" px="4">
+    <CardNoPadding
+      py="3"
+      px="4"
+      data-testid={`kanban-item-${task.id ?? task.index}`}
+      className={styles.kanbanItem}
+    >
       <Flex width="100%" height="100%" direction="column" gap="4">
         <Text size="2" weight="regular">
           {task.name}

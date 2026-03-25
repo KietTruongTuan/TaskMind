@@ -64,6 +64,7 @@ describe("Task list", () => {
             <TaskList
               tasks={MOCK_TASK_LIST_RESPONSE_DATA}
               onTaskCountChange={() => {}}
+              setTasksLocal={() => {}}
             />
           </GoalProvider>
         </ToastProvider>
@@ -90,6 +91,7 @@ describe("Task list", () => {
             <TaskList
               tasks={MOCK_DRAFT_TASK_LIST_RESPONSE_DATA}
               onTaskCountChange={() => {}}
+              setTasksLocal={() => {}}
             />
           </GoalProvider>
         </ToastProvider>
@@ -114,6 +116,7 @@ describe("Task list", () => {
               tasks={MOCK_TASK_LIST_RESPONSE_DATA}
               onTaskCountChange={() => {}}
               goalId={MOCK_GOAL_DETAIL_RESPONSE_DATA.id}
+              setTasksLocal={() => {}}
             />
           </GoalProvider>
         </ToastProvider>

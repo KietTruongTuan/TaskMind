@@ -19,17 +19,20 @@ import { CustomButton } from "../custom-button/custom-button";
 import { ButtonType } from "@/app/enum/button-type.enum";
 import { NewTaskListItem } from "../new-task-list-item/new-task-list-item";
 import { useRouter } from "next/navigation";
+import { Dispatch, SetStateAction } from "react";
 
 export function TaskList({
   tasks,
   goalId,
   onTaskStatusChange,
   onTaskCountChange,
+  setTasksLocal,
 }: {
   tasks?: Task[] | DraftTask[];
   goalId?: string;
   onTaskStatusChange?: (oldStatus: Status, newStatus: Status) => void;
   onTaskCountChange?: (isDelete?: boolean) => void;
+  setTasksLocal?: Dispatch<SetStateAction<Task[] | DraftTask[] | undefined>>;
 }) {
   const [localTasks, setLocalTasks] = useState<
     Task[] | DraftTask[] | undefined
@@ -49,6 +52,7 @@ export function TaskList({
     const oldTasks = localTasks;
     onTaskCountChange && onTaskCountChange(true);
     setLocalTasks((prev) => prev?.filter((t) => (t as Task).id !== id));
+    setTasksLocal?.((prev) => prev?.filter((t) => (t as Task).id !== id));
     try {
       await taskService.remove(id);
       router.refresh();
@@ -57,6 +61,7 @@ export function TaskList({
       const error = err as ApiError;
       showToast(error.message);
       setLocalTasks(oldTasks);
+      setTasksLocal?.(oldTasks);
       onTaskCountChange && onTaskCountChange(false);
     }
   };
@@ -71,6 +76,7 @@ export function TaskList({
       const updatedTasks = [...(localTasks || []), optimisticTask];
       const oldTasks = localTasks;
       setLocalTasks(updatedTasks);
+      setTasksLocal?.(updatedTasks);
       onTaskCountChange && onTaskCountChange(false);
 
       const formattedDeadline = (
@@ -93,12 +99,16 @@ export function TaskList({
         setLocalTasks((prev) =>
           prev?.map((t) => ((t as Task).id === optimisticId ? createdTask : t)),
         );
+        setTasksLocal?.((prev) =>
+          prev?.map((t) => ((t as Task).id === optimisticId ? createdTask : t)),
+        );
         router.refresh();
       } catch (err) {
         setIsSuccess(false);
         const error = err as ApiError;
         showToast(error.message);
         setLocalTasks(oldTasks);
+        setTasksLocal?.(oldTasks);
         onTaskCountChange && onTaskCountChange(true);
       }
     } else {
@@ -142,6 +152,7 @@ export function TaskList({
                 task={value}
                 onTaskStatusChange={onTaskStatusChange}
                 index={index}
+                setTasksLocal={setTasksLocal}
               />
               <Trash2
                 size={16}

@@ -9,6 +9,7 @@ import {
   OnCardDragEndHandler,
 } from "@saas-ui-pro/kanban";
 import {
+  DraftTask,
   DraftTaskRequestBody,
   StatusDisplay,
   Task,
@@ -17,7 +18,6 @@ import {
 import { Status } from "@/app/enum/status.enum";
 import { KanbanItem } from "../kanban-item/kanban-item";
 import {
-  Badge,
   Box,
   Flex,
   Inset,
@@ -28,22 +28,36 @@ import {
 } from "@radix-ui/themes";
 import { CardNoPadding } from "../card-no-padding/card-no-padding";
 import styles from "./kanban-board.module.scss";
-import { useCallback, useState } from "react";
+import {
+  useCallback,
+  useState,
+  useEffect,
+  Dispatch,
+  SetStateAction,
+} from "react";
 import { useToast } from "@/app/contexts/toast-context/toast-context";
 import { useThemeContext } from "@/app/contexts/theme-context/theme-context";
 import { useRouter } from "next/navigation";
 
 export function KanbanBoard({
   tasks: initialTasks,
+  setTasksLocal,
   isLocal = false,
   onTaskStatusChange,
 }: {
   tasks?: Task[];
+  setTasksLocal?: Dispatch<SetStateAction<DraftTask[] | Task[] | undefined>>;
   isLocal?: boolean;
   onTaskStatusChange?: (oldStatus: Status, newStatus: Status) => void;
 }) {
   const { theme } = useThemeContext();
   const [tasks, setTasks] = useState(initialTasks);
+
+  useEffect(() => {
+    setTasks(initialTasks);
+    setKey((k) => k + 1);
+  }, [initialTasks]);
+
   const [key, setKey] = useState(0);
   const { showToast, setIsSuccess } = useToast();
   const router = useRouter();
@@ -77,6 +91,14 @@ export function KanbanBoard({
             String(t.id) === taskId ? { ...t, status: newStatus } : t,
           ),
         );
+
+        if (setTasksLocal) {
+          setTasksLocal((prevTasks) =>
+            prevTasks?.map((t) =>
+              String(t.id) === taskId ? { ...t, status: newStatus } : t,
+            ),
+          );
+        }
         if (onTaskStatusChange) {
           onTaskStatusChange(oldStatus, newStatus);
         }
@@ -91,6 +113,14 @@ export function KanbanBoard({
               String(t.id) === taskId ? { ...t, status: oldStatus } : t,
             ),
           );
+
+          if (setTasksLocal) {
+            setTasksLocal((prevTasks) =>
+              prevTasks?.map((t) =>
+                String(t.id) === taskId ? { ...t, status: oldStatus } : t,
+              ),
+            );
+          }
 
           if (onTaskStatusChange) {
             onTaskStatusChange(newStatus, oldStatus);

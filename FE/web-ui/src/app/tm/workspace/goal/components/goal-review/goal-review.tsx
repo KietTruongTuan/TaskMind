@@ -2,6 +2,7 @@
 import { CustomButton } from "@/app/components/custom-button/custom-button";
 import { GoalCard } from "@/app/components/goal-card/goal-card";
 import { KanbanBoard } from "@/app/components/kanban-board/kanban-board";
+import { SearchBar } from "@/app/components/search-bar/search-bar";
 import {
   TabContainer,
   TabListProps,
@@ -23,7 +24,7 @@ import { Status } from "@/app/enum/status.enum";
 import { AddStep } from "@/app/enum/step.enum";
 import { WebUrl } from "@/app/enum/web-url.enum";
 import { Flex } from "@radix-ui/themes";
-import { Clock, Kanban, ListChecks } from "lucide-react";
+import { Kanban, ListChecks } from "lucide-react";
 import { Dispatch, SetStateAction, useState } from "react";
 
 export function GoalReview({
@@ -53,6 +54,17 @@ export function GoalReview({
   const [localCompletedCount, setLocalCompletedCount] =
     useState(completedCount);
   const [localTaskCount, setLocalTaskCount] = useState(taskCount);
+  const [localTasks, setLocalTasks] = useState(tasks);
+  const [searchValue, setSearchValue] = useState("");
+
+  const handleSearchTask = (searchValue: string) => {
+    setSearchValue(searchValue);
+    setLocalTasks(
+      tasks?.filter((task) =>
+        task.name.toLowerCase().includes(searchValue.toLowerCase()),
+      ),
+    );
+  };
 
   const handleTaskStatusChange = (oldStatus: Status, newStatus: Status) => {
     if (oldStatus !== newStatus) {
@@ -85,15 +97,17 @@ export function GoalReview({
       showToast(error.message);
     }
   };
+
   const tabList: TabListProps[] = [
     {
       label: "List",
-      component: tasks ? (
+      component: localTasks ? (
         <TaskList
-          tasks={tasks}
+          tasks={localTasks}
           goalId={(goalData as GoalDetailResponseBody).id}
           onTaskStatusChange={handleTaskStatusChange}
           onTaskCountChange={handleTaskCountChange}
+          setTasksLocal={setLocalTasks}
         />
       ) : (
         <Flex height="100%" align="center" justify="center" p="5">
@@ -103,18 +117,19 @@ export function GoalReview({
       icon: <ListChecks size={15} />,
     },
     {
-      label: "History",
-      component: <div>History View Coming Soon!</div>,
-      icon: <Clock size={15} />,
-    },
-    {
       label: "Board",
-      component: tasks ? (
-        <KanbanBoard
-          tasks={tasks as Task[]}
-          onTaskStatusChange={handleTaskStatusChange}
-          isLocal
-        />
+      component: localTasks ? (
+        <Flex direction="column" gap="5" height="100%" width="100%">
+          <Flex width="70%">
+            <SearchBar value={searchValue} onClientSearch={handleSearchTask} />
+          </Flex>
+          <KanbanBoard
+            tasks={localTasks as Task[]}
+            onTaskStatusChange={handleTaskStatusChange}
+            setTasksLocal={setLocalTasks}
+            isLocal
+          />
+        </Flex>
       ) : (
         <Flex height="100%" align="center" justify="center" p="5">
           No tasks exist

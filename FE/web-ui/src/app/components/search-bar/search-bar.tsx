@@ -7,7 +7,13 @@ import { SearchParams } from "@/app/enum/search-params.enum";
 import { buildUrl } from "@/app/tm/utils";
 import { useCallback, useRef, useState } from "react";
 
-export function SearchBar({ value }: { value: string }) {
+export function SearchBar({
+  value,
+  onClientSearch,
+}: {
+  value: string;
+  onClientSearch?: (searchValue: string) => void;
+}) {
   const router = useRouter();
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastPushedRef = useRef<string | null>(null);
@@ -32,6 +38,10 @@ export function SearchBar({ value }: { value: string }) {
 
         lastPushedRef.current = trimmedSearch;
 
+        if (onClientSearch) {
+          onClientSearch(trimmedSearch);
+          return;
+        }
         const params: Record<
           SearchParams,
           string | string[] | null | undefined
