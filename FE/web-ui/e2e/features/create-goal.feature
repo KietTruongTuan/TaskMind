@@ -20,4 +20,10 @@ Feature: User creates Goal
             | Deadline                  |
             | Estimated time remaining  |
         And I should see the "Save" button
+        And I should see the "Cancel" button
+
+
+    
+
+
 
