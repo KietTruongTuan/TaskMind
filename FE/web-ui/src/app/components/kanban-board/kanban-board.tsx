@@ -8,7 +8,13 @@ import {
   KanbanDragOverlay,
   OnCardDragEndHandler,
 } from "@saas-ui-pro/kanban";
-import { DraftTask, StatusDisplay } from "@/app/constants";
+import {
+  DraftTask,
+  DraftTaskRequestBody,
+  StatusDisplay,
+  Task,
+  taskService,
+} from "@/app/constants";
 import { Status } from "@/app/enum/status.enum";
 import { KanbanItem } from "../kanban-item/kanban-item";
 import {
@@ -26,14 +32,14 @@ import { useCallback, useState } from "react";
 import { useToast } from "@/app/contexts/toast-context/toast-context";
 import { ThemeProvider } from "@/app/contexts/theme-context/theme-context";
 
-export function KanbanBoard({ tasks: initialTasks }: { tasks?: DraftTask[] }) {
+export function KanbanBoard({ tasks: initialTasks }: { tasks?: Task[] }) {
   const [tasks, setTasks] = useState(initialTasks);
   const [key, setKey] = useState(0);
   const { showToast, setIsSuccess } = useToast();
   const kanbanItems = tasks
     ? Object.values(Status).reduce(
         (acc, status) => {
-          acc[status] = tasks 
+          acc[status] = tasks
             .filter((task) => task.status === status)
             .map((task) => String(task.id));
           return acc;
@@ -42,33 +48,31 @@ export function KanbanBoard({ tasks: initialTasks }: { tasks?: DraftTask[] }) {
       )
     : {};
 
-  const updateTaskStatus = async (taskId: number, status: Status) => {
-    // throw new Error("API call failed - testing revert behavior");
-  };
-
   const onCardDragEnd: OnCardDragEndHandler = useCallback(
     async (args) => {
       const { to, items } = args;
       const newStatus = to.columnId as Status;
       const taskIds = items[newStatus] || [];
-      const taskId = Number(taskIds[to.index]);
+      const taskId = String(taskIds[to.index]);
 
-      const task = tasks?.find((t) => t.id === taskId);
+      const task = tasks?.find((t) => String(t.id) === taskId);
 
       if (task && task.status !== newStatus) {
         const oldStatus = task.status;
 
         setTasks((prevTasks) =>
           prevTasks?.map((t) =>
-            t.id === taskId ? { ...t, status: newStatus } : t,
+            String(t.id) === taskId ? { ...t, status: newStatus } : t,
           ),
         );
         try {
-          await updateTaskStatus(taskId, newStatus);
+          await taskService.update(taskId, {
+            status: newStatus,
+          } as DraftTaskRequestBody);
         } catch (error) {
           setTasks((prevTasks) =>
             prevTasks?.map((t) =>
-              t.id === taskId ? { ...t, status: oldStatus } : t,
+              String(t.id) === taskId ? { ...t, status: oldStatus } : t,
             ),
           );
 
@@ -120,11 +124,11 @@ export function KanbanBoard({ tasks: initialTasks }: { tasks?: DraftTask[] }) {
 
                       <KanbanColumnBody>
                         {kanbanState.items[columnId]?.map((itemId) => {
-                          const task: DraftTask | undefined = tasks?.find(
+                          const task: Task | undefined = tasks?.find(
                             (t) => String(t.id) === itemId,
                           );
                           return task ? (
-                            <KanbanCard key={itemId} id={itemId}>
+                            <KanbanCard key={itemId} id={itemId} cursor="grab">
                               <KanbanItem task={task} />
                             </KanbanCard>
                           ) : null;

@@ -4,22 +4,44 @@ import { Flex, Text } from "@radix-ui/themes";
 import { StatusDropDown } from "../status-dropdown/status-dropdown";
 import { Calendar, Target } from "lucide-react";
 import styles from "./kanban-item.module.scss";
+import { useRouteLoadingContext } from "@/app/contexts/route-loading-context/route-loading-context";
+import { buildUrl } from "@/app/tm/utils";
+import { WebUrl } from "@/app/enum/web-url.enum";
+
 export function KanbanItem({ task }: { task: DraftTask }) {
+  const { route } = useRouteLoadingContext();
   return (
     <CardNoPadding py="3" px="4">
       <Flex width="100%" height="100%" direction="column" gap="4">
         <Text size="2" weight="regular">
           {task.name}
         </Text>
-        <Flex direction="column" gap="3" justify="center" className={styles.subText}>
-          <Flex>
-            <StatusDropDown status={task.status} />
+        <Flex
+          direction="column"
+          gap="2"
+          justify="center"
+          className={styles.subText}
+        >
+          <Flex justify="between">
+            <Flex>
+              <StatusDropDown status={task.status} />
+            </Flex>
+            <Flex gap="1" align="start">
+              <Calendar size={14} />
+              <Text size="1">
+                {new Date(task.deadline).toISOString().split("T")[0]}
+              </Text>
+            </Flex>
           </Flex>
-          <Flex gap="1" align="start">
-            <Calendar size={14} />
-            <Text size="1">{task.deadline.toISOString().split("T")[0]}</Text>
-          </Flex>
-          <Flex gap="1" align="start">
+
+          <Flex
+            gap="1"
+            align="start"
+            onClick={() =>
+              route(buildUrl(WebUrl.GoalDetail, task.goalId, undefined))
+            }
+            className={styles.buttonText}
+          >
             <Target size={14} />
             <Text size="1">{task.goalName}</Text>
           </Flex>
