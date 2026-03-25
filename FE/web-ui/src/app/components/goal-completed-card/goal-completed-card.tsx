@@ -7,11 +7,12 @@ import styles from "./goal-completed-card.module.scss";
 
 export function GoalCompletedCard({
   name,
-  completedDate,
+  completedDate: rawCompletedDate,
 }: {
   name: string;
   completedDate: Date;
 }) {
+  const completedDate = new Date(rawCompletedDate || new Date());
   const time = formatDistanceToNow(completedDate, { addSuffix: true });
   return (
     <CardNoPadding p="3">

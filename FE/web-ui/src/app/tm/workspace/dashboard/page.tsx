@@ -10,86 +10,29 @@ import { Crown, TrendingUp } from "lucide-react";
 import { GreetingText } from "@/app/components/greeting-text/greeting-text";
 import { Status } from "@/app/enum/status.enum";
 import { GoalProvider } from "@/app/contexts/goal-context/goal-context";
+import { useServerSideService } from "@/app/hooks/useServerSideService/useServerSideService";
 
-export default function DashboardPage() {
-  const recentGoals: GoalCardPropsData[] = [
-    {
-      name: "Learn TypeScript",
-      status: Status.InProgress,
-      description:
-        "Master TypeScript to enhance your JavaScript skills and build robust applications.",
-      tag: ["Study"],
-      deadline: new Date("2025-12-31"),
-      completedCount: 10,
-      taskCount: 20,
-    },
-    {
-      name: "ABC Project",
-      status: Status.InProgress,
-      description:
-        "Complete the ABC project to deliver a high-quality product that meets client requirements and deadlines.",
-      tag: ["Work"],
-      deadline: new Date("2025-10-15"),
-      completedCount: 10,
-      taskCount: 20,
-    },
-    {
-      name: "Six-pack abs",
-      status: Status.InProgress,
-      description:
-        "Achieve six-pack abs through a combination of regular exercise, a healthy diet, and consistent effort to improve physical fitness.",
-      tag: ["Health", "Gym"],
-      deadline: new Date("2025-12-31"),
-      completedCount: 10,
-      taskCount: 20,
-    },
-    {
-      name: "Visit Indonesia",
-      status: Status.InProgress,
-      description:
-        "Explore the diverse culture, stunning landscapes, and vibrant cities of Indonesia for an unforgettable travel experience.",
-      tag: ["Travel"],
-      deadline: new Date("2025-11-01"),
-      completedCount: 10,
-      taskCount: 20,
-    },
-  ];
+export default async function DashboardPage() {
+  const { goalService } = await useServerSideService();
+  const goalListData = await goalService.getAll();
+  console.log(goalListData);
+  const recentGoals: GoalCardPropsData[] = goalListData
+    .filter((goal) => goal.status === Status.InProgress)
+    .sort(
+      (a, b) =>
+        new Date(a.deadline).getTime() - new Date(b.deadline).getTime(),
+    )
+    .slice(0, 4);
 
-  const recentCompletedGoals: GoalCardPropsData[] = [
-    {
-      name: "Learn TypeScript",
-      status: Status.InProgress,
-      description:
-        "Master TypeScript to enhance your JavaScript skills and build robust applications.",
-      tag: ["Study"],
-      deadline: new Date("2025-12-31"),
-      completedCount: 10,
-      taskCount: 20,
-      completedDate: new Date("2025-09-02"),
-    },
-    {
-      name: "ABC Project",
-      status: Status.InProgress,
-      description:
-        "Complete the ABC project to deliver a high-quality product that meets client requirements and deadlines.",
-      tag: ["Work"],
-      deadline: new Date("2025-10-15"),
-      completedCount: 10,
-      taskCount: 20,
-      completedDate: new Date("2025-08-02"),
-    },
-    {
-      name: "ABC Project",
-      description:
-        "Complete the ABC project to deliver a high-quality product that meets client requirements and deadlines.",
-      status: Status.InProgress,
-      tag: ["Work"],
-      deadline: new Date("2025-09-06"),
-      completedCount: 10,
-      taskCount: 20,
-      completedDate: new Date("2025-09-06"),
-    },
-  ];
+  const recentCompletedGoals: GoalCardPropsData[] = goalListData
+    .filter((goal) => goal.status === Status.Completed)
+    .sort((a, b) => {
+      const dateA = a.completedDate ? new Date(a.completedDate).getTime() : 0;
+      const dateB = b.completedDate ? new Date(b.completedDate).getTime() : 0;
+      return dateB - dateA;
+    })
+    .slice(0, 3);
+
   const tasksDueSoon: GoalCardPropsData[] = [];
 
   return (

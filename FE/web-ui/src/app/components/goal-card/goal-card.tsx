@@ -3,13 +3,7 @@ import { CardNoPadding } from "../card-no-padding/card-no-padding";
 import { Fragment, useRef, useState } from "react";
 import { Flex, Progress, Text } from "@radix-ui/themes";
 
-import {
-  Calendar,
-  CheckCircle,
-  Clock,
-  Trash2,
-  TrendingUp,
-} from "lucide-react";
+import { Calendar, CheckCircle, Clock, Trash2, TrendingUp } from "lucide-react";
 import { GoalCardPropsData } from "@/app/tm/workspace/dashboard/components/recent-goal-list/recent-goal-list";
 import { StatusDropDown } from "../status-dropdown/status-dropdown";
 import { StatusCard, StatusCardProps } from "../status-card/status-card";
@@ -28,6 +22,7 @@ import { AlertDialogPopUp } from "../alert-dialog-pop-up/alert-dialog-pop-up";
 import { WebUrl } from "@/app/enum/web-url.enum";
 import { useRouteLoadingContext } from "@/app/contexts/route-loading-context/route-loading-context";
 import { useGoalContext } from "@/app/contexts/goal-context/goal-context";
+import { buildUrl } from "@/app/tm/utils";
 
 export function GoalCard({
   id,
@@ -37,11 +32,12 @@ export function GoalCard({
   tag,
   completedCount,
   taskCount,
-  deadline,
+  deadline: rawDeadline,
   isDetailCard = false,
   isPrimary = false,
   isDraft = false,
 }: GoalCardPropsData) {
+  const deadline = new Date(rawDeadline);
   const initialDetail: GoalResponseBody = {
     name,
     status,
@@ -162,10 +158,16 @@ export function GoalCard({
   };
 
   return (
-    <CardNoPadding p={isDetailCard ? "5" : "3"} isPrimary={isPrimary}>
+    <>
+      <CardNoPadding
+        px={isDetailCard ? "5" : "3"}
+        pt={isDetailCard ? "5" : "2"}
+        pb={isDetailCard ? "5" : "1"}
+        isPrimary={isPrimary}
+      >
         <Flex direction="column" width="100%" height="100%" gap="4">
           <Flex width="100%" height="100%" justify="between" gap="2">
-            <Flex direction="column" width="100%" height="100%" gap="3">
+            <Flex direction="column" width="100%" height="100%" gap="2">
               <Flex
                 width="100%"
                 height="100%"
@@ -195,7 +197,16 @@ export function GoalCard({
                   }}
                   isDetailCard={isDetailCard}
                 >
-                  <Text size={isDetailCard ? "6" : "2"} weight="regular">
+                  <Text
+                    size={isDetailCard ? "6" : "2"}
+                    weight="regular"
+                    onClick={() => {
+                      if (id) {
+                        route(buildUrl(WebUrl.GoalDetail, id, undefined));
+                      }
+                    }}
+                    className={styles.routeText}
+                  >
                     {detail.name}
                   </Text>
                 </EditField>
@@ -249,7 +260,7 @@ export function GoalCard({
                       </Flex>
                     </EditField>
                     {detail.status && (
-                      <Flex mt="1">
+                      <Flex mt={isDetailCard ? "1" : "0"}>
                         <StatusDropDown
                           status={detail.status}
                           onStatusChange={(newValue) => {
@@ -260,7 +271,7 @@ export function GoalCard({
                             setDetail(detailRef.current);
                             handleUpdate("status");
                           }}
-                          isDropdown
+                          isDropdown={isDetailCard}
                         />
                       </Flex>
                     )}
@@ -270,10 +281,18 @@ export function GoalCard({
                   )}
                 </Flex>
                 {!isDetailCard && (
-                  <Progress value={progress} size="2" highContrast />
+                  <Flex direction="column" gap="1">
+                    <Progress value={progress} size="2" highContrast mt="1" />
+                    <Flex justify="end">
+                      <Text
+                        size="1"
+                        className={styles.subText}
+                      >{`${progress}%`}</Text>
+                    </Flex>
+                  </Flex>
                 )}
               </Flex>
-              {description && (
+              {description && isDetailCard && (
                 <EditField
                   iconSize={14}
                   fieldName="goal-description"
