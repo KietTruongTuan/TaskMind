@@ -14,6 +14,7 @@ export const PAGE_ROUTES: {[key: string]: string} = {
   'Log in'      : `${HOST_DOMAIN}/tm/authentication`,
   'Dashboard'   : `${HOST_DOMAIN}/tm/workspace/dashboard`,
   'New Goal'    : `${HOST_DOMAIN}/tm/workspace/goal/add`,
+  'My Goals'    : `${HOST_DOMAIN}/tm/workspace/goal/my-goals`
 };
 
 export class CustomWorld extends World {
