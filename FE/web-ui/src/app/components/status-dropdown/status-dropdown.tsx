@@ -22,6 +22,7 @@ export function StatusDropDown({
       <Select.Trigger
         className={styles.statusTrigger}
         style={{ cursor: isDropdown ? "pointer" : "default" }}
+        data-testid="status-dropdown"
       >
         <Flex
           className={`${styles.status} ${styles[status]}`}

@@ -88,7 +88,7 @@ export function GoalReview({
   const handleSave = async () => {
     try {
       await goalService.save(goalData as SaveGoalRequestBody);
-      route(WebUrl.Dashboard);
+      route(WebUrl.GoalList);
       setIsSuccess(true);
       showToast("Your goal is successfully saved");
     } catch (err) {

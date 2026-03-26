@@ -34,13 +34,13 @@ export function BarItems({
       icon: List,
       label: "My Goals",
       url: WebUrl.GoalList,
-      testId: "goal-board",
+      testId: "my-goal",
     },
     {
       icon: Kanban,
       label: "All Tasks",
       url: WebUrl.TaskBoard,
-      testId: "task-board",
+      testId: "all-tasks",
     },
   ];
 
