@@ -69,6 +69,14 @@ export function TaskList({
   const handleAddNewTask = async (newTask: DraftTask) => {
     setIsAddingTask(false);
 
+    const formattedDeadline = (
+      newTask.deadline instanceof Date
+        ? newTask.deadline
+        : new Date(newTask.deadline)
+    )
+      .toISOString()
+      .split("T")[0];
+
     if (goalId) {
       const optimisticId = `temp-${Date.now()}`;
       const optimisticTask = { ...newTask, id: optimisticId };
@@ -78,14 +86,6 @@ export function TaskList({
       setLocalTasks(updatedTasks);
       setTasksLocal?.(updatedTasks);
       onTaskCountChange && onTaskCountChange(false);
-
-      const formattedDeadline = (
-        newTask.deadline instanceof Date
-          ? newTask.deadline
-          : new Date(newTask.deadline)
-      )
-        .toISOString()
-        .split("T")[0];
 
       const newTaskData: CreateTaskRequestBody = {
         name: newTask.name,
@@ -115,7 +115,12 @@ export function TaskList({
       const maxIndex = localTasks?.length
         ? Math.max(...localTasks.map((t) => (t as DraftTask).index || 0))
         : 0;
-      const draftTask = { ...newTask, index: maxIndex + 1 };
+
+      const draftTask = {
+        ...newTask,
+        deadline: formattedDeadline as unknown as Date,
+        index: maxIndex + 1,
+      };
 
       const updatedTasks = [...(localTasks || []), draftTask];
       setLocalTasks(updatedTasks);
