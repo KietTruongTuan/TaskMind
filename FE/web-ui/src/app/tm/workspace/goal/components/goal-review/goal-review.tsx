@@ -89,7 +89,7 @@ export function GoalReview({
     try {
       setIsRouteLoading(true);
       await goalService.save(goalData as SaveGoalRequestBody);
-      route(WebUrl.Dashboard);
+      route(WebUrl.GoalList);
       setIsSuccess(true);
       showToast("Your goal is successfully saved");
     } catch (err) {
