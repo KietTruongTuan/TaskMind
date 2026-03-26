@@ -102,13 +102,18 @@ export function GoalReview({
     {
       label: "List",
       component: localTasks ? (
-        <TaskList
-          tasks={localTasks}
-          goalId={(goalData as GoalDetailResponseBody).id}
-          onTaskStatusChange={handleTaskStatusChange}
-          onTaskCountChange={handleTaskCountChange}
-          setTasksLocal={setLocalTasks}
-        />
+        <Flex direction="column" gap="5" height="100%" width="100%">
+          <Flex width="70%">
+            <SearchBar value={searchValue} onClientSearch={handleSearchTask} />
+          </Flex>
+          <TaskList
+            tasks={localTasks}
+            goalId={(goalData as GoalDetailResponseBody).id}
+            onTaskStatusChange={handleTaskStatusChange}
+            onTaskCountChange={handleTaskCountChange}
+            setTasksLocal={setLocalTasks}
+          />
+        </Flex>
       ) : (
         <Flex height="100%" align="center" justify="center" p="5">
           No tasks exist

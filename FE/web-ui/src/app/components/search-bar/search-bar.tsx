@@ -42,6 +42,7 @@ export function SearchBar({
           onClientSearch(trimmedSearch);
           return;
         }
+        
         const params: Record<
           SearchParams,
           string | string[] | null | undefined
@@ -56,7 +57,7 @@ export function SearchBar({
         router.push(buildUrl(pathname, undefined, params));
       }, 500);
     },
-    [router, pathname, searchParams],
+    [router, pathname, searchParams, onClientSearch],
   );
   return (
     <TextField.Root

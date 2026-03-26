@@ -132,7 +132,7 @@ export function KanbanBoard({
         }
       }
     },
-    [tasks],
+    [tasks, onTaskStatusChange, router, showToast, setTasksLocal, setIsSuccess],
   );
 
   return (

@@ -17,12 +17,12 @@ describe("AuthenticationService", () => {
   });
 
   it("should call login with the correct URL and data", async () => {
-    const postSpy = jest
+    const spy = jest
       .spyOn(AuthenticationService.prototype, "post")
       .mockResolvedValue(MOCK_LOGIN_RESPONSE_DATA);
 
     const result = await authenticationService.login(MOCK_LOGIN_REQUEST_DATA);
-    expect(postSpy).toHaveBeenCalledWith(
+    expect(spy).toHaveBeenCalledWith(
       ApiUrl.LocalLogin,
       MOCK_LOGIN_REQUEST_DATA,
     );
@@ -31,27 +31,26 @@ describe("AuthenticationService", () => {
   });
 
   it("should call register with the correct URL and data", async () => {
-    const postSpy = jest
+    const spy = jest
       .spyOn(AuthenticationService.prototype, "post")
       .mockResolvedValue(MOCK_REGISTER_RESPONSE_DATA);
 
     const result = await authenticationService.register(
       MOCK_REGISTER_REQUEST_DATA,
     );
-    expect(postSpy).toHaveBeenCalled();
+    expect(spy).toHaveBeenCalled();
 
     expect(result).toEqual(MOCK_REGISTER_RESPONSE_DATA);
   });
 
   it("should call refresh with the correct URL and data", async () => {
-    const postSpy = jest
+    const spy = jest
       .spyOn(authenticationService["refreshInstance"], "post")
       .mockResolvedValue(MOCK_ACCESS_TOKEN);
 
     const result = await authenticationService.refresh();
-    expect(postSpy).toHaveBeenCalledWith(ApiUrl.LocalRefreshToken);
+    expect(spy).toHaveBeenCalledWith(ApiUrl.LocalRefreshToken);
 
     expect(result).toEqual(MOCK_ACCESS_TOKEN);
   });
-
 });

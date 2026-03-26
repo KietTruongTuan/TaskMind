@@ -1,4 +1,4 @@
-import { Flex } from "@radix-ui/themes";
+import { Flex, Text } from "@radix-ui/themes";
 import { CardNoPadding } from "../card-no-padding/card-no-padding";
 import { TaskListItem } from "../task-list-item/task-list-item";
 import {
@@ -10,7 +10,7 @@ import {
   taskService,
 } from "@/app/constants";
 import { Status } from "@/app/enum/status.enum";
-import { Trash2 } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import styles from "./task-list.module.scss";
 import { useEffect, useState } from "react";
 import { useToast } from "@/app/contexts/toast-context/toast-context";
@@ -145,7 +145,9 @@ export function TaskList({
             size="1"
             data-testid={`add-task-button`}
           >
-            Add Task
+            <Flex align="center" gap="1" className={styles.addTaskButton}>
+              <Plus size={16} /> New
+            </Flex>
           </CustomButton>
         </Flex>
         {localTasks?.map((value, index) => {
