@@ -43,13 +43,13 @@ describe("AIService", () => {
   });
 
   it("should call post with the correct URL and data", async () => {
-    const postSpy = jest
+    const spy = jest
       .spyOn(AIService.prototype, "post")
       .mockResolvedValue(MOCK_GOAL_RESPONSE_DATA);
 
     const result = await aiService.createGoal(MOCK_GOAL_REQUEST_DATA);
 
-    expect(postSpy).toHaveBeenCalledWith(
+    expect(spy).toHaveBeenCalledWith(
       ApiUrl.GoalGenerate,
       MOCK_GOAL_REQUEST_DATA,
     );
@@ -66,7 +66,7 @@ describe("AIService", () => {
     global.window = {} as any;
 
     const clientSideService = new AIService();
-    
+
     expect((clientSideService as any)._receivedUrl).toBe(publicUrl);
 
     delete (global as any).window;

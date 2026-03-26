@@ -7,6 +7,8 @@ export interface DraftTask {
   status: Status;
   deadline: Date;
   completedDate?: Date;
+  goalId?: string;
+  goalName?: string;
 }
 
 export interface Task {
@@ -15,6 +17,8 @@ export interface Task {
   status: Status;
   deadline: Date;
   completedDate?: Date;
+  goalId?: string;
+  goalName?: string;
 }
 
 export interface DraftTaskRequestBody {

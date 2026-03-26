@@ -13,6 +13,7 @@ export const MOCK_ROUTER_PUSH = jest.fn();
 jest.mock("next/navigation", () => ({
   useRouter: () => ({
     push: MOCK_ROUTER_PUSH,
+    refresh: jest.fn(),
   }),
   usePathname: jest.fn(),
   useSearchParams: jest.fn(),

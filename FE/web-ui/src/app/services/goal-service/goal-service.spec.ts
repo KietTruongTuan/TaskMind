@@ -20,27 +20,27 @@ describe("GoalService", () => {
   });
 
   it("should call save with the correct URL and data", async () => {
-    const postSpy = jest
+    const spy = jest
       .spyOn(GoalService.prototype, "post")
       .mockResolvedValue(MOCK_GOAL_RESPONSE_DATA);
 
     const result = await goalService.save(
       MOCK_GOAL_RESPONSE_DATA as SaveGoalRequestBody,
     );
-    expect(postSpy).toHaveBeenCalledWith(ApiUrl.Goal, MOCK_GOAL_RESPONSE_DATA);
+    expect(spy).toHaveBeenCalledWith(ApiUrl.Goal, MOCK_GOAL_RESPONSE_DATA);
 
     expect(result).toEqual(MOCK_GOAL_RESPONSE_DATA);
   });
 
   it("should call getAll with the correct URL and data", async () => {
-    const postSpy = jest
+    const spy = jest
       .spyOn(GoalService.prototype, "get")
       .mockResolvedValue(MOCK_GOAL_LIST_DATA);
 
     const result = await goalService.getAll(
       {} as Record<SearchParams, string | string[] | null | undefined>,
     );
-    expect(postSpy).toHaveBeenCalledWith(ApiUrl.Goal);
+    expect(spy).toHaveBeenCalledWith(ApiUrl.Goal);
 
     expect(result).toEqual(MOCK_GOAL_LIST_DATA);
   });
@@ -49,27 +49,25 @@ describe("GoalService", () => {
     const mockStatusFilterGoalListData = MOCK_GOAL_LIST_DATA.filter(
       (goal) => goal.status === Status.ToDo,
     );
-    const postSpy = jest
+    const spy = jest
       .spyOn(GoalService.prototype, "get")
       .mockResolvedValue(mockStatusFilterGoalListData);
 
     const result = await goalService.getAll({
       [SearchParams.Status]: Status.ToDo,
     } as Record<SearchParams, string | string[] | null | undefined>);
-    expect(postSpy).toHaveBeenCalledWith(
-      `${ApiUrl.Goal}?status=${Status.ToDo}`,
-    );
+    expect(spy).toHaveBeenCalledWith(`${ApiUrl.Goal}?status=${Status.ToDo}`);
 
     expect(result).toEqual(mockStatusFilterGoalListData);
   });
 
   it("should call getById with the correct URL and data", async () => {
-    const postSpy = jest
+    const spy = jest
       .spyOn(GoalService.prototype, "get")
       .mockResolvedValue(MOCK_GOAL_DETAIL_RESPONSE_DATA);
 
     const result = await goalService.getById(MOCK_GOAL_DETAIL_RESPONSE_DATA.id);
-    expect(postSpy).toHaveBeenCalledWith(
+    expect(spy).toHaveBeenCalledWith(
       `${ApiUrl.Goal}/${MOCK_GOAL_DETAIL_RESPONSE_DATA.id}`,
     );
 
@@ -81,14 +79,14 @@ describe("GoalService", () => {
       ...MOCK_GOAL_DETAIL_RESPONSE_DATA,
       name: "Edited Goal",
     } as GoalDetailResponseBody;
-    const postSpy = jest
+    const spy = jest
       .spyOn(GoalService.prototype, "patch")
       .mockResolvedValue(mockUpdatedGoalData);
 
     const result = await goalService.update(MOCK_GOAL_DETAIL_RESPONSE_DATA.id, {
       name: "Edited Goal",
     } as DraftGoalRequestBody);
-    expect(postSpy).toHaveBeenCalledWith(
+    expect(spy).toHaveBeenCalledWith(
       `${ApiUrl.Goal}/${MOCK_GOAL_DETAIL_RESPONSE_DATA.id}`,
       { name: "Edited Goal" },
     );
@@ -97,12 +95,12 @@ describe("GoalService", () => {
   });
 
   it("should call remove with the correct URL and data", async () => {
-    const postSpy = jest
+    const spy = jest
       .spyOn(GoalService.prototype, "delete")
       .mockResolvedValue(undefined);
 
     const result = await goalService.remove(MOCK_GOAL_DETAIL_RESPONSE_DATA.id);
-    expect(postSpy).toHaveBeenCalledWith(
+    expect(spy).toHaveBeenCalledWith(
       `${ApiUrl.Goal}/${MOCK_GOAL_DETAIL_RESPONSE_DATA.id}`,
     );
 

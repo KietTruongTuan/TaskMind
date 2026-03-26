@@ -27,6 +27,7 @@ describe("MyGoalPage", () => {
       },
     });
   });
+
   it("should render message when there is no goal", async () => {
     (useSearchParams as jest.Mock).mockImplementation(
       () => new URLSearchParams(),
@@ -44,6 +45,7 @@ describe("MyGoalPage", () => {
     );
     expect(await screen.findByText("No goal found")).toBeInTheDocument();
   });
+  
   it("should render list of goals", async () => {
     (useSearchParams as jest.Mock).mockImplementation(
       () => new URLSearchParams(),

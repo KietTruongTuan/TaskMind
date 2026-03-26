@@ -1,0 +1,17 @@
+.subText {
+    color: var(--text-secondary)
+}
+
+.buttonText {
+    cursor: pointer;
+
+    &:hover {
+        color: var(--text-primary)
+    }
+}
+
+.kanbanItem {
+    background-color: var(--card-primary) !important;
+    border-radius: var(--spacing-small) !important;
+    border: 1px solid var(--card-border) !important;
+}

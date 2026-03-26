@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { GoalReview } from "./goal-review";
 import { AddStep } from "@/app/enum/step.enum";
@@ -151,9 +151,14 @@ describe("GoalReview", () => {
     await user.click(saveButton);
 
     expect(goalService.save).toHaveBeenCalledWith(MOCK_GOAL_RESPONSE_DATA);
-    expect(
-      await screen.findByText("Your goal is successfully saved"),
-    ).toBeInTheDocument();
+    await waitFor(
+      () => {
+        expect(
+          screen.getByText("Your goal is successfully saved"),
+        ).toBeInTheDocument();
+      },
+      { timeout: 1000 },
+    );
   });
 
   it("should update task count when update task status", async () => {
@@ -187,5 +192,38 @@ describe("GoalReview", () => {
     await user.click(completedOption);
 
     expect(taskService.update).toHaveBeenCalled();
+  });
+
+  it("should search task", async () => {
+    const user = userEvent.setup();
+    render(
+      <ThemeProvider>
+        <ToastProvider>
+          <RouteLoadingProvider>
+            <GoalProvider>
+              <GoalReview
+                setStep={mockSetStep}
+                goalData={MOCK_GOAL_RESPONSE_DATA}
+              />
+            </GoalProvider>
+          </RouteLoadingProvider>
+        </ToastProvider>
+      </ThemeProvider>,
+    );
+
+    const boardTab = await screen.findByTestId("tab-trigger-board");
+    await user.click(boardTab);
+
+    const searchBar = await screen.findByPlaceholderText("Search");
+    await user.type(searchBar, "Task 1");
+
+    await waitFor(
+      () => {
+        expect(screen.queryByText("Task 2")).not.toBeInTheDocument();
+      },
+      { timeout: 1000 },
+    );
+
+    expect(screen.getByText("Task 1")).toBeInTheDocument();
   });
 });

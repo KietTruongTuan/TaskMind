@@ -1,4 +1,4 @@
-import { Flex } from "@radix-ui/themes";
+import { Flex, Text } from "@radix-ui/themes";
 import { CardNoPadding } from "../card-no-padding/card-no-padding";
 import { TaskListItem } from "../task-list-item/task-list-item";
 import {
@@ -10,7 +10,7 @@ import {
   taskService,
 } from "@/app/constants";
 import { Status } from "@/app/enum/status.enum";
-import { Trash2 } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import styles from "./task-list.module.scss";
 import { useEffect, useState } from "react";
 import { useToast } from "@/app/contexts/toast-context/toast-context";
@@ -18,17 +18,21 @@ import { useGoalContext } from "@/app/contexts/goal-context/goal-context";
 import { CustomButton } from "../custom-button/custom-button";
 import { ButtonType } from "@/app/enum/button-type.enum";
 import { NewTaskListItem } from "../new-task-list-item/new-task-list-item";
+import { useRouter } from "next/navigation";
+import { Dispatch, SetStateAction } from "react";
 
 export function TaskList({
   tasks,
   goalId,
   onTaskStatusChange,
   onTaskCountChange,
+  setTasksLocal,
 }: {
   tasks?: Task[] | DraftTask[];
   goalId?: string;
   onTaskStatusChange?: (oldStatus: Status, newStatus: Status) => void;
   onTaskCountChange?: (isDelete?: boolean) => void;
+  setTasksLocal?: Dispatch<SetStateAction<Task[] | DraftTask[] | undefined>>;
 }) {
   const [localTasks, setLocalTasks] = useState<
     Task[] | DraftTask[] | undefined
@@ -36,6 +40,7 @@ export function TaskList({
   const [isAddingTask, setIsAddingTask] = useState(false);
   const { showToast, setIsSuccess } = useToast();
   const { draftGoal, setDraftGoal } = useGoalContext();
+  const router = useRouter();
 
   useEffect(() => {
     setLocalTasks(tasks);
@@ -47,19 +52,30 @@ export function TaskList({
     const oldTasks = localTasks;
     onTaskCountChange && onTaskCountChange(true);
     setLocalTasks((prev) => prev?.filter((t) => (t as Task).id !== id));
+    setTasksLocal?.((prev) => prev?.filter((t) => (t as Task).id !== id));
     try {
       await taskService.remove(id);
+      router.refresh();
     } catch (err) {
       setIsSuccess(false);
       const error = err as ApiError;
       showToast(error.message);
       setLocalTasks(oldTasks);
+      setTasksLocal?.(oldTasks);
       onTaskCountChange && onTaskCountChange(false);
     }
   };
 
   const handleAddNewTask = async (newTask: DraftTask) => {
     setIsAddingTask(false);
+
+    const formattedDeadline = (
+      newTask.deadline instanceof Date
+        ? newTask.deadline
+        : new Date(newTask.deadline)
+    )
+      .toISOString()
+      .split("T")[0];
 
     if (goalId) {
       const optimisticId = `temp-${Date.now()}`;
@@ -68,15 +84,8 @@ export function TaskList({
       const updatedTasks = [...(localTasks || []), optimisticTask];
       const oldTasks = localTasks;
       setLocalTasks(updatedTasks);
+      setTasksLocal?.(updatedTasks);
       onTaskCountChange && onTaskCountChange(false);
-
-      const formattedDeadline = (
-        newTask.deadline instanceof Date
-          ? newTask.deadline
-          : new Date(newTask.deadline)
-      )
-        .toISOString()
-        .split("T")[0];
 
       const newTaskData: CreateTaskRequestBody = {
         name: newTask.name,
@@ -87,22 +96,31 @@ export function TaskList({
 
       try {
         const createdTask = await taskService.create(newTaskData);
-
         setLocalTasks((prev) =>
           prev?.map((t) => ((t as Task).id === optimisticId ? createdTask : t)),
         );
+        setTasksLocal?.((prev) =>
+          prev?.map((t) => ((t as Task).id === optimisticId ? createdTask : t)),
+        );
+        router.refresh();
       } catch (err) {
         setIsSuccess(false);
         const error = err as ApiError;
         showToast(error.message);
         setLocalTasks(oldTasks);
+        setTasksLocal?.(oldTasks);
         onTaskCountChange && onTaskCountChange(true);
       }
     } else {
       const maxIndex = localTasks?.length
         ? Math.max(...localTasks.map((t) => (t as DraftTask).index || 0))
         : 0;
-      const draftTask = { ...newTask, index: maxIndex + 1 };
+
+      const draftTask = {
+        ...newTask,
+        deadline: formattedDeadline as unknown as Date,
+        index: maxIndex + 1,
+      };
 
       const updatedTasks = [...(localTasks || []), draftTask];
       setLocalTasks(updatedTasks);
@@ -127,7 +145,9 @@ export function TaskList({
             size="1"
             data-testid={`add-task-button`}
           >
-            Add Task
+            <Flex align="center" gap="1" className={styles.addTaskButton}>
+              <Plus size={16} /> New
+            </Flex>
           </CustomButton>
         </Flex>
         {localTasks?.map((value, index) => {
@@ -139,6 +159,7 @@ export function TaskList({
                 task={value}
                 onTaskStatusChange={onTaskStatusChange}
                 index={index}
+                setTasksLocal={setTasksLocal}
               />
               <Trash2
                 size={16}

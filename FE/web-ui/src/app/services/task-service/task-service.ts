@@ -6,6 +6,7 @@ import {
   DraftTaskRequestBody,
   Task,
 } from "@/app/constants";
+import { SearchParams } from "@/app/enum/search-params.enum";
 
 export class TaskService extends HttpService {
   constructor() {
@@ -19,6 +20,12 @@ export class TaskService extends HttpService {
 
   async create(data: CreateTaskRequestBody) {
     const res = await this.post<Task, CreateTaskRequestBody>(ApiUrl.Task, data);
+    return res;
+  }
+
+  async getAll(params: Record<SearchParams, string | string[] | null | undefined>) {
+    const url = buildUrl(ApiUrl.Task, undefined, params);
+    const res = await this.get<Task[]>(url);
     return res;
   }
 

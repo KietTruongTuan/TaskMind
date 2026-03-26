@@ -12,7 +12,7 @@ import {
   GoalDetailResponseBody,
   GoalListItemResponseBody,
 } from "./goal.constants";
-import { DraftTask, Task } from "./task.constants";
+import { CreateTaskRequestBody, DraftTask, Task } from "./task.constants";
 
 const getFutureDate = () => {
   const date = new Date();
@@ -44,24 +44,37 @@ export const MOCK_TASK_RESPONSE_DATA: Task = {
   deadline: getFutureDate(),
 };
 
+export const MOCK_TASK_REQUEST_DATA: CreateTaskRequestBody = {
+  name: "Task 1",
+  status: Status.ToDo,
+  deadline: getFutureDate(),
+  goalId: "1",
+};
+
 export const MOCK_TASK_LIST_RESPONSE_DATA: Task[] = [
   {
     id: "1",
     name: "Task 1",
     status: Status.ToDo,
     deadline: getFutureDate(),
+    goalId: "1",
+    goalName: "Goal 1",
   },
   {
     id: "2",
     name: "Task 2",
     status: Status.InProgress,
     deadline: getFutureDate(),
+    goalId: "1",
+    goalName: "Goal 1",
   },
   {
     id: "3",
     name: "Task 3",
     status: Status.OnHold,
     deadline: getFutureDate(),
+    goalId: "2",
+    goalName: "Goal 2",
   },
 ];
 
