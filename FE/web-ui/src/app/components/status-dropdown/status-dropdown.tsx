@@ -13,15 +13,43 @@ export function StatusDropDown({
   isDropdown?: boolean;
 }) {
   return (
-    <Flex
-      className={`${styles.status} ${styles[status]}`}
-      px="2"
-      py="1"
-      align="center"
-      justify="center"
-      data-testid="status-dropdown"
+    <Select.Root
+      value={status}
+      onValueChange={(value) => onStatusChange?.(value as Status)}
+      disabled={!isDropdown}
+      size="1"
     >
-      <Text size="1">{status}</Text>
-    </Flex>
+      <Select.Trigger
+        className={styles.statusTrigger}
+        style={{ cursor: isDropdown ? "pointer" : "default" }}
+      >
+        <Flex
+          className={`${styles.status} ${styles[status]}`}
+          px="2"
+          py="1"
+          align="center"
+          justify="center"
+        >
+          <Text size="1" trim="both">
+            {status}
+          </Text>
+        </Flex>
+      </Select.Trigger>
+      <Select.Content position="item-aligned" className={styles.statusContent}>
+        <Select.Group>
+          <Flex direction="column" gap="1">
+            {Object.values(Status).map((value) => (
+              <Select.Item
+                key={value}
+                value={value}
+                className={`${styles.selectItem} ${styles[value]}`}
+              >
+                {value}
+              </Select.Item>
+            ))}
+          </Flex>
+        </Select.Group>
+      </Select.Content>
+    </Select.Root>
   );
 }
