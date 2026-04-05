@@ -1,3 +1,4 @@
+from django.db.models import QuerySet
 import os
 import json
 import base64
@@ -7,12 +8,18 @@ from openai import OpenAI
 from pypdf import PdfReader
 from docx import Document
 from django.utils import timezone
+from django.db.models import Q
+from .models import Goal, Task
+from django.db.models.functions import Coalesce
+from django.db.models import Value
+from datetime import date
 
 logger = logging.getLogger(__name__)
 
+
 class AIGoalGeneratorService:
     """Service class for handling AI goal generation and document parsing"""
-    
+
     @staticmethod
     def get_api_key():
         return os.getenv("API_KEY")
@@ -22,43 +29,51 @@ class AIGoalGeneratorService:
         """Get AI response with retry logic for network issues"""
         import time
         import httpx
-        
+
         GROQ_MODEL = "groq/compound"
-        
+
         for attempt in range(max_retries):
             try:
                 client = OpenAI(
                     api_key=api_key,
                     base_url="https://api.groq.com/openai/v1",
-                    timeout=60.0  # 60 second timeout
+                    timeout=60.0,  # 60 second timeout
                 )
                 response_stream = client.chat.completions.create(
                     model=GROQ_MODEL,
                     messages=[
-                        {"role": "system",
-                            "content": "You are a helpful project management assistant."},
-                        {"role": "user", "content": prompt}
+                        {
+                            "role": "system",
+                            "content": "You are a helpful project management assistant.",
+                        },
+                        {"role": "user", "content": prompt},
                     ],
                     stream=True,
-                    temperature=0.7
+                    temperature=0.7,
                 )
                 full_content = ""
                 for chunk in response_stream:
-                    if hasattr(chunk, 'choices') and chunk.choices and chunk.choices[0].delta.content is not None:
+                    if (
+                        hasattr(chunk, "choices")
+                        and chunk.choices
+                        and chunk.choices[0].delta.content is not None
+                    ):
                         full_content += chunk.choices[0].delta.content
-                        
+
                 if not full_content:
                     raise ValueError("No response received from AI.")
 
                 return AIGoalGeneratorService.extract_json_response(full_content)
-                
+
             except (httpx.RemoteProtocolError, httpx.ReadTimeout, ConnectionError) as e:
                 if attempt < max_retries - 1:
                     wait_time = (attempt + 1) * 2  # 2, 4, 6 seconds
                     time.sleep(wait_time)
                     continue
                 else:
-                    raise ValueError(f"AI service unavailable after {max_retries} attempts. Please try again later. Error: {str(e)}")
+                    raise ValueError(
+                        f"AI service unavailable after {max_retries} attempts. Please try again later. Error: {str(e)}"
+                    )
 
     @staticmethod
     def extract_json_response(text):
@@ -69,15 +84,16 @@ class AIGoalGeneratorService:
             try:
                 tasks = json.loads(json_array_response)
                 if not isinstance(tasks, list):
-                    raise ValueError(
-                        "AI did not return a JSON array as expected.")
+                    raise ValueError("AI did not return a JSON array as expected.")
                 return tasks
             except (json.JSONDecodeError, ValueError):
                 raise ValueError(
-                    f"AI returned invalid format. Extracted: {json_array_response}")
+                    f"AI returned invalid format. Extracted: {json_array_response}"
+                )
         else:
             raise ValueError(
-                f"Could not find a JSON array in AI response. Content: {text}")
+                f"Could not find a JSON array in AI response. Content: {text}"
+            )
 
     @staticmethod
     def extract_context_from_files(files, api_key):
@@ -85,7 +101,7 @@ class AIGoalGeneratorService:
         for file in files:
             ext = os.path.splitext(file.name)[1].lower()
             try:
-                if ext == '.pdf':
+                if ext == ".pdf":
                     reader = PdfReader(file)
                     text = ""
                     for page in reader.pages:
@@ -93,20 +109,32 @@ class AIGoalGeneratorService:
                         if page_text:
                             text += page_text + "\n"
                     if text.strip():
-                        context_parts.append(f"--- Document Content ({file.name}) ---\n{text.strip()}")
-                elif ext == '.docx':
+                        context_parts.append(
+                            f"--- Document Content ({file.name}) ---\n{text.strip()}"
+                        )
+                elif ext == ".docx":
                     doc = Document(file)
                     text = "\n".join([p.text for p in doc.paragraphs if p.text.strip()])
                     if text.strip():
-                        context_parts.append(f"--- Document Content ({file.name}) ---\n{text.strip()}")
-                elif ext in ['.jpg', '.jpeg', '.png', '.webp']:
-                    image_base64 = base64.b64encode(file.read()).decode('utf-8')
-                    mime_type = file.content_type or f"image/{ext.lstrip('.')}" # example: image/jpeg
-                    image_summary = AIGoalGeneratorService.analyze_image_with_vision(image_base64, api_key, mime_type)
+                        context_parts.append(
+                            f"--- Document Content ({file.name}) ---\n{text.strip()}"
+                        )
+                elif ext in [".jpg", ".jpeg", ".png", ".webp"]:
+                    image_base64 = base64.b64encode(file.read()).decode("utf-8")
+                    mime_type = (
+                        file.content_type or f"image/{ext.lstrip('.')}"
+                    )  # example: image/jpeg
+                    image_summary = AIGoalGeneratorService.analyze_image_with_vision(
+                        image_base64, api_key, mime_type
+                    )
                     if image_summary:
-                        context_parts.append(f"--- Image Content Description ({file.name}) ---\n{image_summary.strip()}")
+                        context_parts.append(
+                            f"--- Image Content Description ({file.name}) ---\n{image_summary.strip()}"
+                        )
             except Exception as e:
-                logger.warning("Failed to process file %s: %s", file.name, str(e), exc_info=True)
+                logger.warning(
+                    "Failed to process file %s: %s", file.name, str(e), exc_info=True
+                )
                 continue
         return "\n\n".join(context_parts)
 
@@ -115,9 +143,7 @@ class AIGoalGeneratorService:
         """Use Groq's Vision model to extract context from an image."""
         try:
             client = OpenAI(
-                api_key=api_key,
-                base_url="https://api.groq.com/openai/v1",
-                timeout=60.0
+                api_key=api_key, base_url="https://api.groq.com/openai/v1", timeout=60.0
             )
             response = client.chat.completions.create(
                 model="llama-3.2-11b-vision-preview",
@@ -125,17 +151,20 @@ class AIGoalGeneratorService:
                     {
                         "role": "user",
                         "content": [
-                            {"type": "text", "text": "Describe the contents of this image. Extract any important text, diagrams, or requirements that could be relevant for a project goal."},
+                            {
+                                "type": "text",
+                                "text": "Describe the contents of this image. Extract any important text, diagrams, or requirements that could be relevant for a project goal.",
+                            },
                             {
                                 "type": "image_url",
                                 "image_url": {
                                     "url": f"data:{mime_type};base64,{base64_image}"
-                                }
-                            }
-                        ]
+                                },
+                            },
+                        ],
                     }
                 ],
-                max_tokens=1024
+                max_tokens=1024,
             )
             if response.choices and response.choices[0].message.content:
                 return response.choices[0].message.content
@@ -145,11 +174,10 @@ class AIGoalGeneratorService:
             logger.error("Vision API Error for image: %s", str(e), exc_info=True)
             # On failure, return None so callers can skip adding this to the prompt.
             return None
-            
+
     @staticmethod
     def build_prompt_for_task(name, description, deadline):
-        return (
-            f"""You are an excellent project management assistant.
+        return f"""You are an excellent project management assistant.
             Here is a new goal:
             Name: '{name}'
             Description: '{description}'
@@ -197,12 +225,10 @@ class AIGoalGeneratorService:
                 }}
             ]
             """
-        )
-    
+
     @staticmethod
     def build_prompt_for_description(name, description, deadline):
-        return (
-            f"""You are an excellent project management assistant.
+        return f"""You are an excellent project management assistant.
             Here is a new goal:
             Name: '{name}'
             Description: '{description}'
@@ -213,4 +239,213 @@ class AIGoalGeneratorService:
             
             The return language should match the name and description language.
             """
+
+
+class GoalService:
+    @staticmethod
+    def sync_goal_completion_status(goal):
+        """Syncs the goal's completion status based on its tasks."""
+        if GoalService._has_completed_all_tasks(goal):
+            GoalService._mark_goal_completed(goal)
+
+    @staticmethod
+    def _has_completed_all_tasks(goal):
+        return (
+            goal.tasks.exists() and not goal.tasks.exclude(status="Completed").exists()
         )
+
+    @staticmethod
+    def _mark_goal_completed(goal):
+        if goal.status != "Completed":
+            goal.status = "Completed"
+            goal.complete_date = timezone.now().date()
+            goal.save(update_fields=["status", "complete_date"])
+
+    @staticmethod
+    def prepare_goal_update(goal, validated_data):
+        if GoalService._is_status_change_to_completed(goal, validated_data):
+            GoalService._set_completion_date(validated_data)
+
+    @staticmethod
+    def _is_status_change_to_completed(goal, validated_data):
+        new_status = validated_data.get("status")
+        return new_status == "Completed" and goal.status != "Completed"
+
+    @staticmethod
+    def _set_completion_date(validated_data):
+        validated_data["complete_date"] = timezone.now().date()
+
+    @staticmethod
+    def get_filtered_goals(user, query_params):
+        goals = Goal.objects.filter(user=user)
+
+        goals = GoalService._apply_status_filter(goals, query_params.get("status"))
+        goals = GoalService._apply_search_filter(goals, query_params.get("search"))
+        goals = GoalService._apply_tag_filter(goals, query_params.get("tag"))
+        goals = GoalService._apply_date_filter(goals, query_params)
+
+        return goals
+
+    @staticmethod
+    def _apply_status_filter(goals, status_filter):
+        if status_filter:
+            status_list = [s.strip() for s in status_filter.split(",")]
+            goals = goals.filter(status__in=status_list)
+        return goals
+
+    @staticmethod
+    def _apply_search_filter(goals, search_query):
+        if search_query:
+            goals = goals.filter(
+                Q(name__icontains=search_query) | Q(description__icontains=search_query)
+            )
+        return goals
+
+    @staticmethod
+    def _apply_tag_filter(goals, tag_filter):
+        if tag_filter:
+            tag_list = [t.strip() for t in tag_filter.split(",")]
+            goals = goals.filter(tag__contains=tag_list)
+        return goals
+
+    @staticmethod
+    def _apply_date_filter(goals, query_params):
+        # Apply filters
+        start_date_filter = query_params.get("startDate", None)
+        end_date_filter = query_params.get("endDate", None)
+
+        if start_date_filter:
+            goals = goals.filter(created_at__date__gte=start_date_filter)
+
+        if end_date_filter:
+            goals = goals.filter(created_at__date__lte=end_date_filter)
+
+        return goals
+
+    @staticmethod
+    def build_goal_list_response(serializer_data):
+        counts = GoalService._count_status(serializer_data)
+
+        response_data = {
+            "goals": serializer_data,
+            "totalCount": len(serializer_data),
+            "toDoCount": counts["ToDo"],
+            "inProgressCount": counts["InProgress"],
+            "completedCount": counts["Completed"],
+            "onHoldCount": counts["OnHold"],
+            "cancelledCount": counts["Cancelled"],
+            "overdueCount": counts["Overdue"],
+        }
+
+        return response_data
+
+    @staticmethod
+    def _count_status(serializer_data):
+        counts = GoalService._get_default_counts()
+
+        for goal in serializer_data:
+            counts[goal["status"]] += 1
+
+        return counts
+
+    @staticmethod
+    def _get_default_counts():
+        return {
+            "ToDo": 0,
+            "InProgress": 0,
+            "Completed": 0,
+            "OnHold": 0,
+            "Cancelled": 0,
+            "Overdue": 0,
+        }
+
+
+class TaskService:
+    @staticmethod
+    def prepare_task_update(task, validated_data):
+        """Update the task completion date if the task status change to complete"""
+        if TaskService._is_status_changed_to_completed(task, validated_data):
+            TaskService._set_completion_date(validated_data)
+
+    @staticmethod
+    def _is_status_changed_to_completed(task, validated_data):
+        new_status = validated_data.get("status")
+        return new_status == "Completed" and task.status != "Completed"
+
+    @staticmethod
+    def _set_completion_date(validated_data):
+        validated_data["complete_date"] = timezone.now().date()
+
+    @staticmethod
+    def get_prepared_tasks(user, query_params):
+        tasks = Task.objects.filter(goal__user=user)
+
+        tasks = TaskService._apply_status_filter(tasks, query_params.get("status"))
+        tasks = TaskService._apply_goal_id_filter(tasks, query_params.get("goalId"))
+        tasks = TaskService._apply_search_query(tasks, query_params.get("search"))
+
+        tasks = TaskService._apply_task_ordering(tasks)
+
+        return tasks
+
+    @staticmethod
+    def _apply_status_filter(tasks, status_filter):
+        if status_filter:
+            status_list = [s.strip() for s in status_filter.split(",")]
+            tasks = tasks.filter(status__in=status_list)
+        return tasks
+
+    @staticmethod
+    def _apply_goal_id_filter(tasks, goal_id_filter):
+        if goal_id_filter:
+            tasks = tasks.filter(goal_id=goal_id_filter)
+        return tasks
+
+    @staticmethod
+    def _apply_search_query(tasks, search_query):
+        if search_query:
+            tasks = tasks.filter(name__icontains=search_query)
+        return tasks
+
+    @staticmethod
+    def _apply_task_ordering(tasks):
+        return tasks.select_related("goal").order_by(
+            Coalesce("deadline", Value(date.max)), "created_at"
+        )
+
+    @staticmethod
+    def build_task_list_response(serializer_data):
+        counts = TaskService._count_status(serializer_data)
+
+        response_data = {
+            "tasks": serializer_data,
+            "totalCount": len(serializer_data),
+            "toDoCount": counts["ToDo"],
+            "inProgressCount": counts["InProgress"],
+            "completedCount": counts["Completed"],
+            "onHoldCount": counts["OnHold"],
+            "cancelledCount": counts["Cancelled"],
+            "overdueCount": counts["Overdue"],
+        }
+
+        return response_data
+
+    @staticmethod
+    def _count_status(serializer_data):
+        counts = TaskService._get_default_counts()
+
+        for task in serializer_data:
+            counts[task["status"]] += 1
+
+        return counts
+
+    @staticmethod
+    def _get_default_counts():
+        return {
+            "ToDo": 0,
+            "InProgress": 0,
+            "Completed": 0,
+            "OnHold": 0,
+            "Cancelled": 0,
+            "Overdue": 0,
+        }
