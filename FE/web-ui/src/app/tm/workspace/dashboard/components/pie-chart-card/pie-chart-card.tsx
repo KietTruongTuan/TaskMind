@@ -35,37 +35,39 @@ export function PieChartCard({
   });
 
   return (
-    <CardNoPadding py="5" px="5" isPrimary>
-      <Flex direction="column" width="100%" gap="1" mb="3">
-        <Header
-          text={header}
-          subText={subHeader}
-          textSize="2"
-          subTextSize="1"
-          icon={<PieChartIcon size={18} />}
-        />
-      </Flex>
-      <Flex justify="center" align="center" width="100%" mt="4">
-        <ThemeProvider theme={muiTheme}>
-          <PieChart
-            className={styles.pieChart}
-            series={[
-              {
-                data: chartData,
-                highlightScope: { fade: "global", highlight: "item" },
-                faded: {
-                  innerRadius: 30,
-                  additionalRadius: -30,
-                  color: "gray",
-                },
-                innerRadius: 20,
-                paddingAngle: 5,
-                cornerRadius: 4,
-                valueFormatter: (v) => `${v.value}`,
-              },
-            ]}
+    <CardNoPadding py="5" px="5" data-testid="pie-chart" isPrimary>
+      <Flex direction="column" width="100%" gap="7">
+        <Flex direction="column" width="100%" gap="1">
+          <Header
+            text={header}
+            subText={subHeader}
+            textSize="2"
+            subTextSize="1"
+            icon={<PieChartIcon size={18} />}
           />
-        </ThemeProvider>
+        </Flex>
+        <Flex justify="center" align="center" width="100%">
+          <ThemeProvider theme={muiTheme}>
+            <PieChart
+              className={styles.pieChart}
+              series={[
+                {
+                  data: chartData,
+                  highlightScope: { fade: "global", highlight: "item" },
+                  faded: {
+                    innerRadius: 30,
+                    additionalRadius: -30,
+                    color: "gray",
+                  },
+                  innerRadius: 20,
+                  paddingAngle: 5,
+                  cornerRadius: 4,
+                  valueFormatter: (v) => `${v.value}`,
+                },
+              ]}
+            />
+          </ThemeProvider>
+        </Flex>
       </Flex>
     </CardNoPadding>
   );

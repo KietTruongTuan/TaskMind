@@ -5,6 +5,12 @@ import { ToastProvider } from "@/app/contexts/toast-context/toast-context";
 import { RouteLoadingProvider } from "@/app/contexts/route-loading-context/route-loading-context";
 import { ThemeProvider } from "@/app/contexts/theme-context/theme-context";
 
+jest.mock('react-activity-calendar', () => {
+  return {
+    ActivityCalendar: () => <div data-testid="mock-activity-calendar">Mocked Graph</div>,
+  };
+});
+
 describe("DashboardPage", () => {
   it("should render page", () => {
     render(

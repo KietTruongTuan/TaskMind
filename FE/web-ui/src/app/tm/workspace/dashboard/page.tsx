@@ -1,4 +1,4 @@
-import { Flex, Grid } from "@radix-ui/themes";
+import { Box, Flex, Grid } from "@radix-ui/themes";
 import { StatusCardList } from "./components/status-card-list/status-card-list";
 import {
   GoalCardPropsData,
@@ -17,6 +17,7 @@ import {
   PieChartCard,
   PieChartData,
 } from "./components/pie-chart-card/pie-chart-card";
+import { ContributionGraph } from "@/app/tm/workspace/dashboard/components/contribution-graph/contribution-graph";
 
 export default async function DashboardPage() {
   const { goalService, taskService } = await useServerSideService();
@@ -46,7 +47,7 @@ export default async function DashboardPage() {
     .sort(
       (a, b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime(),
     )
-    .slice(0, 4);
+    .slice(0, 2);
 
   const totalGoal = goalListData.length;
   const completedGoal = goalListData.filter(
@@ -77,6 +78,7 @@ export default async function DashboardPage() {
   const overdueTask = taskListData.filter(
     (task) => task.status === Status.Overdue,
   ).length;
+
   const chartData: PieChartData[] = [
     {
       id: 0,
@@ -133,25 +135,41 @@ export default async function DashboardPage() {
               inProgressGoal={inProgressGoal}
               overdueGoal={overdueGoal}
             />
-            <Grid columns={{ initial: "1", md: "1fr 1fr 1fr" }} gap="5">
-              <PieChartCard
-                data={chartData}
-                header="Task Statistics"
-                subHeader="Overview of your tasks"
-              />
+            <Grid columns={{ initial: "1", md: "2fr 1fr" }} gap="5">
+              <Grid
+                rows={{ initial: "1", md: "1fr auto" }}
+                columns={{ initial: "1", md: "1fr 1fr" }}
+                gap="5"
+              >
+                <Box gridRow="1" gridColumn="1">
+                  <PieChartCard
+                    data={chartData}
+                    header="Task Statistics"
+                    subHeader="Overview of your tasks"
+                  />
+                </Box>
+                <Box gridRow="1" gridColumn="2">
+                  <RecentGoalList
+                    header="Due soon"
+                    subHeader="Tasks Nearing Deadline"
+                    icon={Clock}
+                    data={tasksDueSoon}
+                    cardTypeComponent={KanbanItem}
+                  />
+                </Box>
+                <Box gridRow="2" gridColumnStart="1" gridColumnEnd="3">
+                  <ContributionGraph
+                    header="Productivity"
+                    subHeader="Your activity over time"
+                  />
+                </Box>
+              </Grid>
               <RecentGoalList
                 header="Recent Goals"
                 subHeader="Track the progress of current goals"
                 icon={TrendingUp}
                 data={recentGoals}
                 cardTypeComponent={GoalCard}
-              />
-              <RecentGoalList
-                header="Due soon"
-                subHeader="Tasks Nearing Deadline"
-                icon={Clock}
-                data={tasksDueSoon}
-                cardTypeComponent={KanbanItem}
               />
             </Grid>
             <RecentGoalList

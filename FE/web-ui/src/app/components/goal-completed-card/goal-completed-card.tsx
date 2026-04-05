@@ -15,7 +15,7 @@ export function GoalCompletedCard({
   const completedDate = new Date(rawCompletedDate || new Date());
   const time = formatDistanceToNow(completedDate, { addSuffix: true });
   return (
-    <CardNoPadding p="3" width="30%">
+    <CardNoPadding p="3" maxWidth="35%">
       <Flex direction="column" width="100" align="center" gap="1">
         <CheckCircle size="30" className={styles.completed} />
         <Header
