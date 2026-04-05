@@ -133,6 +133,27 @@ export const MOCK_GOAL_LIST_DATA: GoalListItemResponseBody[] = [
     completedCount: 1,
     taskCount: 3,
   },
+  {
+    id: "3",
+    name: "Test Goal 3",
+    description: "This is a test goal",
+    status: Status.Completed,
+    deadline: getFutureDate(),
+    tag: ["test", "goal"],
+    completedDate: getFutureDate(),
+    completedCount: 3,
+    taskCount: 3,
+  },
+  {
+    id: "4",
+    name: "Test Goal 4",
+    description: "This is a test goal",
+    status: Status.Completed,
+    deadline: getFutureDate(),
+    tag: ["test", "goal"],
+    completedCount: 5,
+    taskCount: 5,
+  },
 ];
 
 export const MOCK_GOAL_REQUEST_DATA: CreateGoalRequestBody = {
