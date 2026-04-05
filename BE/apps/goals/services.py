@@ -1,3 +1,4 @@
+from django.db.models import QuerySet
 import os
 import json
 import base64
@@ -7,6 +8,8 @@ from openai import OpenAI
 from pypdf import PdfReader
 from docx import Document
 from django.utils import timezone
+from django.db.models import Q
+from .models import Goal
 
 logger = logging.getLogger(__name__)
 
@@ -239,16 +242,12 @@ class GoalService:
     @staticmethod
     def sync_goal_completion_status(goal):
         """Syncs the goal's completion status based on its tasks."""
-        if GoalService._should_complete_goal(goal):
+        if GoalService._has_completed_all_tasks(goal):
             GoalService._mark_goal_completed(goal)
 
     @staticmethod
-    def _should_complete_goal(goal):
-        return goal.tasks.exists() and GoalService._are_all_tasks_completed(goal)
-
-    @staticmethod
-    def _are_all_tasks_completed(goal):
-        return not goal.tasks.exclude(status="Completed").exists()
+    def _has_completed_all_tasks(goal):
+        return goal.tasks.exists() and not goal.tasks.exclude(status="Completed").exists()
 
     @staticmethod
     def _mark_goal_completed(goal):
@@ -270,6 +269,90 @@ class GoalService:
     @staticmethod
     def _set_completion_date(validated_data):
         validated_data["complete_date"] = timezone.now().date()
+
+    @staticmethod
+    def get_filtered_goals(user, query_params):
+        goals = Goal.objects.filter(user=user)
+
+        goals = GoalService._apply_status_filter(goals, query_params.get("status"))
+        goals = GoalService._apply_search_filter(goals, query_params.get("search"))
+        goals = GoalService._apply_tag_filter(goals, query_params.get("tag"))
+        goals = GoalService._apply_date_filter(goals, query_params)
+
+        return goals
+
+    @staticmethod
+    def _apply_status_filter(goals, status_filter):
+        if status_filter:
+            status_list = [s.strip() for s in status_filter.split(",")]
+            goals = goals.filter(status__in=status_list)
+        return goals
+
+    @staticmethod
+    def _apply_search_filter(goals, search_query):
+        if search_query:
+            goals = goals.filter(
+                Q(name__icontains=search_query) | Q(description__icontains=search_query)
+            )
+        return goals
+
+    @staticmethod
+    def _apply_tag_filter(goals, tag_filter):
+        if tag_filter:
+            tag_list = [t.strip() for t in tag_filter.split(",")]
+            goals = goals.filter(tag__contains=tag_list)
+        return goals
+
+    @staticmethod
+    def _apply_date_filter(goals, query_params):
+        # Apply filters
+        start_date_filter = query_params.get("startDate", None)
+        end_date_filter = query_params.get("endDate", None)
+
+        if start_date_filter:
+            goals = goals.filter(created_at__date__gte=start_date_filter)
+
+        if end_date_filter:
+            goals = goals.filter(created_at__date__lte=end_date_filter)
+
+        return goals
+
+    @staticmethod
+    def build_goal_list_response(serializer_data):
+        counts = GoalService._count_status(serializer_data)
+
+        response_data = {
+            "goals": serializer_data,
+            "totalCount": len(serializer_data),
+            "toDoCount": counts["ToDo"],
+            "inProgressCount": counts["InProgress"],
+            "completedCount": counts["Completed"],
+            "onHoldCount": counts["OnHold"],
+            "cancelledCount": counts["Cancelled"],
+            "overdueCount": counts["Overdue"],
+        }
+
+        return response_data
+
+    @staticmethod
+    def _count_status(serializer_data):
+        counts = GoalService._get_default_counts()
+
+        for goal in serializer_data:
+            counts[goal["status"]] += 1
+
+        return counts
+
+    @staticmethod
+    def _get_default_counts():
+        return {
+            "ToDo": 0,
+            "InProgress": 0,
+            "Completed": 0,
+            "OnHold": 0,
+            "Cancelled": 0,
+            "Overdue": 0,
+        }
 
 
 class TaskService:

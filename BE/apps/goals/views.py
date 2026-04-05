@@ -1,9 +1,9 @@
+from rich import traceback
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
-from django.db.models import Q
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from django.utils import timezone
 import json
@@ -23,6 +23,7 @@ from .serializers import (
 from django.db.models.functions import Coalesce
 from django.db.models import Value
 from datetime import date
+
 
 
 @extend_schema(
@@ -198,38 +199,22 @@ class GoalView(APIView):
         - startDate: Filter by start date
         - endDate: Filter by end date
         """
-        user = request.user
-        goals = Goal.objects.filter(user=user)
+        try: 
+            # 1. Get filtered data
+            goals = GoalService.get_filtered_goals(request.user, request.query_params)
 
-        # Apply filters
-        status_filter = request.query_params.get("status", None)
-        search_query = request.query_params.get("search", None)
-        tag_filter = request.query_params.get("tag", None)
-        start_date_filter = request.query_params.get("startDate", None)
-        end_date_filter = request.query_params.get("endDate", None)
+            # 2. Serialize
+            serializer = GoalListSerializer(goals, many=True)
+            
+            # 3. Build response payload (with counts)
+            response_data = GoalService.build_goal_list_response(serializer.data)
 
-        if status_filter:
-            status_list = [s.strip() for s in status_filter.split(",")]
-            goals = goals.filter(status__in=status_list)
-
-        # Search by keyword
-        if search_query:
-            goals = goals.filter(
-                Q(name__icontains=search_query) | Q(description__icontains=search_query)
-            )
-
-        if tag_filter:
-            tag_list = [t.strip() for t in tag_filter.split(",")]
-            goals = goals.filter(tag__contains=tag_list)
-
-        if start_date_filter:
-            goals = goals.filter(created_at__date__gte=start_date_filter)
-
-        if end_date_filter:
-            goals = goals.filter(created_at__date__lte=end_date_filter)
-
-        serializer = GoalListSerializer(goals, many=True)
-        return Response(serializer.data)
+            return Response(response_data)
+        
+        except Exception as e: 
+            print(f"CRASH IN GOALVIEW GET: {str(e)}")
+            traceback.print_exc()
+            return Response({"error": "Something went wrong!"}, status= 500)
 
     def post(self, request):
         """
@@ -308,7 +293,7 @@ class GoalDetailView(APIView):
         if serializer.is_valid():
             #update goal completed date if status = completed
             GoalService.prepare_goal_update(goal, serializer.validated_data)
-            
+
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
