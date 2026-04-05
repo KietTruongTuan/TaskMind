@@ -158,107 +158,124 @@ export function GoalCard({
   };
 
   return (
-    <>
-      <CardNoPadding
-        px={isDetailCard ? "5" : "3"}
-        pt={isDetailCard ? "5" : "2"}
-        pb={isDetailCard ? "5" : "1"}
-        isPrimary={isPrimary}
-      >
-        <Flex direction="column" width="100%" height="100%" gap="4">
-          <Flex width="100%" height="100%" justify="between" gap="2">
-            <Flex direction="column" width="100%" height="100%" gap="2">
-              <Flex
-                width="100%"
-                height="100%"
-                direction="column"
-                gap={isDetailCard ? "2" : "1"}
+    <CardNoPadding p={isDetailCard ? "5" : "3"} isPrimary={isPrimary}>
+      <Flex direction="column" width="100%" height="100%" gap="4">
+        <Flex width="100%" height="100%" justify="between" gap="2">
+          <Flex direction="column" width="100%" height="100%" gap="2">
+            <Flex
+              width="100%"
+              height="100%"
+              direction="column"
+              gap={isDetailCard ? "2" : "1"}
+            >
+              <EditField
+                iconSize={14}
+                fieldName="goal-name"
+                fieldSize="2"
+                fieldLength="50%"
+                type="text"
+                value={detail.name}
+                isEditing={editingField === "name"}
+                onEditStart={() => setEditingField("name")}
+                onChange={(newValue) => {
+                  if (!newValue) return;
+                  detailRef.current = {
+                    ...detailRef.current,
+                    name: newValue,
+                  };
+                }}
+                onSave={() => handleUpdate("name")}
+                onCancel={() => {
+                  setDetail(initialDetail);
+                  setEditingField(null);
+                }}
+                isDetailCard={isDetailCard}
               >
-                <EditField
-                  iconSize={14}
-                  fieldName="goal-name"
-                  fieldSize="2"
-                  fieldLength="50%"
-                  type="text"
-                  value={detail.name}
-                  isEditing={editingField === "name"}
-                  onEditStart={() => setEditingField("name")}
-                  onChange={(newValue) => {
-                    if (!newValue) return;
-                    detailRef.current = {
-                      ...detailRef.current,
-                      name: newValue,
-                    };
+                <Text
+                  size={isDetailCard ? "6" : "2"}
+                  weight="regular"
+                  onClick={() => {
+                    if (id) {
+                      route(buildUrl(WebUrl.GoalDetail, id, undefined));
+                    }
                   }}
-                  onSave={() => handleUpdate("name")}
-                  onCancel={() => {
-                    setDetail(initialDetail);
-                    setEditingField(null);
-                  }}
-                  isDetailCard={isDetailCard}
+                  className={styles.routeText}
                 >
-                  <Text
-                    size={isDetailCard ? "6" : "2"}
-                    weight="regular"
-                    onClick={() => {
-                      if (id) {
-                        route(buildUrl(WebUrl.GoalDetail, id, undefined));
-                      }
-                    }}
-                    className={styles.routeText}
-                  >
-                    {detail.name}
-                  </Text>
-                </EditField>
+                  {detail.name}
+                </Text>
+              </EditField>
 
-                <Flex justify="between" className={styles.subText}>
-                  <Flex gap="4" align="start">
-                    <EditField
-                      iconSize={14}
-                      fieldSize="1"
-                      type="text"
-                      fieldName="goal-tag"
-                      isMultiInput
-                      value={(detail.tag || []).join(", ")}
-                      isEditing={editingField === "tag"}
-                      onEditStart={() => setEditingField("tag")}
-                      onChange={(newValue) => {
-                        const tags = Array.isArray(newValue)
-                          ? newValue
-                          : (newValue || "")
-                              .toString()
-                              .split(",")
-                              .map((s) => s.trim())
-                              .filter(Boolean);
-                        detailRef.current = {
-                          ...detailRef.current,
-                          tag: tags,
-                        };
-                      }}
-                      onSave={() => handleUpdate("tag")}
-                      onCancel={() => {
-                        setDetail(initialDetail);
-                        setEditingField(null);
-                      }}
-                      isDetailCard={isDetailCard}
-                    >
-                      <Flex gap="2" align="center">
-                        {(detail.tag || []).map((value, index) => (
-                          <Fragment key={index}>
-                            {index > 0 && (
-                              <Text
-                                size={isDetailCard ? "2" : "1"}
-                                weight="bold"
-                              >
-                                {" "}
-                                ·{" "}
-                              </Text>
-                            )}
-                            <Text size={isDetailCard ? "2" : "1"}>{value}</Text>
-                          </Fragment>
-                        ))}
-                      </Flex>
-                    </EditField>
+              <Flex justify="between" className={styles.subText}>
+                <Flex gap="4" justify="start">
+                  <EditField
+                    iconSize={14}
+                    fieldSize="1"
+                    type="text"
+                    fieldName="goal-tag"
+                    isMultiInput
+                    value={(detail.tag || []).join(", ")}
+                    isEditing={editingField === "tag"}
+                    onEditStart={() => setEditingField("tag")}
+                    onChange={(newValue) => {
+                      const tags = Array.isArray(newValue)
+                        ? newValue
+                        : (newValue || "")
+                            .toString()
+                            .split(",")
+                            .map((s) => s.trim())
+                            .filter(Boolean);
+                      detailRef.current = {
+                        ...detailRef.current,
+                        tag: tags,
+                      };
+                    }}
+                    onSave={() => handleUpdate("tag")}
+                    onCancel={() => {
+                      setDetail(initialDetail);
+                      setEditingField(null);
+                    }}
+                    isDetailCard={isDetailCard}
+                  >
+                    <Flex gap="2" align="center">
+                      {(detail.tag || []).map((value, index) => (
+                        <Fragment key={index}>
+                          {index > 0 && (
+                            <Text size={isDetailCard ? "2" : "1"} weight="bold">
+                              {" "}
+                              ·{" "}
+                            </Text>
+                          )}
+                          <Text size={isDetailCard ? "2" : "1"}>{value}</Text>
+                        </Fragment>
+                      ))}
+                    </Flex>
+                  </EditField>
+                  {detail.status && isDetailCard && (
+                    <Flex mt={isDetailCard ? "1" : "0"}>
+                      <StatusDropDown
+                        status={detail.status}
+                        onStatusChange={(newValue) => {
+                          detailRef.current = {
+                            ...detailRef.current,
+                            status: newValue,
+                          };
+                          setDetail(detailRef.current);
+                          handleUpdate("status");
+                        }}
+                        isDropdown={isDetailCard}
+                      />
+                    </Flex>
+                  )}
+                </Flex>
+
+                {!isDetailCard && (
+                  <Text size="1">{deadline.toISOString().split("T")[0]}</Text>
+                )}
+              </Flex>
+              {!isDetailCard && (
+                <Flex direction="column" gap="2">
+                  <Progress value={progress} size="2" highContrast mt="1" />
+                  <Flex justify="between">
                     {detail.status && (
                       <Flex mt={isDetailCard ? "1" : "0"}>
                         <StatusDropDown
@@ -275,78 +292,69 @@ export function GoalCard({
                         />
                       </Flex>
                     )}
+                    <Text
+                      size="1"
+                      className={styles.subText}
+                    >{`${progress}%`}</Text>
                   </Flex>
-                  {!isDetailCard && (
-                    <Text size="1">{deadline.toISOString().split("T")[0]}</Text>
-                  )}
                 </Flex>
-                {!isDetailCard && (
-                  <Flex direction="column" gap="1">
-                    <Progress value={progress} size="2" highContrast mt="1" />
-                    <Flex justify="end">
-                      <Text
-                        size="1"
-                        className={styles.subText}
-                      >{`${progress}%`}</Text>
-                    </Flex>
-                  </Flex>
-                )}
-              </Flex>
-              {description && isDetailCard && (
-                <EditField
-                  iconSize={14}
-                  fieldName="goal-description"
-                  fieldSize="2"
-                  fieldLength="50%"
-                  type="text"
-                  value={detail.description}
-                  isEditing={editingField === "description"}
-                  onEditStart={() => setEditingField("description")}
-                  onChange={(newValue) => {
-                    if (!newValue) return;
-                    detailRef.current = {
-                      ...detailRef.current,
-                      description: newValue,
-                    };
-                  }}
-                  onSave={() => handleUpdate("description")}
-                  onCancel={() => {
-                    setDetail(initialDetail);
-                    setEditingField(null);
-                  }}
-                  isMultiLine
-                  isDetailCard={isDetailCard}
-                >
-                  <Text size="2" className={styles.subText}>
-                    {detail.description}
-                  </Text>
-                </EditField>
               )}
             </Flex>
-            {isDetailCard && !isDraft && (
-              <AlertDialogPopUp
-                title="Are you sure"
-                description="This action will delete your goal permanently"
-                actionText="Delete"
-                action={handleDelete}
+            {description && isDetailCard && (
+              <EditField
+                iconSize={14}
+                fieldName="goal-description"
+                fieldSize="2"
+                fieldLength="50%"
+                type="text"
+                value={detail.description}
+                isEditing={editingField === "description"}
+                onEditStart={() => setEditingField("description")}
+                onChange={(newValue) => {
+                  if (!newValue) return;
+                  detailRef.current = {
+                    ...detailRef.current,
+                    description: newValue,
+                  };
+                }}
+                onSave={() => handleUpdate("description")}
+                onCancel={() => {
+                  setDetail(initialDetail);
+                  setEditingField(null);
+                }}
+                isMultiLine
+                isDetailCard={isDetailCard}
               >
-                <Trash2
-                  size={16}
-                  cursor="pointer"
-                  className={styles.overdue}
-                  data-testid="delete-goal-button"
-                />
-              </AlertDialogPopUp>
+                <Text size="2" className={styles.subText}>
+                  {detail.description}
+                </Text>
+              </EditField>
             )}
           </Flex>
-          {isDetailCard && (
-            <Flex align="stretch" gap="3">
-              {cardContent.map((value, index) => (
-                <StatusCard key={index} {...value} />
-              ))}
-            </Flex>
+          {isDetailCard && !isDraft && (
+            <AlertDialogPopUp
+              title="Are you sure"
+              description="This action will delete your goal permanently"
+              actionText="Delete"
+              action={handleDelete}
+            >
+              <Trash2
+                size={16}
+                cursor="pointer"
+                className={styles.overdue}
+                data-testid="delete-goal-button"
+              />
+            </AlertDialogPopUp>
           )}
         </Flex>
-      </CardNoPadding>
+        {isDetailCard && (
+          <Flex align="stretch" gap="3">
+            {cardContent.map((value, index) => (
+              <StatusCard key={index} {...value} />
+            ))}
+          </Flex>
+        )}
+      </Flex>
+    </CardNoPadding>
   );
 }

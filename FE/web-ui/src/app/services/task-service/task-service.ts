@@ -23,7 +23,7 @@ export class TaskService extends HttpService {
     return res;
   }
 
-  async getAll(params: Record<SearchParams, string | string[] | null | undefined>) {
+  async getAll(params?: Record<SearchParams, string | string[] | null | undefined>) {
     const url = buildUrl(ApiUrl.Task, undefined, params);
     const res = await this.get<Task[]>(url);
     return res;

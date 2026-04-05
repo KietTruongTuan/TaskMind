@@ -62,7 +62,7 @@ describe("GoalCard - handleStatusChange", () => {
     render(
       <RouteLoadingProvider>
         <ThemeProvider>
-          <ToastProvider>
+          <ToastProvider> 
             <GoalProvider>
               <GoalCard
                 id={id}
@@ -73,6 +73,7 @@ describe("GoalCard - handleStatusChange", () => {
                 tag={tag || []}
                 completedCount={completedCount}
                 taskCount={taskCount}
+                isDetailCard
               />
             </GoalProvider>
           </ToastProvider>

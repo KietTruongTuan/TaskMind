@@ -6,21 +6,26 @@ import {
 } from "./components/recent-goal-list/recent-goal-list";
 import { GoalCard } from "@/app/components/goal-card/goal-card";
 import { GoalCompletedCard } from "@/app/components/goal-completed-card/goal-completed-card";
-import { Crown, TrendingUp } from "lucide-react";
+import { Clock, Crown, TrendingUp } from "lucide-react";
 import { GreetingText } from "@/app/components/greeting-text/greeting-text";
 import { Status } from "@/app/enum/status.enum";
 import { GoalProvider } from "@/app/contexts/goal-context/goal-context";
 import { useServerSideService } from "@/app/hooks/useServerSideService/useServerSideService";
+import { KanbanItem } from "@/app/components/kanban-item/kanban-item";
+import { StatusDisplay, Task } from "@/app/constants";
+import {
+  PieChartCard,
+  PieChartData,
+} from "./components/pie-chart-card/pie-chart-card";
 
 export default async function DashboardPage() {
-  const { goalService } = await useServerSideService();
+  const { goalService, taskService } = await useServerSideService();
   const goalListData = await goalService.getAll();
-  console.log(goalListData);
+  const taskListData = await taskService.getAll();
   const recentGoals: GoalCardPropsData[] = goalListData
     .filter((goal) => goal.status === Status.InProgress)
     .sort(
-      (a, b) =>
-        new Date(a.deadline).getTime() - new Date(b.deadline).getTime(),
+      (a, b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime(),
     )
     .slice(0, 4);
 
@@ -33,7 +38,83 @@ export default async function DashboardPage() {
     })
     .slice(0, 3);
 
-  const tasksDueSoon: GoalCardPropsData[] = [];
+  const tasksDueSoon: Task[] = taskListData
+    .filter(
+      (task) =>
+        task.status === Status.InProgress || task.status === Status.ToDo,
+    )
+    .sort(
+      (a, b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime(),
+    )
+    .slice(0, 4);
+
+  const totalGoal = goalListData.length;
+  const completedGoal = goalListData.filter(
+    (goal) => goal.status === Status.Completed,
+  ).length;
+  const inProgressGoal = goalListData.filter(
+    (goal) => goal.status === Status.InProgress,
+  ).length;
+  const overdueGoal = goalListData.filter(
+    (goal) => goal.status === Status.Overdue,
+  ).length;
+
+  const toDoTask = taskListData.filter(
+    (task) => task.status === Status.ToDo,
+  ).length;
+  const inProgressTask = taskListData.filter(
+    (task) => task.status === Status.InProgress,
+  ).length;
+  const completedTask = taskListData.filter(
+    (task) => task.status === Status.Completed,
+  ).length;
+  const onHoldTask = taskListData.filter(
+    (task) => task.status === Status.OnHold,
+  ).length;
+  const cancelledTask = taskListData.filter(
+    (task) => task.status === Status.Cancelled,
+  ).length;
+  const overdueTask = taskListData.filter(
+    (task) => task.status === Status.Overdue,
+  ).length;
+  const chartData: PieChartData[] = [
+    {
+      id: 0,
+      value: toDoTask,
+      label: StatusDisplay[Status.ToDo].title,
+      color: "var(--status-to-do)",
+    },
+    {
+      id: 1,
+      value: inProgressTask,
+      label: StatusDisplay[Status.InProgress].title,
+      color: "var(--status-in-progress)",
+    },
+    {
+      id: 2,
+      value: completedTask,
+      label: StatusDisplay[Status.Completed].title,
+      color: "var(--status-completed)",
+    },
+    {
+      id: 3,
+      value: onHoldTask,
+      label: StatusDisplay[Status.OnHold].title,
+      color: "var(--status-on-hold)",
+    },
+    {
+      id: 4,
+      value: cancelledTask,
+      label: StatusDisplay[Status.Cancelled].title,
+      color: "var(--status-cancel)",
+    },
+    {
+      id: 5,
+      value: overdueTask,
+      label: StatusDisplay[Status.Overdue].title,
+      color: "var(--status-overdue)",
+    },
+  ];
 
   return (
     <GoalProvider>
@@ -46,8 +127,18 @@ export default async function DashboardPage() {
         >
           <GreetingText />
           <Grid rows="1fr auto auto" gap="5">
-            <StatusCardList />
-            <Grid columns={{ initial: "1", md: "2fr 1fr" }} gap="5">
+            <StatusCardList
+              totalGoal={totalGoal}
+              completedGoal={completedGoal}
+              inProgressGoal={inProgressGoal}
+              overdueGoal={overdueGoal}
+            />
+            <Grid columns={{ initial: "1", md: "1fr 1fr 1fr" }} gap="5">
+              <PieChartCard
+                data={chartData}
+                header="Task Statistics"
+                subHeader="Overview of your tasks"
+              />
               <RecentGoalList
                 header="Recent Goals"
                 subHeader="Track the progress of current goals"
@@ -56,10 +147,11 @@ export default async function DashboardPage() {
                 cardTypeComponent={GoalCard}
               />
               <RecentGoalList
-                header="Due soon (will do when we have the design of tasks checklist)"
+                header="Due soon"
                 subHeader="Tasks Nearing Deadline"
+                icon={Clock}
                 data={tasksDueSoon}
-                cardTypeComponent={GoalCard}
+                cardTypeComponent={KanbanItem}
               />
             </Grid>
             <RecentGoalList
