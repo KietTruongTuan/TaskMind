@@ -214,3 +214,42 @@ class AIGoalGeneratorService:
             The return language should match the name and description language.
             """
         )
+
+class TaskService:
+    @staticmethod
+    def prepare_task_update(task, validated_data):
+        """Update the task completion date if the task status change to complete"""
+        if TaskService._is_status_changed_to_completed(task, validated_data):
+            TaskService._set_completion_date(validated_data)
+
+    @staticmethod
+    def _is_status_changed_to_completed(task, validated_data):
+        new_status = validated_data.get("status")
+        return new_status == "Completed" and task.status != "Completed"
+
+    @staticmethod
+    def _set_completion_date(validated_data):
+        validated_data["complete_date"] = timezone.now().date()
+
+
+class GoalService:
+    @staticmethod
+    def sync_goal_completion_status(goal):
+        """Syncs the goal's completion status based on its tasks."""
+        if GoalService._should_complete_goal(goal):
+            GoalService._mark_goal_completed(goal)
+
+    @staticmethod
+    def _should_complete_goal(goal):
+        return goal.tasks.exists() and GoalService._are_all_tasks_completed(goal)
+
+    @staticmethod
+    def _are_all_tasks_completed(goal):
+        return not goal.tasks.exclude(status="Completed").exists()
+
+    @staticmethod
+    def _mark_goal_completed(goal):
+        if goal.status != "Completed":
+            goal.status = "Completed"
+            goal.complete_date = timezone.now().date()
+            goal.save(update_fields=["status", "complete_date"])

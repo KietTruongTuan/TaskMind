@@ -10,7 +10,7 @@ import json
 import re
 
 from .models import Goal, Task
-from .services import AIGoalGeneratorService
+from .services import AIGoalGeneratorService, TaskService, GoalService
 from .serializers import (
     GoalListSerializer,
     GoalDetailSerializer,
@@ -371,14 +371,11 @@ class TaskDetailView(APIView):
         serializer = TaskSerializer(task, data=request.data, partial=True)
 
         if serializer.is_valid():
-            # Auto-set complete_date when status is changed to Completed
-            if (
-                serializer.validated_data.get("status") == "Completed"
-                and task.status != "Completed"
-            ):
-                serializer.validated_data["complete_date"] = timezone.now().date()
+            TaskService.prepare_task_update(task, serializer.validated_data)
+            updated_task = serializer.save()
 
-            serializer.save()
+            GoalService.sync_goal_completion_status(updated_task.goal)
+            
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
