@@ -20,11 +20,6 @@ from .serializers import (
     GoalGenerateResponseSerializer,
 )
 
-from django.db.models.functions import Coalesce
-from django.db.models import Value
-from datetime import date
-
-
 
 @extend_schema(
     tags=["Goals"],
@@ -199,22 +194,22 @@ class GoalView(APIView):
         - startDate: Filter by start date
         - endDate: Filter by end date
         """
-        try: 
+        try:
             # 1. Get filtered data
             goals = GoalService.get_filtered_goals(request.user, request.query_params)
 
             # 2. Serialize
             serializer = GoalListSerializer(goals, many=True)
-            
+
             # 3. Build response payload (with counts)
             response_data = GoalService.build_goal_list_response(serializer.data)
 
             return Response(response_data)
-        
-        except Exception as e: 
+
+        except Exception as e:
             print(f"CRASH IN GOALVIEW GET: {str(e)}")
             traceback.print_exc()
-            return Response({"error": "Something went wrong!"}, status= 500)
+            return Response({"error": "Something went wrong!"}, status=500)
 
     def post(self, request):
         """
@@ -291,7 +286,7 @@ class GoalDetailView(APIView):
         goal = self.get_object(goal_id)
         serializer = GoalDetailSerializer(goal, data=request.data, partial=True)
         if serializer.is_valid():
-            #update goal completed date if status = completed
+            # update goal completed date if status = completed
             GoalService.prepare_goal_update(goal, serializer.validated_data)
 
             serializer.save()
@@ -363,7 +358,7 @@ class TaskDetailView(APIView):
             updated_task = serializer.save()
 
             GoalService.sync_goal_completion_status(updated_task.goal)
-            
+
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -409,38 +404,16 @@ class TaskListView(APIView):
         - goal_id: Filter by specific goal
         - search: Search in task name
         """
-        # Get all tasks from user's goals
-        tasks = Task.objects.filter(goal__user=request.user)
+        # 1. Get filtered and sorted data
+        tasks = TaskService.get_prepared_tasks(request.user, request.query_params)
 
-        # Apply filters
-        status_filter = request.query_params.get("status", None)
-        goal_id_filter = request.query_params.get("goalId", None)
-        search_query = request.query_params.get("search", None)
-
-        if status_filter:
-            status_list = [s.strip() for s in status_filter.split(",")]
-            tasks = tasks.filter(status__in=status_list)
-
-        if goal_id_filter:
-            tasks = tasks.filter(goal_id=goal_id_filter)
-
-        if search_query:
-            tasks = tasks.filter(name__icontains=search_query)
-
-        # Order by deadline (soonest first), with tasks lacking a deadline placed after those with one
-        tasks = tasks.select_related("goal").order_by(
-            Coalesce("deadline", Value(date.max)), "created_at"
-        )
-
+        # 2. Serialize
         serializer = TaskSerializer(tasks, many=True)
 
-        # Add goal_name to each task for context (using camelCase for API consistency)
-        data = serializer.data
-        for i, task in enumerate(tasks):
-            data[i]["goalName"] = task.goal.name
-            data[i]["goalId"] = str(task.goal.id)
+        # 3. Response
+        response_data = TaskService.build_task_list_response(serializer.data)
 
-        return Response(data)
+        return Response(response_data)
 
     def post(self, request):
         """

@@ -9,7 +9,10 @@ from pypdf import PdfReader
 from docx import Document
 from django.utils import timezone
 from django.db.models import Q
-from .models import Goal
+from .models import Goal, Task
+from django.db.models.functions import Coalesce
+from django.db.models import Value
+from datetime import date
 
 logger = logging.getLogger(__name__)
 
@@ -247,7 +250,9 @@ class GoalService:
 
     @staticmethod
     def _has_completed_all_tasks(goal):
-        return goal.tasks.exists() and not goal.tasks.exclude(status="Completed").exists()
+        return (
+            goal.tasks.exists() and not goal.tasks.exclude(status="Completed").exists()
+        )
 
     @staticmethod
     def _mark_goal_completed(goal):
@@ -370,3 +375,77 @@ class TaskService:
     @staticmethod
     def _set_completion_date(validated_data):
         validated_data["complete_date"] = timezone.now().date()
+
+    @staticmethod
+    def get_prepared_tasks(user, query_params):
+        tasks = Task.objects.filter(goal__user=user)
+
+        tasks = TaskService._apply_status_filter(tasks, query_params.get("status"))
+        tasks = TaskService._apply_goal_id_filter(tasks, query_params.get("goalId"))
+        tasks = TaskService._apply_search_query(tasks, query_params.get("search"))
+
+        tasks = TaskService._apply_task_ordering(tasks)
+
+        return tasks
+
+    @staticmethod
+    def _apply_status_filter(tasks, status_filter):
+        if status_filter:
+            status_list = [s.strip() for s in status_filter.split(",")]
+            tasks = tasks.filter(status__in=status_list)
+        return tasks
+
+    @staticmethod
+    def _apply_goal_id_filter(tasks, goal_id_filter):
+        if goal_id_filter:
+            tasks = tasks.filter(goal_id=goal_id_filter)
+        return tasks
+
+    @staticmethod
+    def _apply_search_query(tasks, search_query):
+        if search_query:
+            tasks = tasks.filter(name__icontains=search_query)
+        return tasks
+
+    @staticmethod
+    def _apply_task_ordering(tasks):
+        return tasks.select_related("goal").order_by(
+            Coalesce("deadline", Value(date.max)), "created_at"
+        )
+
+    @staticmethod
+    def build_task_list_response(serializer_data):
+        counts = TaskService._count_status(serializer_data)
+
+        response_data = {
+            "tasks": serializer_data,
+            "totalCount": len(serializer_data),
+            "toDoCount": counts["ToDo"],
+            "inProgressCount": counts["InProgress"],
+            "completedCount": counts["Completed"],
+            "onHoldCount": counts["OnHold"],
+            "cancelledCount": counts["Cancelled"],
+            "overdueCount": counts["Overdue"],
+        }
+
+        return response_data
+
+    @staticmethod
+    def _count_status(serializer_data):
+        counts = TaskService._get_default_counts()
+
+        for task in serializer_data:
+            counts[task["status"]] += 1
+
+        return counts
+
+    @staticmethod
+    def _get_default_counts():
+        return {
+            "ToDo": 0,
+            "InProgress": 0,
+            "Completed": 0,
+            "OnHold": 0,
+            "Cancelled": 0,
+            "Overdue": 0,
+        }
