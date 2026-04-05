@@ -1,6 +1,6 @@
 import {
   DraftTaskRequestBody,
-  MOCK_TASK_LIST_RESPONSE_DATA,
+  MOCK_TASK_LIST_RESPONSE_DATA_WITH_STATS,
   MOCK_TASK_REQUEST_DATA,
   MOCK_TASK_RESPONSE_DATA,
   Task,
@@ -31,14 +31,14 @@ describe("TaskService", () => {
   it("should call getAll with the correct URL and data", async () => {
     const spy = jest
       .spyOn(TaskService.prototype, "get")
-      .mockResolvedValue(MOCK_TASK_LIST_RESPONSE_DATA);
+      .mockResolvedValue(MOCK_TASK_LIST_RESPONSE_DATA_WITH_STATS);
 
     const result = await taskService.getAll(
       {} as Record<SearchParams, string | string[] | null | undefined>,
     );
     expect(spy).toHaveBeenCalledWith(ApiUrl.Task);
 
-    expect(result).toEqual(MOCK_TASK_LIST_RESPONSE_DATA);
+    expect(result).toEqual(MOCK_TASK_LIST_RESPONSE_DATA_WITH_STATS);
   });
 
   it("should call update with the correct URL and data", async () => {

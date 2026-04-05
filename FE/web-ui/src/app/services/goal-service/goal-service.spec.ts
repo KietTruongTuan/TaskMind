@@ -2,7 +2,7 @@ import {
   DraftGoalRequestBody,
   GoalDetailResponseBody,
   MOCK_GOAL_DETAIL_RESPONSE_DATA,
-  MOCK_GOAL_LIST_DATA,
+  MOCK_GOAL_LIST_RESPONSE_DATA_WITH_STATS,
   MOCK_GOAL_RESPONSE_DATA,
   SaveGoalRequestBody,
 } from "@/app/constants";
@@ -35,20 +35,23 @@ describe("GoalService", () => {
   it("should call getAll with the correct URL and data", async () => {
     const spy = jest
       .spyOn(GoalService.prototype, "get")
-      .mockResolvedValue(MOCK_GOAL_LIST_DATA);
+      .mockResolvedValue(MOCK_GOAL_LIST_RESPONSE_DATA_WITH_STATS);
 
     const result = await goalService.getAll(
       {} as Record<SearchParams, string | string[] | null | undefined>,
     );
     expect(spy).toHaveBeenCalledWith(ApiUrl.Goal);
 
-    expect(result).toEqual(MOCK_GOAL_LIST_DATA);
+    expect(result).toEqual(MOCK_GOAL_LIST_RESPONSE_DATA_WITH_STATS);
   });
 
   it("should call getAll with status filter with the correct URL and data", async () => {
-    const mockStatusFilterGoalListData = MOCK_GOAL_LIST_DATA.filter(
-      (goal) => goal.status === Status.ToDo,
-    );
+    const mockStatusFilterGoalListData = {
+      ...MOCK_GOAL_LIST_RESPONSE_DATA_WITH_STATS,
+      goals: MOCK_GOAL_LIST_RESPONSE_DATA_WITH_STATS.goals.filter(
+        (goal) => goal.status === Status.ToDo,
+      ),
+    };
     const spy = jest
       .spyOn(GoalService.prototype, "get")
       .mockResolvedValue(mockStatusFilterGoalListData);

@@ -19,7 +19,10 @@ export default async function MyGoalPage({
 }) {
   const params = await searchParams;
   const { goalService } = await useServerSideService();
+  
   const goalListData = await goalService.getAll(params);
+  const { goals } = goalListData;
+
   const filterOptions: FilterOption[] = [
     {
       label: "Status",
@@ -63,8 +66,8 @@ export default async function MyGoalPage({
 
         <ScrollArea type="auto" scrollbars="vertical">
           <Flex gap="3" wrap="wrap">
-            {goalListData.length > 0 ? (
-              goalListData.map((goal) => (
+            {goals.length > 0 ? (
+              goals.map((goal) => (
                 <Box
                   key={goal.id}
                   flexBasis={{

@@ -21,16 +21,21 @@ import { ContributionGraph } from "@/app/tm/workspace/dashboard/components/contr
 
 export default async function DashboardPage() {
   const { goalService, taskService } = await useServerSideService();
+  
   const goalListData = await goalService.getAll();
+  const { goals, ...goalStats } = goalListData;
+
   const taskListData = await taskService.getAll();
-  const recentGoals: GoalCardPropsData[] = goalListData
+  const { tasks, ...taskStats } = taskListData;
+
+  const recentGoals: GoalCardPropsData[] = goals
     .filter((goal) => goal.status === Status.InProgress)
     .sort(
       (a, b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime(),
     )
     .slice(0, 4);
 
-  const recentCompletedGoals: GoalCardPropsData[] = goalListData
+  const recentCompletedGoals: GoalCardPropsData[] = goals
     .filter((goal) => goal.status === Status.Completed)
     .sort((a, b) => {
       const dateA = a.completedDate ? new Date(a.completedDate).getTime() : 0;
@@ -39,7 +44,7 @@ export default async function DashboardPage() {
     })
     .slice(0, 3);
 
-  const tasksDueSoon: Task[] = taskListData
+  const tasksDueSoon: Task[] = taskListData.tasks
     .filter(
       (task) =>
         task.status === Status.InProgress || task.status === Status.ToDo,
@@ -49,70 +54,40 @@ export default async function DashboardPage() {
     )
     .slice(0, 2);
 
-  const totalGoal = goalListData.length;
-  const completedGoal = goalListData.filter(
-    (goal) => goal.status === Status.Completed,
-  ).length;
-  const inProgressGoal = goalListData.filter(
-    (goal) => goal.status === Status.InProgress,
-  ).length;
-  const overdueGoal = goalListData.filter(
-    (goal) => goal.status === Status.Overdue,
-  ).length;
-
-  const toDoTask = taskListData.filter(
-    (task) => task.status === Status.ToDo,
-  ).length;
-  const inProgressTask = taskListData.filter(
-    (task) => task.status === Status.InProgress,
-  ).length;
-  const completedTask = taskListData.filter(
-    (task) => task.status === Status.Completed,
-  ).length;
-  const onHoldTask = taskListData.filter(
-    (task) => task.status === Status.OnHold,
-  ).length;
-  const cancelledTask = taskListData.filter(
-    (task) => task.status === Status.Cancelled,
-  ).length;
-  const overdueTask = taskListData.filter(
-    (task) => task.status === Status.Overdue,
-  ).length;
-
   const chartData: PieChartData[] = [
     {
       id: 0,
-      value: toDoTask,
+      value: taskStats.toDoCount,
       label: StatusDisplay[Status.ToDo].title,
       color: "var(--status-to-do)",
     },
     {
       id: 1,
-      value: inProgressTask,
+      value: taskStats.inProgressCount,
       label: StatusDisplay[Status.InProgress].title,
       color: "var(--status-in-progress)",
     },
     {
       id: 2,
-      value: completedTask,
+      value: taskStats.completedCount,
       label: StatusDisplay[Status.Completed].title,
       color: "var(--status-completed)",
     },
     {
       id: 3,
-      value: onHoldTask,
+      value: taskStats.onHoldCount,
       label: StatusDisplay[Status.OnHold].title,
       color: "var(--status-on-hold)",
     },
     {
       id: 4,
-      value: cancelledTask,
+      value: taskStats.cancelledCount,
       label: StatusDisplay[Status.Cancelled].title,
       color: "var(--status-cancel)",
     },
     {
       id: 5,
-      value: overdueTask,
+      value: taskStats.overdueCount,
       label: StatusDisplay[Status.Overdue].title,
       color: "var(--status-overdue)",
     },
@@ -130,10 +105,10 @@ export default async function DashboardPage() {
           <GreetingText />
           <Grid rows="1fr auto auto" gap="5">
             <StatusCardList
-              totalGoal={totalGoal}
-              completedGoal={completedGoal}
-              inProgressGoal={inProgressGoal}
-              overdueGoal={overdueGoal}
+              totalGoal={goalStats.totalCount}
+              completedGoal={goalStats.completedCount}
+              inProgressGoal={goalStats.inProgressCount}
+              overdueGoal={goalStats.overdueCount}
             />
             <Grid columns={{ initial: "1", md: "2fr 1fr" }} gap="5">
               <Grid
