@@ -1,4 +1,4 @@
-from rich import traceback
+import traceback
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -20,6 +20,9 @@ from .serializers import (
     GoalGenerateResponseSerializer,
 )
 
+import logging
+
+logger = logging.getLogger(__name__)
 
 @extend_schema(
     tags=["Goals"],
@@ -207,9 +210,11 @@ class GoalView(APIView):
             return Response(response_data)
 
         except Exception as e:
-            print(f"CRASH IN GOALVIEW GET: {str(e)}")
-            traceback.print_exc()
-            return Response({"error": "Something went wrong!"}, status=500)
+            logger.exception("Error in GoalView.get")
+            return Response(
+                {"error": "Something went wrong!"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
     def post(self, request):
         """
