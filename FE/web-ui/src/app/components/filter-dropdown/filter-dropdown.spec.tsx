@@ -39,6 +39,7 @@ describe("FilterDropdown", () => {
             [SearchParams.Search]: [],
             [SearchParams.StartDate]: [],
             [SearchParams.EndDate]: [],
+            [SearchParams.Year]: [],
           }}
         />
       </ThemeProvider>,
@@ -62,6 +63,7 @@ describe("FilterDropdown", () => {
           [SearchParams.StartDate]: undefined,
           [SearchParams.EndDate]: undefined,
           [SearchParams.Tag]: ["FE"],
+          [SearchParams.Year]: undefined,
         }),
       );
     });

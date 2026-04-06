@@ -50,6 +50,7 @@ export function FilterDropDown({
       [SearchParams.StartDate]: searchParams?.get(SearchParams.StartDate),
       [SearchParams.EndDate]: searchParams?.get(SearchParams.EndDate),
       [SearchParams.Tag]: searchParams?.getAll(SearchParams.Tag),
+      [SearchParams.Year]: searchParams?.get(SearchParams.Year),
     };
 
     filterOptions?.forEach((opt) => {

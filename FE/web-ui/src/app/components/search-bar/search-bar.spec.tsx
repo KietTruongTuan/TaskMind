@@ -29,6 +29,7 @@ describe("Searchbar", () => {
           [SearchParams.StartDate]: undefined,
           [SearchParams.EndDate]: undefined,
           [SearchParams.Tag]: ["FE"],
+          [SearchParams.Year]: undefined,
         }),
       );
     });
