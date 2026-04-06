@@ -1,28 +1,34 @@
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
-from django.shortcuts import get_object_or_404
-from drf_spectacular.utils import extend_schema, extend_schema_view
-from django.utils import timezone
 import json
-
-
-from .models import Goal, Task
-from .services import AIGoalGeneratorService, TaskService, GoalService, ContributionService
-from .serializers import (
-    GoalListSerializer,
-    GoalDetailSerializer,
-    GoalCreateSerializer,
-    TaskSerializer,
-    GoalGenerateRequestSerializer,
-    GoalGenerateResponseSerializer,
-)
-
 import logging
 from datetime import datetime
 
+from django.shortcuts import get_object_or_404
+from django.utils import timezone
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
+from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from .models import Goal, Task
+from .serializers import (
+    GoalCreateSerializer,
+    GoalDetailSerializer,
+    GoalGenerateRequestSerializer,
+    GoalGenerateResponseSerializer,
+    GoalListSerializer,
+    TaskSerializer,
+)
+from .services import (
+    AIGoalGeneratorService,
+    ContributionService,
+    GoalService,
+    TaskService,
+)
+
 logger = logging.getLogger(__name__)
+
 
 @extend_schema(
     tags=["Goals"],
@@ -447,9 +453,21 @@ class TaskListView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 @extend_schema_view(
     get=extend_schema(
         tags=["Dashboard"],
+        summary="Get yearly task productivity stats",
+        description="Retrieves a list of daily task completion counts for the contribution heatmap. Always includes Jan 1st and Dec 31st.",
+        parameters=[
+            OpenApiParameter(
+                name="year",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.QUERY,
+                required=False,
+                description="The year to fetch stats for. Defaults to the current year if omitted.",
+            )
+        ],
     ),
 )
 class TaskProductivityView(APIView):
@@ -457,7 +475,7 @@ class TaskProductivityView(APIView):
 
     def get(self, request):
         """Retrieves user task contribution stats for a specific year."""
-        year_str = request.query_params.get('year')
+        year_str = request.query_params.get("year")
         year = self._parse_year(year_str)
 
         stats = ContributionService.get_yearly_productivity(request.user, year)
@@ -468,4 +486,3 @@ class TaskProductivityView(APIView):
         if year_str and year_str.isdigit():
             return int(year_str)
         return datetime.now().year
-        
