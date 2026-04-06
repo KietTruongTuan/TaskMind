@@ -1,4 +1,3 @@
-from django.db.models import QuerySet
 import os
 import json
 import base64
@@ -13,6 +12,7 @@ from .models import Goal, Task
 from django.db.models.functions import Coalesce
 from django.db.models import Value
 from datetime import date
+from django.db.models import Count
 
 logger = logging.getLogger(__name__)
 
@@ -449,3 +449,54 @@ class TaskService:
             "Cancelled": 0,
             "Overdue": 0,
         }
+
+class ContributionService:
+
+    @staticmethod
+    def get_yearly_productivity(user, year: int) -> list[dict]:
+        raw_counts = ContributionService._fetch_daily_counts(user, year)
+        padded_counts = ContributionService._ensure_boundary_dates(raw_counts, year)
+        return ContributionService._build_response_list(padded_counts)
+
+    @staticmethod
+    def _fetch_daily_counts(user, year: int) -> dict[str, int]:
+        queryset = Task.objects.filter(goal__user=user, status='Completed', complete_date__year=year).values('complete_date').annotate(count=Count('id'))
+
+        # transform queryset into dict: {'YYYY-MM-DD': count}
+        return {
+            row['complete_date'].strftime('%Y-%m-%d'): row['count']
+            for row in queryset if row['complete_date']
+        }
+
+    @staticmethod
+    def _ensure_boundary_dates(daily_counts: dict[str, int], year: int) -> dict[str, int]:
+        """Ensures Jan 1st and Dec 31st exist in the data mapping."""
+        daily_counts.setdefault(f"{year}-01-01", 0)
+        daily_counts.setdefault(f"{year}-12-31", 0)
+
+        return daily_counts
+    
+    @staticmethod
+    def _build_response_list(daily_counts: dict[str, int]) -> list[dict]:
+        response_list = [
+            {
+                "date": date_str,
+                "count": count,
+                "level": ContributionService._determine_level(count)
+            }
+            for date_str, count in daily_counts.items()
+        ]
+
+        return sorted(response_list, key=lambda dict_item: dict_item["date"])
+
+    @staticmethod
+    def _determine_level(task_count: int) -> int:
+        if task_count >= 10:
+            return 4
+        if task_count >= 5: 
+            return 3
+        if task_count >= 3: 
+            return 2
+        if task_count >= 1: 
+            return 1
+        return 0

@@ -1,4 +1,3 @@
-import traceback
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -7,10 +6,10 @@ from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from django.utils import timezone
 import json
-import re
+
 
 from .models import Goal, Task
-from .services import AIGoalGeneratorService, TaskService, GoalService
+from .services import AIGoalGeneratorService, TaskService, GoalService, ContributionService
 from .serializers import (
     GoalListSerializer,
     GoalDetailSerializer,
@@ -21,6 +20,7 @@ from .serializers import (
 )
 
 import logging
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
@@ -446,3 +446,26 @@ class TaskListView(APIView):
             serializer.save(goal=goal)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@extend_schema_view(
+    get=extend_schema(
+        tags=["Dashboard"],
+    ),
+)
+class TaskProductivityView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        """Retrieves user task contribution stats for a specific year."""
+        year_str = request.query_params.get('year')
+        year = self._parse_year(year_str)
+
+        stats = ContributionService.get_yearly_productivity(request.user, year)
+
+        return Response(stats)
+
+    def _parse_year(self, year_str: str) -> int:
+        if year_str and year_str.isdigit():
+            return int(year_str)
+        return datetime.now().year
+        
