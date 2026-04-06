@@ -1,6 +1,7 @@
 "use client";
 import { CardNoPadding } from "@/app/components/card-no-padding/card-no-padding";
 import { Header } from "@/app/components/header/header";
+import { TaskProductivityResponseBody } from "@/app/constants";
 import { useThemeContext } from "@/app/contexts/theme-context/theme-context";
 import { Flex } from "@radix-ui/themes/dist/cjs/components/flex";
 import { ActivityIcon } from "lucide-react";
@@ -8,45 +9,14 @@ import React from "react";
 import { ActivityCalendar } from "react-activity-calendar";
 import { Tooltip as ReactTooltip } from "react-tooltip";
 
-const data = [
-  {
-    date: "2026-01-01",
-    count: 5,
-    level: 3,
-  },
-  {
-    date: "2026-04-03",
-    count: 13,
-    level: 1,
-  },
-  {
-    date: "2026-04-03",
-    count: 13,
-    level: 1,
-  },
-  {
-    date: "2026-05-04",
-    count: 2,
-    level: 1,
-  },
-  {
-    date: "2026-06-05",
-    count: 12,
-    level: 4,
-  },
-  {
-    date: "2026-12-31",
-    count: 10,
-    level: 2,
-  },
-];
-
 export function ContributionGraph({
   header,
   subHeader,
+  data,
 }: {
   header: string;
   subHeader?: string;
+  data: TaskProductivityResponseBody[];
 }) {
   const explicitTheme = {
     light: [
@@ -65,6 +35,7 @@ export function ContributionGraph({
     ],
   };
   const { theme } = useThemeContext();
+
   return (
     <CardNoPadding py="5" px="5" data-testid="contribution-graph" isPrimary>
       <Flex direction="column" width="100%" gap="5">

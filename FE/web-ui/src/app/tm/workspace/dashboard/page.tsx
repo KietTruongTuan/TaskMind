@@ -21,12 +21,14 @@ import { ContributionGraph } from "@/app/tm/workspace/dashboard/components/contr
 
 export default async function DashboardPage() {
   const { goalService, taskService } = await useServerSideService();
-  
+
   const goalListData = await goalService.getAll();
   const { goals, ...goalStats } = goalListData;
 
   const taskListData = await taskService.getAll();
   const { tasks, ...taskStats } = taskListData;
+
+  const taskProductivityData = await taskService.getProductivity();
 
   const recentGoals: GoalCardPropsData[] = goals
     .filter((goal) => goal.status === Status.InProgress)
@@ -136,6 +138,7 @@ export default async function DashboardPage() {
                   <ContributionGraph
                     header="Productivity"
                     subHeader="Your activity over time"
+                    data={taskProductivityData}
                   />
                 </Box>
               </Grid>

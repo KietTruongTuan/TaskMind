@@ -16,4 +16,5 @@ export enum ApiUrl {
 
   // Tasks
   Task = "/v1/tasks",
+  TaskProductivity = "/v1/tasks/productivity",
 }

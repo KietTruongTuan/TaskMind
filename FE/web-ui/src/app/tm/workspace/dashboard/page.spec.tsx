@@ -58,6 +58,23 @@ describe("DashboardPage", () => {
         getAll: jest
           .fn()
           .mockResolvedValue(MOCK_TASK_LIST_RESPONSE_DATA_WITH_STATS),
+        getProductivity: jest.fn().mockResolvedValue([
+          {
+            date: "2026-01-01",
+            count: 0,
+            level: 0,
+          },
+          {
+            date: "2026-4-12",
+            count: 3,
+            level: 1,
+          },
+          {
+            date: "2026-12-31",
+            count: 10,
+            level: 2,
+          },
+        ]),
       },
     });
   });
