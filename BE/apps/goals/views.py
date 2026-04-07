@@ -3,7 +3,6 @@ import logging
 from datetime import datetime
 
 from django.shortcuts import get_object_or_404
-from django.utils import timezone
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
 from rest_framework import status
@@ -26,6 +25,7 @@ from .services import (
     GoalService,
     TaskService,
 )
+from .validators import GoalBreakdownValidator
 
 logger = logging.getLogger(__name__)
 
@@ -50,55 +50,11 @@ class GoalBreakdownView(APIView):
         deadline = request.data.get("deadline")
         files = request.FILES.getlist("files")
 
-        if not name:
+        validation_error = GoalBreakdownValidator.validate_request(request.data, files)
+        if validation_error:
             return Response(
-                {"error": "Please provide a goal's name"},
-                status=status.HTTP_400_BAD_REQUEST,
+                {"error": validation_error}, status=status.HTTP_400_BAD_REQUEST
             )
-
-        # if not description and not files:
-        #     return Response({"error": "Please provide a description or upload files to provide context."}, status=status.HTTP_400_BAD_REQUEST)
-
-        if not deadline:
-            return Response(
-                {"error": "Please provide a goal's deadline"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        if deadline < timezone.now().date().isoformat():
-            return Response(
-                {"error": "Deadline must be a future date"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        # File upload limits
-        MAX_FILES = 5
-        MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB per file
-        ALLOWED_EXTENSIONS = [".pdf", ".docx", ".jpg", ".jpeg", ".png", ".webp"]
-
-        if len(files) > MAX_FILES:
-            return Response(
-                {"error": f"Maximum {MAX_FILES} files allowed."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        for file in files:
-            if file.size > MAX_FILE_SIZE:
-                return Response(
-                    {"error": f"File '{file.name}' exceeds the 10MB size limit."},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-            ext = file.name.rsplit(".", 1)[-1].lower() if "." in file.name else ""
-            if f".{ext}" not in ALLOWED_EXTENSIONS:
-                return Response(
-                    {
-                        "error": f"File '{file.name}' has an unsupported format. Allowed: PDF, DOCX, JPG, PNG, WebP."
-                    },
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-
-        # if not tag:
-        #     return Response({"error": "Please provide a goal's tag"}, status=status.HTTP_400_BAD_REQUEST)
 
         api_key = AIGoalGeneratorService.get_api_key()
         if not api_key:
@@ -487,6 +443,7 @@ class TaskProductivityView(APIView):
             return int(year_str)
         return datetime.now().year
 
+
 @extend_schema_view(
     get=extend_schema(
         tags=["Goals"],
@@ -502,4 +459,3 @@ class GoalTagListView(APIView):
         """Retrieves all user's tags as an option for filtering."""
         user_tags_list = GoalService.get_unique_tags(request.user)
         return Response(user_tags_list, status=status.HTTP_200_OK)
-
