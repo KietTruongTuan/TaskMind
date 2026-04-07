@@ -9,6 +9,7 @@ import {
   FilterOption,
 } from "@/app/components/filter-dropdown/filter-dropdown";
 import { Status } from "@/app/enum/status.enum";
+import { StatusDisplay } from "@/app/constants";
 
 export default async function MyGoalPage({
   searchParams,
@@ -19,20 +20,23 @@ export default async function MyGoalPage({
 }) {
   const params = await searchParams;
   const { goalService } = await useServerSideService();
-  
+
   const goalListData = await goalService.getAll(params);
   const { goals } = goalListData;
 
+  const goalTags = await goalService.getTags();
   const filterOptions: FilterOption[] = [
     {
       label: "Status",
       searchParamKey: SearchParams.Status,
-      options: Object.values(Status),
+      options: Object.values(Status).map(
+        (status) => StatusDisplay[status].title,
+      ),
     },
     {
       label: "Tag",
       searchParamKey: SearchParams.Tag,
-      options: ["FE", "Study"],
+      options: goalTags,
     },
   ];
   const filterParams = Object.values(SearchParams).reduce(
