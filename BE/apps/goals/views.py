@@ -499,7 +499,7 @@ class GoalTagListView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        """Retrieves all user's tags as a option to filter"""
+        """Retrieves all user's tags as an option for filtering."""
         user_tags_list = GoalService.get_unique_tags(request.user)
         return Response(user_tags_list, status=status.HTTP_200_OK)
 
