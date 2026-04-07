@@ -526,3 +526,100 @@ class ContributionService:
         if task_count >= 1:
             return 1
         return 0
+
+
+class GoalBreakDownService:
+    @staticmethod
+    def generate_breakdown(data, files):
+        """Orchestrates AI generation of tasks from a goal description."""
+        name = data.get("name")
+        description = data.get("description", "")
+        tag = data.get("tag", "")
+        deadline = data.get("deadline")
+
+        api_key = AIGoalGeneratorService.get_api_key()
+        if not api_key:
+            raise ValueError("Together AI API Key is not configured.")
+
+        enhanced_desc = GoalBreakDownService._prepare_enhanced_description(
+            description, files, api_key
+        )
+
+        tasks = GoalBreakDownService._fetch_ai_tasks(
+            name, enhanced_desc, deadline, api_key
+        )
+        final_desc = GoalBreakDownService._fetch_ai_description(
+            name, enhanced_desc, deadline, api_key
+        )
+
+        return GoalBreakDownService._build_final_result(
+            name, final_desc, deadline, tag, tasks
+        )
+
+    @staticmethod
+    def _prepare_enhanced_description(description, files, api_key):
+        # Parse context from files
+        file_context = AIGoalGeneratorService.extract_context_from_files(files, api_key)
+        if file_context:
+            description = (
+                f"{description}\n\n[Additional Context from Files:]\n{file_context}"
+                if description
+                else file_context
+            )
+            return description
+        return description
+
+    @staticmethod
+    def _fetch_ai_tasks(name, description, deadline, api_key):
+        task_prompt = AIGoalGeneratorService.build_prompt_for_task(
+            name, description, deadline
+        )
+        return AIGoalGeneratorService.get_ai_response(task_prompt, api_key)
+
+    @staticmethod
+    def _fetch_ai_description(name, description, deadline, api_key):
+        description_prompt = AIGoalGeneratorService.build_prompt_for_description(
+            name, description, deadline
+        )
+        raw_response = AIGoalGeneratorService.get_ai_response(
+            description_prompt, api_key
+        )
+        return GoalBreakDownService._parse_description_response(raw_response)
+
+    @staticmethod
+    def _parse_description_response(description_response):
+        # Parse description response
+        if isinstance(description_response, list):
+            # It's already a list, just take the first item
+            if description_response:
+                description = description_response[0]
+            else:
+                description = ""  # Handle empty list case
+        else:
+            # It is a string, so NOW we try to parse it
+            try:
+                parsed_description = json.loads(description_response)
+
+                if isinstance(parsed_description, list) and parsed_description:
+                    description = parsed_description[0]
+                else:
+                    description = str(parsed_description)
+
+            except (json.JSONDecodeError, TypeError):
+                # Fallback: It was just a plain string all along
+                description = description_response
+
+        return description
+
+    @staticmethod
+    def _build_final_result(name, final_desc, deadline, tag, tasks):
+        result = {}
+        result["name"] = name
+        result["description"] = final_desc
+        result["status"] = "ToDo"
+        result["deadline"] = deadline
+        result["tag"] = tag
+        result["completeCount"] = 0
+        result["taskCount"] = len(tasks)
+        result["tasks"] = tasks
+        return result

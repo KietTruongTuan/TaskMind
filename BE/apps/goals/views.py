@@ -24,6 +24,7 @@ from .services import (
     ContributionService,
     GoalService,
     TaskService,
+    GoalBreakDownService,
 )
 from .validators import GoalBreakdownValidator
 
@@ -44,10 +45,6 @@ class GoalBreakdownView(APIView):
     and returns a list of actionable tasks to achieve that goal using the Groq API."""
 
     def post(self, request):
-        name = request.data.get("name")
-        description = request.data.get("description", "")
-        tag = request.data.get("tag")
-        deadline = request.data.get("deadline")
         files = request.FILES.getlist("files")
 
         validation_error = GoalBreakdownValidator.validate_request(request.data, files)
@@ -56,65 +53,8 @@ class GoalBreakdownView(APIView):
                 {"error": validation_error}, status=status.HTTP_400_BAD_REQUEST
             )
 
-        api_key = AIGoalGeneratorService.get_api_key()
-        if not api_key:
-            return Response(
-                {"error": "Together AI API Key is not configured."},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            )
-
-        # Parse context from files
-        file_context = AIGoalGeneratorService.extract_context_from_files(files, api_key)
-        if file_context:
-            description = (
-                f"{description}\n\n[Additional Context from Files:]\n{file_context}"
-                if description
-                else file_context
-            )
-
-        task_prompt = AIGoalGeneratorService.build_prompt_for_task(
-            name, description, deadline
-        )
-        description_prompt = AIGoalGeneratorService.build_prompt_for_description(
-            name, description, deadline
-        )
-        task_list = AIGoalGeneratorService.get_ai_response(task_prompt, api_key)
-
-        description_response = AIGoalGeneratorService.get_ai_response(
-            description_prompt, api_key
-        )
-
-        # FIX: Check if it is ALREADY a list before trying to parse
-        if isinstance(description_response, list):
-            # It's already a list, just take the first item
-            if description_response:
-                description = description_response[0]
-            else:
-                description = ""  # Handle empty list case
-        else:
-            # It is a string, so NOW we try to parse it
-            try:
-                parsed_description = json.loads(description_response)
-
-                if isinstance(parsed_description, list) and parsed_description:
-                    description = parsed_description[0]
-                else:
-                    description = str(parsed_description)
-
-            except (json.JSONDecodeError, TypeError):
-                # Fallback: It was just a plain string all along
-                description = description_response
-
         try:
-            result = {}
-            result["name"] = name
-            result["description"] = description
-            result["status"] = "ToDo"
-            result["deadline"] = deadline
-            result["tag"] = tag
-            result["completeCount"] = 0
-            result["taskCount"] = len(task_list)
-            result["tasks"] = task_list
+            result = GoalBreakDownService.generate_breakdown(request.data, files)
             return Response(result, status=status.HTTP_200_OK)
         except ValueError as e:
             return Response(
