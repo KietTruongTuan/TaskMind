@@ -359,6 +359,23 @@ class GoalService:
             "Overdue": 0,
         }
 
+    @staticmethod
+    def get_unique_tags(user):
+        raw_tags = GoalService._fetch_user_tags(user)
+        return GoalService._extract_and_deduplicate_tags(raw_tags)
+
+    @staticmethod
+    def _fetch_user_tags(user):
+        return Goal.objects.filter(user=user).values_list("tag", flat=True)
+
+    @staticmethod
+    def _extract_and_deduplicate_tags(raw_tags_lists):
+        unique_tags = set()
+        for tags in raw_tags_lists:
+            if isinstance(tags, list):
+                unique_tags.update(tags)
+        return sorted(list(unique_tags))
+
 
 class TaskService:
     @staticmethod
