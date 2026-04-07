@@ -11,8 +11,14 @@ import {
   CreateGoalResponseBody,
   GoalDetailResponseBody,
   GoalListItemResponseBody,
+  GoalListResponseBody,
 } from "./goal.constants";
-import { CreateTaskRequestBody, DraftTask, Task } from "./task.constants";
+import {
+  CreateTaskRequestBody,
+  DraftTask,
+  Task,
+  TaskListResponseBody,
+} from "./task.constants";
 
 const getFutureDate = () => {
   const date = new Date();
@@ -78,6 +84,17 @@ export const MOCK_TASK_LIST_RESPONSE_DATA: Task[] = [
   },
 ];
 
+export const MOCK_TASK_LIST_RESPONSE_DATA_WITH_STATS: TaskListResponseBody = {
+  tasks: MOCK_TASK_LIST_RESPONSE_DATA,
+  toDoCount: 1,
+  inProgressCount: 1,
+  onHoldCount: 1,
+  completedCount: 0,
+  cancelledCount: 0,
+  overdueCount: 0,
+  totalCount: 3,
+};
+
 export const MOCK_DRAFT_TASK_LIST_RESPONSE_DATA: DraftTask[] = [
   {
     name: "Task 1",
@@ -133,7 +150,39 @@ export const MOCK_GOAL_LIST_DATA: GoalListItemResponseBody[] = [
     completedCount: 1,
     taskCount: 3,
   },
+  {
+    id: "3",
+    name: "Test Goal 3",
+    description: "This is a test goal",
+    status: Status.Completed,
+    deadline: getFutureDate(),
+    tag: ["test", "goal"],
+    completedDate: getFutureDate(),
+    completedCount: 3,
+    taskCount: 3,
+  },
+  {
+    id: "4",
+    name: "Test Goal 4",
+    description: "This is a test goal",
+    status: Status.Completed,
+    deadline: getFutureDate(),
+    tag: ["test", "goal"],
+    completedCount: 5,
+    taskCount: 5,
+  },
 ];
+
+export const MOCK_GOAL_LIST_RESPONSE_DATA_WITH_STATS: GoalListResponseBody = {
+  goals: MOCK_GOAL_LIST_DATA,
+  toDoCount: 1,
+  inProgressCount: 1,
+  onHoldCount: 1,
+  completedCount: 0,
+  cancelledCount: 0,
+  overdueCount: 0,
+  totalCount: 3,
+};
 
 export const MOCK_GOAL_REQUEST_DATA: CreateGoalRequestBody = {
   name: "Test Goal",

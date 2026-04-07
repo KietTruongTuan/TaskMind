@@ -39,6 +39,17 @@ export interface GoalListItemResponseBody extends GoalResponseBody {
   id: string;
 }
 
+export interface GoalListResponseBody {
+  goals: GoalListItemResponseBody[];
+  totalCount: number;
+  toDoCount: number;
+  inProgressCount: number;
+  completedCount: number;
+  onHoldCount: number;
+  cancelledCount: number;
+  overdueCount: number;
+}
+
 export interface GoalResponseBody {
   name: string;
   description: string;

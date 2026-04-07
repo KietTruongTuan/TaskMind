@@ -15,7 +15,8 @@ export default async function AllTaskPage({
   const params = await searchParams;
   const { taskService } = await useServerSideService();
   const taskListData = await taskService.getAll(params);
-
+  const { tasks } = taskListData;
+  
   return (
     <Flex width="100%" justify="center" height="100%">
       <Flex width="100%" direction="column" pl="7" py="5" gap="5">
@@ -32,14 +33,14 @@ export default async function AllTaskPage({
           <SearchBar value={(params[SearchParams.Search] as string) || ""} />
         </Flex>
 
-        {taskListData.length === 0 ? (
+        {tasks.length === 0 ? (
           <Flex height="100%" width="100%" justify="center" align="center">
             <Text size="2" align="center" mt="3">
               No task found
             </Text>
           </Flex>
         ) : (
-          <KanbanBoard tasks={taskListData} />
+          <KanbanBoard tasks={tasks} />
         )}
       </Flex>
     </Flex>

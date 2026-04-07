@@ -1,7 +1,7 @@
 import {
   DraftGoalRequestBody,
   GoalDetailResponseBody,
-  GoalListItemResponseBody,
+  GoalListResponseBody,
   SaveGoalRequestBody,
 } from "@/app/constants";
 import { HttpService } from "../http-service/http-service";
@@ -27,9 +27,9 @@ export class GoalService extends HttpService {
     return res;
   }
 
-  async getAll(params: Record<SearchParams, string | string[] | null | undefined>) {
+  async getAll(params?: Record<SearchParams, string | string[] | null | undefined>) {
     const url = buildUrl(ApiUrl.Goal, undefined, params);
-    const res = await this.get<GoalListItemResponseBody[]>(url);
+    const res = await this.get<GoalListResponseBody>(url);
     return res;
   }
 

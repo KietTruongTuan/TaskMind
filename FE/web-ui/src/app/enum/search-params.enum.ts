@@ -4,4 +4,5 @@ export enum SearchParams {
   StartDate = "startDate",
   EndDate = "endDate",
   Tag = "tag",
+  Year = "year",
 }

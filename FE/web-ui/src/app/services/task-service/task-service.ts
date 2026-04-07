@@ -5,6 +5,8 @@ import {
   CreateTaskRequestBody,
   DraftTaskRequestBody,
   Task,
+  TaskListResponseBody,
+  TaskProductivityResponseBody,
 } from "@/app/constants";
 import { SearchParams } from "@/app/enum/search-params.enum";
 
@@ -23,9 +25,11 @@ export class TaskService extends HttpService {
     return res;
   }
 
-  async getAll(params: Record<SearchParams, string | string[] | null | undefined>) {
+  async getAll(
+    params?: Record<SearchParams, string | string[] | null | undefined>,
+  ) {
     const url = buildUrl(ApiUrl.Task, undefined, params);
-    const res = await this.get<Task[]>(url);
+    const res = await this.get<TaskListResponseBody>(url);
     return res;
   }
 
@@ -38,6 +42,14 @@ export class TaskService extends HttpService {
   async remove(id: string) {
     const url = buildUrl(ApiUrl.Task, id, undefined);
     const res = await this.delete(url);
+    return res;
+  }
+
+  async getProductivity(
+    params?: Record<SearchParams, string | string[] | null | undefined>,
+  ) {
+    const url = buildUrl(ApiUrl.TaskProductivity, undefined, params);
+    const res = await this.get<TaskProductivityResponseBody[]>(url);
     return res;
   }
 }

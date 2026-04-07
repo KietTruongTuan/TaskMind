@@ -1,9 +1,9 @@
 .iconBox {
-  border-radius: var(--spacing-small);
+    border-radius: var(--spacing-small);
 }
 
 .subText {
-  color: var(--text-secondary)
+    color: var(--text-secondary)
 }
 
 .onHold {
@@ -24,4 +24,8 @@
 
 .overdue {
     color: var(--status-overdue);
+}
+
+.routeText {
+    cursor: pointer;
 }

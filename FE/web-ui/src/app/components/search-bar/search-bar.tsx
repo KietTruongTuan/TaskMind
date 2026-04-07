@@ -42,7 +42,7 @@ export function SearchBar({
           onClientSearch(trimmedSearch);
           return;
         }
-        
+
         const params: Record<
           SearchParams,
           string | string[] | null | undefined
@@ -52,6 +52,7 @@ export function SearchBar({
           [SearchParams.StartDate]: searchParams?.get(SearchParams.StartDate),
           [SearchParams.EndDate]: searchParams?.get(SearchParams.EndDate),
           [SearchParams.Tag]: searchParams?.getAll(SearchParams.Tag),
+          [SearchParams.Year]: searchParams?.get(SearchParams.Year),
         };
 
         router.push(buildUrl(pathname, undefined, params));

@@ -1,3 +1,4 @@
+"use client";
 import { DraftTask } from "@/app/constants";
 import { CardNoPadding } from "../card-no-padding/card-no-padding";
 import { Flex, Text } from "@radix-ui/themes";
@@ -9,13 +10,20 @@ import { buildUrl } from "@/app/tm/utils";
 import { WebUrl } from "@/app/enum/web-url.enum";
 
 export function KanbanItem({
-  task,
+  task: taskProp,
   isLocal,
+  ...taskProps
 }: {
-  task: DraftTask;
+  task?: DraftTask;
   isLocal?: boolean;
-}) {
+} & Partial<DraftTask>) {
   const { route } = useRouteLoadingContext();
+  const task = taskProp ?? (taskProps as DraftTask);
+
+  if (!task) {
+    return null;
+  }
+
   return (
     <CardNoPadding
       py="3"

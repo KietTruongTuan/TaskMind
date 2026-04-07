@@ -8,6 +8,10 @@ class ResizeObserver {
 
 global.ResizeObserver = ResizeObserver;
 
+if (typeof global.structuredClone === 'undefined') {
+  global.structuredClone = (val) => JSON.parse(JSON.stringify(val));
+}
+
 export const MOCK_ROUTER_PUSH = jest.fn();
 
 jest.mock("next/navigation", () => ({

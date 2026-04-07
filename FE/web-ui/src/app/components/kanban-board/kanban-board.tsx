@@ -147,7 +147,7 @@ export function KanbanBoard({
             <Flex gap="4" align="start" mb="4">
               {kanbanState.columns.map((columnId) => (
                 <Flex key={columnId} className={styles.columnWrapper}>
-                  <CardNoPadding key={columnId} p="2">
+                  <CardNoPadding key={columnId} p="2" isPrimary>
                     <KanbanColumn id={columnId}>
                       <Flex direction="column" gap="3">
                         <KanbanColumnHeader>

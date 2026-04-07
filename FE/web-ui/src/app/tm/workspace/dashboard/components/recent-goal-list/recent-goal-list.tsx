@@ -1,25 +1,17 @@
 import { CardNoPadding } from "@/app/components/card-no-padding/card-no-padding";
 import { Header } from "@/app/components/header/header";
-import { Status } from "@/app/enum/status.enum";
+import { GoalResponseBody } from "@/app/constants";
 import { Flex } from "@radix-ui/themes";
 import { ElementType } from "react";
 
-export interface GoalCardPropsData {
+export interface GoalCardPropsData extends GoalResponseBody {
   id?: string;
-  name: string;
-  status: Status;
-  description: string;
-  tag?: string[];
-  deadline: Date;
-  completedDate?: Date;
-  completedCount: number;
-  taskCount: number;
   isDetailCard?: boolean;
   isPrimary?: boolean;
   isDraft?: boolean;
 }
 
-export function RecentGoalList({
+export function RecentGoalList<T>({
   isFlexible = false,
   header,
   icon,
@@ -32,7 +24,7 @@ export function RecentGoalList({
   icon?: ElementType;
   subHeader: string;
   cardTypeComponent: ElementType;
-  data: GoalCardPropsData[];
+  data: T[];
 }) {
   const Card = cardTypeComponent;
   const Icon = icon;

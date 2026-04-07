@@ -5,7 +5,10 @@ import AllTaskPage from "./page";
 import { render, screen, waitFor } from "@testing-library/react";
 import { RouteLoadingProvider } from "@/app/contexts/route-loading-context/route-loading-context";
 import { ThemeProvider } from "@/app/contexts/theme-context/theme-context";
-import { MOCK_TASK_LIST_RESPONSE_DATA } from "@/app/constants";
+import {
+  MOCK_TASK_LIST_RESPONSE_DATA_WITH_STATS,
+  TaskListResponseBody,
+} from "@/app/constants";
 import { ToastProvider } from "@/app/contexts/toast-context/toast-context";
 import { taskService } from "@/app/constants";
 import { Status } from "@/app/enum/status.enum";
@@ -108,7 +111,16 @@ describe("AllTaskPage", () => {
     (useSearchParams as jest.Mock).mockImplementation(
       () => new URLSearchParams(),
     );
-    mockGetAll.mockResolvedValueOnce([]);
+    mockGetAll.mockResolvedValueOnce({
+      tasks: [],
+      totalCount: 0,
+      toDoCount: 0,
+      inProgressCount: 0,
+      completedCount: 0,
+      onHoldCount: 0,
+      cancelledCount: 0,
+      overdueCount: 0,
+    } as TaskListResponseBody);
 
     const mockSearchParams = Promise.resolve(
       {} as Record<SearchParams, string | string[] | null | undefined>,
@@ -128,7 +140,7 @@ describe("AllTaskPage", () => {
     (useSearchParams as jest.Mock).mockImplementation(
       () => new URLSearchParams(),
     );
-    mockGetAll.mockResolvedValueOnce(MOCK_TASK_LIST_RESPONSE_DATA);
+    mockGetAll.mockResolvedValueOnce(MOCK_TASK_LIST_RESPONSE_DATA_WITH_STATS);
 
     const mockSearchParams = Promise.resolve(
       {} as Record<SearchParams, string | string[] | null | undefined>,
@@ -149,7 +161,7 @@ describe("AllTaskPage", () => {
     (useSearchParams as jest.Mock).mockImplementation(
       () => new URLSearchParams(),
     );
-    mockGetAll.mockResolvedValueOnce(MOCK_TASK_LIST_RESPONSE_DATA);
+    mockGetAll.mockResolvedValueOnce(MOCK_TASK_LIST_RESPONSE_DATA_WITH_STATS);
     (taskService.update as jest.Mock).mockResolvedValueOnce({});
 
     const mockSearchParams = Promise.resolve(
@@ -179,7 +191,7 @@ describe("AllTaskPage", () => {
     (useSearchParams as jest.Mock).mockImplementation(
       () => new URLSearchParams(),
     );
-    mockGetAll.mockResolvedValueOnce(MOCK_TASK_LIST_RESPONSE_DATA);
+    mockGetAll.mockResolvedValueOnce(MOCK_TASK_LIST_RESPONSE_DATA_WITH_STATS);
     (taskService.update as jest.Mock).mockResolvedValueOnce({});
 
     const mockSearchParams = Promise.resolve(

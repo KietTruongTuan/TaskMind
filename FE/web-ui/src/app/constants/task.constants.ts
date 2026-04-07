@@ -21,6 +21,23 @@ export interface Task {
   goalName?: string;
 }
 
+export interface TaskProductivityResponseBody {
+  date: string;
+  count: number;
+  level: number;
+}
+
+export interface TaskListResponseBody {
+  tasks: Task[];
+  totalCount: number;
+  toDoCount: number;
+  inProgressCount: number;
+  completedCount: number;
+  onHoldCount: number;
+  cancelledCount: number;
+  overdueCount: number;
+}
+
 export interface DraftTaskRequestBody {
   name?: string;
   status?: Status;
@@ -32,4 +49,4 @@ export interface CreateTaskRequestBody {
   name: string;
   status: Status;
   deadline: Date;
-} 
+}

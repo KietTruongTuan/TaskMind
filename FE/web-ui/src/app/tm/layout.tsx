@@ -1,5 +1,6 @@
 import "./layout.scss";
 import "@radix-ui/themes/styles.css";
+import "react-tooltip/dist/react-tooltip.css";
 import { ThemeProvider } from "../contexts/theme-context/theme-context";
 import { ToastProvider } from "../contexts/toast-context/toast-context";
 import { RouteLoadingProvider } from "../contexts/route-loading-context/route-loading-context";

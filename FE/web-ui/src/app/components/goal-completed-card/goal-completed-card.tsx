@@ -7,14 +7,15 @@ import styles from "./goal-completed-card.module.scss";
 
 export function GoalCompletedCard({
   name,
-  completedDate,
+  completedDate: rawCompletedDate,
 }: {
   name: string;
   completedDate: Date;
 }) {
+  const completedDate = new Date(rawCompletedDate || new Date());
   const time = formatDistanceToNow(completedDate, { addSuffix: true });
   return (
-    <CardNoPadding p="3">
+    <CardNoPadding p="3" maxWidth="35%">
       <Flex direction="column" width="100" align="center" gap="1">
         <CheckCircle size="30" className={styles.completed} />
         <Header
