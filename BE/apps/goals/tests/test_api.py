@@ -664,3 +664,43 @@ class TestTaskList:
 
         assert response.status_code == 200
         assert len(response.data) == 0  # Should not see other user's tasks
+
+
+# ============ GOAL TAG LIST TESTS ============
+
+@pytest.mark.django_db
+class TestGoalTagList:
+    """Tests for GET /v1/goals/tags"""
+
+    def test_list_tags_success(self, auth_client, user, future_deadline):
+        """Test getting unique tags across multiple goals"""
+        Goal.objects.create(user=user, name="Goal 1", status="ToDo", deadline=future_deadline, tag=["work", "urgent"])
+        Goal.objects.create(user=user, name="Goal 2", status="ToDo", deadline=future_deadline, tag=["personal", "urgent"])
+        Goal.objects.create(user=user, name="Goal 3", status="ToDo", deadline=future_deadline, tag=[])
+
+        response = auth_client.get('/v1/goals/tags')
+
+        assert response.status_code == 200
+        assert isinstance(response.data, list)
+        assert len(response.data) == 3
+        # Should be sorted
+        assert response.data == ["personal", "urgent", "work"]
+
+    def test_list_tags_empty(self, auth_client, user, future_deadline):
+        """Test getting tags when there are none"""
+        Goal.objects.create(user=user, name="Goal 1", status="ToDo", deadline=future_deadline, tag=[])
+
+        response = auth_client.get('/v1/goals/tags')
+
+        assert response.status_code == 200
+        assert response.data == []
+
+    def test_list_tags_user_isolation(self, auth_client, user, other_user, future_deadline):
+        """Test getting tags respects user isolation"""
+        Goal.objects.create(user=user, name="My Goal", status="ToDo", deadline=future_deadline, tag=["my-tag"])
+        Goal.objects.create(user=other_user, name="Other Goal", status="ToDo", deadline=future_deadline, tag=["other-tag"])
+
+        response = auth_client.get('/v1/goals/tags')
+
+        assert response.status_code == 200
+        assert response.data == ["my-tag"]

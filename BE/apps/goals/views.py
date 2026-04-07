@@ -486,3 +486,20 @@ class TaskProductivityView(APIView):
         if year_str and year_str.isdigit():
             return int(year_str)
         return datetime.now().year
+
+@extend_schema_view(
+    get=extend_schema(
+        tags=["Goals"],
+        summary="Get unique goal tags",
+        description="Retrieves a list of all unique tags used across a user's goals.",
+        responses={200: OpenApiTypes.ANY},
+    ),
+)
+class GoalTagListView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        """Retrieves all user's tags as an option for filtering."""
+        user_tags_list = GoalService.get_unique_tags(request.user)
+        return Response(user_tags_list, status=status.HTTP_200_OK)
+
