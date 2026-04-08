@@ -1,4 +1,3 @@
-import json
 import logging
 from datetime import datetime
 
@@ -20,7 +19,6 @@ from .serializers import (
     TaskSerializer,
 )
 from .services import (
-    AIGoalGeneratorService,
     ContributionService,
     GoalService,
     TaskService,
