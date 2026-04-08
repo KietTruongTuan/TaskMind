@@ -28,6 +28,7 @@ describe("MyGoalPage", () => {
     (useServerSideService as jest.Mock).mockResolvedValue({
       goalService: {
         getAll: mockGetAll,
+        getTags: jest.fn().mockResolvedValue(["FE", "Study"]),
       },
     });
   });

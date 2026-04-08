@@ -10,6 +10,7 @@ export enum ApiUrl {
 
   // Goals
   Goal = "/v1/goals",
+  GoalTags = "/v1/goals/tags",
 
   //Goal Generate
   GoalGenerate = "/v1/goals/generate",
