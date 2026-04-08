@@ -1,4 +1,4 @@
-# TaskMind
+# ChibChob
 
 - This project focuses on the research, analysis, design, and implementation of a goal management system that leverages artificial intelligence to automatically break down objectives into manageable tasks. The system allows users to input high-level goals, which the AI then analyzes and decomposes into specific steps and actionable items. These are further organized into tasks, enabling users to easily track, manage, and execute their objectives in a structured and efficient manner.
 
