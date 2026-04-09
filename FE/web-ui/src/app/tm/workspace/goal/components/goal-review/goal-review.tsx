@@ -47,7 +47,7 @@ export function GoalReview({
     tag,
     deadline,
   } = goalData;
-  const { route } = useRouteLoadingContext();
+  const { route, setIsRouteLoading } = useRouteLoadingContext();
   const { showToast, setIsSuccess } = useToast();
   const { clearDraftGoal } = useGoalContext();
 
@@ -87,6 +87,7 @@ export function GoalReview({
 
   const handleSave = async () => {
     try {
+      setIsRouteLoading(true);
       await goalService.save(goalData as SaveGoalRequestBody);
       route(WebUrl.Dashboard);
       setIsSuccess(true);
@@ -95,6 +96,8 @@ export function GoalReview({
       setIsSuccess(false);
       const error = err as ApiError;
       showToast(error.message);
+    } finally {
+      setIsRouteLoading(false);
     }
   };
 
