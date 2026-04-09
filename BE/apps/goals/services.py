@@ -24,16 +24,33 @@ class AIGoalGeneratorService:
 
     @staticmethod
     def get_api_key():
-        return os.getenv("API_KEY")
+        api_key = os.getenv("API_KEY")
+        if not api_key:
+            raise ValueError("AI API Key is not configured.")
+        return api_key
 
     @staticmethod
-    def get_ai_response(prompt, api_key, max_retries=3):
+    def get_base_url():
+        base_url = os.getenv("AI_BASE_URL")
+        if not base_url:
+            raise ValueError("AI API Key is not configured.")
+        return base_url
+
+    @staticmethod
+    def get_ai_text_model():
+        model = os.getenv("AI_TEXT_MODEL", "groq/compound")
+        if not model:
+            raise ValueError("AI Text model is not configured.")
+        return model
+
+    @staticmethod
+    def get_ai_response(prompt, api_key, base_url, model, max_retries=3):
         """Get AI response with retry logic for network issues"""
 
         for attempt in range(max_retries):
             try:
                 return AIGoalGeneratorService._execute_generation_attempt(
-                    prompt, api_key
+                    prompt, api_key, base_url, model
                 )
 
             except (httpx.RemoteProtocolError, httpx.ReadTimeout, ConnectionError) as e:
@@ -47,24 +64,28 @@ class AIGoalGeneratorService:
                     )
 
     @staticmethod
-    def _execute_generation_attempt(prompt, api_key):
+    def _execute_generation_attempt(prompt, api_key, base_url, model):
         client = OpenAI(
             api_key=api_key,
-            base_url="https://api.groq.com/openai/v1",
+            base_url=base_url,
             timeout=60.0,  # 60 second timeout
         )
-        response_stream = client.chat.completions.create(
-            model="groq/compound",
-            messages=[
-                {
-                    "role": "system",
-                    "content": "You are a helpful project management assistant.",
-                },
-                {"role": "user", "content": prompt},
-            ],
-            stream=True,
-            temperature=0.7,
-        )
+        try:
+            response_stream = client.chat.completions.create(
+                model=model,
+                messages=[
+                    {
+                        "role": "system",
+                        "content": "You are a helpful project management assistant.",
+                    },
+                    {"role": "user", "content": prompt},
+                ],
+                stream=True,
+                temperature=0.7,
+            )
+        except Exception as e:
+            logger.error(f"OpenAI Client Error: {str(e)}", exc_info=True)
+            raise ValueError(f"AI Provider Error: {str(e)}")
 
         # Delegate chunk processing
         full_content = AIGoalGeneratorService._process_response_stream(response_stream)
@@ -562,18 +583,20 @@ class GoalBreakDownService:
         deadline = data.get("deadline")
 
         api_key = AIGoalGeneratorService.get_api_key()
-        if not api_key:
-            raise ValueError("Together AI API Key is not configured.")
+
+        base_url = AIGoalGeneratorService.get_base_url()
+
+        text_model = AIGoalGeneratorService.get_ai_text_model()
 
         enhanced_desc = GoalBreakDownService._prepare_enhanced_description(
             description, files, api_key
         )
 
         tasks = GoalBreakDownService._fetch_ai_tasks(
-            name, enhanced_desc, deadline, api_key
+            name, enhanced_desc, deadline, api_key, base_url, text_model
         )
         final_desc = GoalBreakDownService._fetch_ai_description(
-            name, enhanced_desc, deadline, api_key
+            name, enhanced_desc, deadline, api_key, base_url, text_model
         )
 
         return GoalBreakDownService._build_final_result(
@@ -594,19 +617,23 @@ class GoalBreakDownService:
         return description
 
     @staticmethod
-    def _fetch_ai_tasks(name, description, deadline, api_key):
+    def _fetch_ai_tasks(name, description, deadline, api_key, base_url, text_model):
         task_prompt = AIGoalGeneratorService.build_prompt_for_task(
             name, description, deadline
         )
-        return AIGoalGeneratorService.get_ai_response(task_prompt, api_key)
+        return AIGoalGeneratorService.get_ai_response(
+            task_prompt, api_key, base_url, text_model
+        )
 
     @staticmethod
-    def _fetch_ai_description(name, description, deadline, api_key):
+    def _fetch_ai_description(
+        name, description, deadline, api_key, base_url, text_model
+    ):
         description_prompt = AIGoalGeneratorService.build_prompt_for_description(
             name, description, deadline
         )
         raw_response = AIGoalGeneratorService.get_ai_response(
-            description_prompt, api_key
+            description_prompt, api_key, base_url, text_model
         )
         return GoalBreakDownService._parse_description_response(raw_response)
 
