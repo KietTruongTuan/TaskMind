@@ -6,6 +6,7 @@ import { WebUrl } from "@/app/enum/web-url.enum";
 import { useTokenRefresherContext } from "@/app/contexts/token-refresher-context/token-refresher-context";
 import { useRouteLoadingContext } from "@/app/contexts/route-loading-context/route-loading-context";
 import { Theme } from "@radix-ui/themes";
+import { ToastProvider } from "@/app/contexts/toast-context/toast-context";
 
 // 1. Mock the Services and Contexts
 jest.mock("../../constants", () => ({
@@ -30,6 +31,7 @@ describe("AvatarMenu onLogOut", () => {
 
     (useRouteLoadingContext as jest.Mock).mockReturnValue({
       route: mockRoute,
+      setIsRouteLoading: jest.fn(),
     });
 
     (useTokenRefresherContext as jest.Mock).mockReturnValue({
@@ -44,7 +46,9 @@ describe("AvatarMenu onLogOut", () => {
 
     render(
       <Theme>
-        <AvatarMenu />
+        <ToastProvider>
+          <AvatarMenu />
+        </ToastProvider>
       </Theme>
     );
 

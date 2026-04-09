@@ -133,10 +133,11 @@ describe("HttpService", () => {
   describe("handleError", () => {
     it("should handle error response", async () => {
       const mockError = {
-        message: "Request failed",
         response: {
+          data: {
+            error: "Request failed",
+          },
           status: 500,
-          statusText: "Internal Server Error",
         },
         isAxiosError: true,
       };
@@ -148,6 +149,25 @@ describe("HttpService", () => {
 
       await expect(interceptedPromise).rejects.toEqual({
         message: "Request failed",
+        status: 500,
+      });
+    });
+
+    it("should handle error response with no error message", async () => {
+      const mockError = {
+        response: {
+          status: 500,
+        },
+        isAxiosError: true,
+      };
+
+      const useMock = mockAxiosInstance.interceptors.response.use as jest.Mock;
+      const responseErrorInterceptor = useMock.mock.calls[0][1];
+
+      const interceptedPromise = responseErrorInterceptor(mockError);
+
+      await expect(interceptedPromise).rejects.toEqual({
+        message: "Server Internal Error",
         status: 500,
       });
     });

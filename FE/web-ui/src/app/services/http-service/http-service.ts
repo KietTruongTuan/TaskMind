@@ -1,5 +1,6 @@
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from "axios";
 import { ApiError } from "@/app/constants";
+import { ApiUrl } from "@/app/enum/api-url.enum";
 
 export class HttpService {
   private instance: AxiosInstance;
@@ -73,11 +74,12 @@ export class HttpService {
       async (error) => {
         const originalRequest = error.config;
 
-        // If 401 and we haven't retried yet
         if (
           error.response?.status === 401 &&
           !originalRequest._retry &&
-          !originalRequest._isRefresh
+          !originalRequest._isRefresh &&
+          !originalRequest.url?.includes(ApiUrl.LocalLogin) &&
+          !originalRequest.url?.includes(ApiUrl.LocalRefreshToken)
         ) {
           originalRequest._retry = true;
           const { authenticationService } = await import("@/app/constants");
@@ -102,13 +104,17 @@ export class HttpService {
 
   private handleError(error: AxiosError): ApiError {
     if (error.response) {
+      const data = error.response.data as { error?: string };
+
       return {
-        message:
-          error.message || error.response.statusText || "Server Internal Error",
+        message: data?.error || "Server Internal Error",
         status: error.response.status,
       };
     } else if (error.request) {
-      console.error(`🚨 "No response received" for URL: ${error.config?.url}`, error.config?.data);
+      console.error(
+        `🚨 "No response received" for URL: ${error.config?.url}`,
+        error.config?.data,
+      );
       return {
         message: "No response received.",
         status: 0,
