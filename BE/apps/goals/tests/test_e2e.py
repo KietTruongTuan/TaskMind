@@ -141,10 +141,20 @@ class TestEndToEndGoalFlow:
                 print(f"    {i}. {task.get('name')} (deadline: {task.get('deadline')})")
             print("✅ Goal generated successfully with AI!")
         else:
-            print(f"❌ Generation failed: {generate_response.data}")
-            # Check if it's an API key issue
-            if "API Key" in str(generate_response.data):
+            error_detail = str(generate_response.data)
+            print(f"❌ Generation failed (HTTP {generate_response.status_code}): {error_detail}")
+
+            # Skip on known transient / infrastructure issues instead of hard-failing CI
+            transient_indicators = ["503", "429", "UNAVAILABLE", "high demand", "rate limit", "timeout", "overloaded"]
+            if any(indicator.lower() in error_detail.lower() for indicator in transient_indicators):
+                pytest.skip(
+                    f"AI provider transient error (HTTP {generate_response.status_code}) — "
+                    f"this is not a code bug. Detail: {error_detail[:200]}"
+                )
+
+            if "API Key" in error_detail or "API_KEY" in error_detail:
                 pytest.skip("API_KEY not configured - skipping real AI test")
+
             assert False, f"Goal generation failed: {generate_response.data}"
         
         # ========== STEP 4: Save Generated Goal ==========

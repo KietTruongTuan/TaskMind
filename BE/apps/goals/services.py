@@ -2,9 +2,11 @@ import base64
 import json
 import logging
 import os
+import random
 import re
 import time
 from datetime import date
+from uuid import uuid4
 
 import httpx
 from django.db.models import Count, Q, Value
@@ -33,12 +35,12 @@ class AIGoalGeneratorService:
     def get_base_url():
         base_url = os.getenv("AI_BASE_URL")
         if not base_url:
-            raise ValueError("AI API Key is not configured.")
+            raise ValueError("AI Base URL is not configured.")
         return base_url
 
     @staticmethod
     def get_ai_text_model():
-        model = os.getenv("AI_TEXT_MODEL", "groq/compound")
+        model = os.getenv("AI_TEXT_MODEL")
         if not model:
             raise ValueError("AI Text model is not configured.")
         return model
@@ -46,25 +48,57 @@ class AIGoalGeneratorService:
     @staticmethod
     def get_ai_response(prompt, api_key, base_url, model, max_retries=3):
         """Get AI response with retry logic for network issues"""
+        correlation_id = str(uuid4())[:8]
+
+        logger.info(
+            "AI request started",
+            extra={
+                "correlation_id": correlation_id,
+                "model": model,
+                "prompt_length": len(prompt),
+                "max_retries": max_retries,
+            },
+        )
 
         for attempt in range(max_retries):
             try:
-                return AIGoalGeneratorService._execute_generation_attempt(
-                    prompt, api_key, base_url, model
+                result = AIGoalGeneratorService._execute_generation_attempt(
+                    prompt, api_key, base_url, model, correlation_id, attempt
                 )
+                return result
 
             except (httpx.RemoteProtocolError, httpx.ReadTimeout, ConnectionError) as e:
                 if attempt < max_retries - 1:
-                    wait_time = (attempt + 1) * 2  # 2, 4, 6 seconds
+                    wait_time = min((2 ** attempt) + random.uniform(0, 1), 30)
+                    logger.warning(
+                        "AI request retrying",
+                        extra={
+                            "correlation_id": correlation_id,
+                            "attempt": attempt + 1,
+                            "max_retries": max_retries,
+                            "error_type": type(e).__name__,
+                            "wait_seconds": round(wait_time, 2),
+                        },
+                    )
                     time.sleep(wait_time)
                     continue
                 else:
+                    logger.error(
+                        "AI request exhausted retries",
+                        extra={
+                            "correlation_id": correlation_id,
+                            "attempts": max_retries,
+                            "error_type": type(e).__name__,
+                            "error_detail": str(e)[:500],
+                        },
+                    )
                     raise ValueError(
                         f"AI service unavailable after {max_retries} attempts. Please try again later. Error: {str(e)}"
                     )
 
     @staticmethod
-    def _execute_generation_attempt(prompt, api_key, base_url, model):
+    def _execute_generation_attempt(prompt, api_key, base_url, model, correlation_id="", attempt=0):
+        start_time = time.time()
         client = OpenAI(
             api_key=api_key,
             base_url=base_url,
@@ -84,14 +118,42 @@ class AIGoalGeneratorService:
                 temperature=0.7,
             )
         except Exception as e:
-            logger.error(f"OpenAI Client Error: {str(e)}", exc_info=True)
+            latency_ms = (time.time() - start_time) * 1000
+            logger.error(
+                "AI provider error",
+                extra={
+                    "correlation_id": correlation_id,
+                    "attempt": attempt + 1,
+                    "error_type": type(e).__name__,
+                    "error_code": getattr(e, "status_code", None),
+                    "latency_ms": round(latency_ms, 1),
+                    "error_detail": str(e)[:500],
+                },
+                exc_info=True,
+            )
             raise ValueError(f"AI Provider Error: {str(e)}")
 
         # Delegate chunk processing
         full_content = AIGoalGeneratorService._process_response_stream(response_stream)
 
+        latency_ms = (time.time() - start_time) * 1000
+
         if not full_content:
+            logger.warning(
+                "AI returned empty response",
+                extra={"correlation_id": correlation_id, "latency_ms": round(latency_ms, 1)},
+            )
             raise ValueError("No response received from AI.")
+
+        logger.info(
+            "AI request succeeded",
+            extra={
+                "correlation_id": correlation_id,
+                "attempt": attempt + 1,
+                "response_length": len(full_content),
+                "latency_ms": round(latency_ms, 1),
+            },
+        )
 
         return AIGoalGeneratorService.extract_json_response(full_content)
 

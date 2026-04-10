@@ -2,7 +2,7 @@ FROM python:3.12-slim AS basebe
 
 # dont write .pyc files
 ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONBUFFERED=1
+ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 

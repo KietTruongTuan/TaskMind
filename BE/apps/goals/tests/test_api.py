@@ -294,8 +294,9 @@ class TestGoalList:
         response = auth_client.get('/v1/goals')
 
         assert response.status_code == 200
-        assert len(response.data) == 1
-        assert response.data[0]['name'] == created_goal.name
+        goals = response.data['goals']
+        assert len(goals) == 1
+        assert goals[0]['name'] == created_goal.name
 
     def test_list_goals_filter_by_status(self, auth_client, user, future_deadline):
         """Test filtering goals by status"""
@@ -306,8 +307,9 @@ class TestGoalList:
         response = auth_client.get('/v1/goals?status=InProgress')
 
         assert response.status_code == 200
-        assert len(response.data) == 1
-        assert response.data[0]['name'] == "InProgress Goal"
+        goals = response.data['goals']
+        assert len(goals) == 1
+        assert goals[0]['name'] == "InProgress Goal"
 
     def test_list_goals_filter_by_multiple_statuses(self, auth_client, user, future_deadline):
         """Test filtering goals by multiple statuses using comma separated values"""
@@ -318,8 +320,9 @@ class TestGoalList:
         response = auth_client.get('/v1/goals?status=ToDo,InProgress')
 
         assert response.status_code == 200
-        assert len(response.data) == 2
-        names = [g['name'] for g in response.data]
+        goals = response.data['goals']
+        assert len(goals) == 2
+        names = [g['name'] for g in goals]
         assert "ToDo Goal" in names
         assert "InProgress Goal" in names
         assert "Completed Goal" not in names
@@ -333,8 +336,9 @@ class TestGoalList:
         response = auth_client.get('/v1/goals?tag=work,urgent')
 
         assert response.status_code == 200
-        assert len(response.data) == 1
-        assert response.data[0]['name'] == "Goal 1"
+        goals = response.data['goals']
+        assert len(goals) == 1
+        assert goals[0]['name'] == "Goal 1"
 
     def test_list_goals_search(self, auth_client, user, future_deadline):
         """Test searching goals by keyword"""
@@ -344,8 +348,9 @@ class TestGoalList:
         response = auth_client.get('/v1/goals?search=capstone')
 
         assert response.status_code == 200
-        assert len(response.data) == 1
-        assert "Capstone" in response.data[0]['name']
+        goals = response.data['goals']
+        assert len(goals) == 1
+        assert "Capstone" in goals[0]['name']
 
     def test_list_goals_user_isolation(self, auth_client, other_user, future_deadline):
         """Test that users only see their own goals"""
@@ -355,7 +360,7 @@ class TestGoalList:
         response = auth_client.get('/v1/goals')
 
         assert response.status_code == 200
-        assert len(response.data) == 0  # Should not see other user's goals
+        assert len(response.data['goals']) == 0  # Should not see other user's goals
 
 
 @pytest.mark.django_db
@@ -567,10 +572,11 @@ class TestTaskList:
         response = auth_client.get('/v1/tasks')
 
         assert response.status_code == 200
-        assert len(response.data) == 2  # created_goal has 2 tasks
+        tasks = response.data['tasks']
+        assert len(tasks) == 2  # created_goal has 2 tasks
         # Check that goal info is included
-        assert 'goalName' in response.data[0]
-        assert 'goalId' in response.data[0]
+        assert 'goalName' in tasks[0]
+        assert 'goalId' in tasks[0]
 
     def test_list_tasks_filter_by_status(self, auth_client, created_goal):
         """Test filtering tasks by status"""
@@ -582,8 +588,9 @@ class TestTaskList:
         response = auth_client.get('/v1/tasks?status=InProgress')
 
         assert response.status_code == 200
-        assert len(response.data) == 1
-        assert response.data[0]['status'] == "InProgress"
+        tasks = response.data['tasks']
+        assert len(tasks) == 1
+        assert tasks[0]['status'] == "InProgress"
 
     def test_list_tasks_filter_by_multiple_statuses(self, auth_client, created_goal, future_deadline):
         """Test filtering tasks by multiple statuses using comma separated values"""
@@ -600,8 +607,9 @@ class TestTaskList:
         response = auth_client.get('/v1/tasks?status=ToDo,InProgress')
 
         assert response.status_code == 200
-        assert len(response.data) == 2
-        statuses = [t['status'] for t in response.data]
+        tasks = response.data['tasks']
+        assert len(tasks) == 2
+        statuses = [t['status'] for t in tasks]
         assert "ToDo" in statuses
         assert "InProgress" in statuses
         assert "Completed" not in statuses
@@ -617,16 +625,18 @@ class TestTaskList:
         response = auth_client.get(f'/v1/tasks?goalId={goal1.id}')
 
         assert response.status_code == 200
-        assert len(response.data) == 1
-        assert response.data[0]['name'] == "Task for Goal 1"
+        tasks = response.data['tasks']
+        assert len(tasks) == 1
+        assert tasks[0]['name'] == "Task for Goal 1"
 
     def test_list_tasks_search(self, auth_client, created_goal):
         """Test searching tasks by name"""
         response = auth_client.get('/v1/tasks?search=Task 1')
 
         assert response.status_code == 200
-        assert len(response.data) == 1
-        assert "Task 1" in response.data[0]['name']
+        tasks = response.data['tasks']
+        assert len(tasks) == 1
+        assert "Task 1" in tasks[0]['name']
 
     def test_list_tasks_ordered_by_deadline(self, auth_client, user):
         """Test that tasks are ordered by deadline"""
@@ -646,9 +656,10 @@ class TestTaskList:
         response = auth_client.get('/v1/tasks')
 
         assert response.status_code == 200
+        tasks = response.data['tasks']
         # Earlier deadline should come first
-        assert response.data[0]['name'] == "Earlier Task"
-        assert response.data[1]['name'] == "Later Task"
+        assert tasks[0]['name'] == "Earlier Task"
+        assert tasks[1]['name'] == "Later Task"
 
     def test_list_tasks_user_isolation(self, auth_client, other_user, future_deadline):
         """Test that users only see their own tasks"""
@@ -663,7 +674,7 @@ class TestTaskList:
         response = auth_client.get('/v1/tasks')
 
         assert response.status_code == 200
-        assert len(response.data) == 0  # Should not see other user's tasks
+        assert len(response.data['tasks']) == 0  # Should not see other user's tasks
 
 
 # ============ GOAL TAG LIST TESTS ============

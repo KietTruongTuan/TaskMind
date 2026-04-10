@@ -10,9 +10,11 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
-from pathlib import Path
+import logging as _logging
 import os
 from datetime import timedelta
+from pathlib import Path
+
 from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -249,3 +251,74 @@ CSRF_COOKIE_SAMESITE = 'None'
 
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
+
+# ============ Logging Configuration ============
+# Logs are printed to stdout (visible via `docker logs capstone-backend -f`)
+# The 'apps.goals.services' logger captures all AI request lifecycle events
+# with structured extra fields: correlation_id, model, latency_ms, error_type, etc.
+
+
+
+
+class _StructuredFormatter(_logging.Formatter):
+    """Appends extra={} fields as key=value pairs so they appear in log output."""
+    BUILTIN_ATTRS = _logging.LogRecord('', 0, '', 0, '', (), None).__dict__.keys()
+
+    def format(self, record):
+        base = super().format(record)
+        extras = {
+            k: v for k, v in record.__dict__.items()
+            if k not in self.BUILTIN_ATTRS and k not in ('message', 'asctime')
+        }
+        if extras:
+            pairs = ' '.join(f'{k}={v}' for k, v in extras.items())
+            return f'{base} | {pairs}'
+        return base
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'structured': {
+            '()': lambda: _StructuredFormatter(
+                fmt='%(asctime)s [%(levelname)s] %(name)s: %(message)s',
+                datefmt='%Y-%m-%d %H:%M:%S',
+            ),
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'structured',
+        },
+    },
+    'loggers': {
+        # Django's own logging (request errors, SQL, etc.)
+        'django': {
+            'handlers': ['console'],
+            'level': 'WARNING',
+            'propagate': False,
+        },
+        'django.request': {
+            'handlers': ['console'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        # Our application loggers — this is where AI service logs go
+        'apps.goals.services': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'apps.goals.views': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
+    # Root logger — catch-all for anything not matched above
+    'root': {
+        'handlers': ['console'],
+        'level': 'WARNING',
+    },
+}
