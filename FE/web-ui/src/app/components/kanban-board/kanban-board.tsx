@@ -136,7 +136,7 @@ export function KanbanBoard({
   );
 
   return (
-    <ScrollArea size="1" type="hover" scrollbars="horizontal">
+    <ScrollArea size="1" type="hover" scrollbars="horizontal" style={{ maxWidth: isLocal ? '89vw' : '100vw' }}>
       <Kanban
         key={key}
         defaultItems={kanbanItems}

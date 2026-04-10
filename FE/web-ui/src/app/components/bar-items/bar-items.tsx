@@ -25,12 +25,7 @@ export function BarItems({
   isSideItem?: boolean;
 }) {
   const currentUrl = usePathname();
-  const router = useRouter();
   const { route } = useRouteLoadingContext();
-  const onLogOut = async () => {
-    await authenticationService.logout();
-    route(WebUrl.Authentication);
-  };
   const navBarItems: BarItem[] = [
     {
       icon: Home,
@@ -66,7 +61,7 @@ export function BarItems({
               variant="ghost"
               onClick={() => {
                 onItemClick?.();
-                router.push(value.url);
+                route(value.url);
               }}
               buttonType={ButtonType.Tab}
               isActive={isActive}
@@ -90,25 +85,6 @@ export function BarItems({
           );
         })}
       </Flex>
-      <AlertDialogPopUp
-        title="Are you sure"
-        description="This action will log out your account"
-        actionText="Log Out"
-        action={onLogOut}
-      >
-        <Flex
-          direction="column"
-          align="center"
-          gap="1"
-          width={isSideItem ? "100%" : ""}
-          className={styles.logOutText}
-        >
-          <LogOut size={16} />
-          <Text weight="medium" size="1" truncate>
-            Log Out
-          </Text>
-        </Flex>
-      </AlertDialogPopUp>
     </Flex>
   );
 }

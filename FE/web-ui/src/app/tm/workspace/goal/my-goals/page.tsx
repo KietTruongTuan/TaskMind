@@ -54,7 +54,7 @@ export default async function MyGoalPage({
 
   return (
     <Flex width="100%" justify="center" height="92vh">
-      <Flex width="100%" direction="column" py="5" px="7" gap="5">
+      <Flex width="100%" direction="column" py="5"gap="5">
         <Box>
           <Header
             text="My Goals"

@@ -8,13 +8,19 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <TokenRefresherProvider>
       <LoadingOverlay isGlobal />
-      <NavigationBar />
-      <Flex pt="8" height="100vh" width="100%">
-        <SideBar />
-        <Flex width="100%">
-          <ScrollArea type="auto" scrollbars="vertical">
-            <Box px="4">{children}</Box>
-          </ScrollArea>
+      <Flex height="100vh" width="100%" overflow="hidden">
+        <Flex width="5%">
+          <SideBar />
+        </Flex>
+        <Flex direction="column" height="100%" flexGrow="1" minHeight="0" width="95%">
+          <NavigationBar />
+          <Box flexGrow="1" minHeight="0">
+            <ScrollArea scrollbars="vertical">
+              <Box px="7" pb="4">
+                {children}
+              </Box>
+            </ScrollArea>
+          </Box>
         </Flex>
       </Flex>
     </TokenRefresherProvider>

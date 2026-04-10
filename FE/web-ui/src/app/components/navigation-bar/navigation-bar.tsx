@@ -15,7 +15,7 @@ export function NavigationBar() {
       py="2"
       px="3"
       justify="between"
-      position="fixed"
+      position="sticky"
       data-testid="navbar"
     >
       <Flex gap="2" align="center">

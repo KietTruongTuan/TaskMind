@@ -4,11 +4,12 @@ import styles from "./side-bar.module.scss";
 
 export function SideBar() {
   return (
-    <Flex height="100%" py="2" pl="1">
+    <Flex height="100%">
       <Flex
         direction="column"
         height="100%"
         align="center"
+        width="100%"
         p="4"
         className={styles.sideBar}
       >
