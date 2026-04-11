@@ -20,9 +20,9 @@ from .serializers import (
 )
 from .services import (
     ContributionService,
+    GoalBreakDownService,
     GoalService,
     TaskService,
-    GoalBreakDownService,
 )
 from .validators import GoalBreakdownValidator
 
@@ -54,10 +54,24 @@ class GoalBreakdownView(APIView):
         try:
             result = GoalBreakDownService.generate_breakdown(request.data, files)
             return Response(result, status=status.HTTP_200_OK)
-        except ValueError as e:
+        except Exception as e:
+            return self._handle_view_error(e)
+
+    def _handle_view_error(self, e):
+        if isinstance(e, ValueError):
             return Response(
                 {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+        logger.error(
+            "Unexpected error in goal generation",
+            exc_info=True,
+            extra={"error_type": type(e).__name__, "error_detail": str(e)[:500]},
+        )
+        return Response(
+            {"error": f"Unexpected error: {str(e)}"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
 
 
 # The rest of the AI logic was moved to services.py
