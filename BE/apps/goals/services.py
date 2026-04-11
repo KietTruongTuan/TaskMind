@@ -1,18 +1,23 @@
-import os
-import json
+from typing import Any, Iterable
 import base64
-import re
+import json
 import logging
+import os
+import random
+import re
+import time
+from datetime import date
+from uuid import uuid4
+
+import httpx
+from django.db.models import Count, Q, Value
+from django.db.models.functions import Coalesce
+from django.utils import timezone
+from docx import Document
 from openai import OpenAI
 from pypdf import PdfReader
-from docx import Document
-from django.utils import timezone
-from django.db.models import Q
+
 from .models import Goal, Task
-from django.db.models.functions import Coalesce
-from django.db.models import Value
-from datetime import date
-from django.db.models import Count
 
 logger = logging.getLogger(__name__)
 
@@ -22,58 +27,246 @@ class AIGoalGeneratorService:
 
     @staticmethod
     def get_api_key():
-        return os.getenv("API_KEY")
+        api_key = os.getenv("API_KEY")
+        if not api_key:
+            raise ValueError("AI API Key is not configured.")
+        return api_key
 
     @staticmethod
-    def get_ai_response(prompt, api_key, max_retries=3):
+    def get_base_url():
+        base_url = os.getenv("AI_BASE_URL")
+        if not base_url:
+            raise ValueError("AI Base URL is not configured.")
+        return base_url
+
+    @staticmethod
+    def get_ai_text_model():
+        model = os.getenv("AI_TEXT_MODEL")
+        if not model:
+            raise ValueError("AI Text model is not configured.")
+        return model
+
+    @staticmethod
+    def get_ai_response(prompt, api_key, base_url, model, max_retries=3):
         """Get AI response with retry logic for network issues"""
-        import time
-        import httpx
+        correlation_id = str(uuid4())[:8]
+        AIGoalGeneratorService._log_request_start(
+            correlation_id, model, prompt, max_retries
+        )
 
-        GROQ_MODEL = "groq/compound"
+        return AIGoalGeneratorService._retry_with_backoff(
+            prompt, api_key, base_url, model, correlation_id, max_retries
+        )
 
+    @staticmethod
+    def _log_request_start(correlation_id, model, prompt, max_retries):
+        logger.info(
+            "AI request started",
+            extra={
+                "correlation_id": correlation_id,
+                "model": model,
+                "prompt_length": len(prompt),
+                "max_retries": max_retries,
+            },
+        )
+
+    @staticmethod
+    def _retry_with_backoff(
+        prompt, api_key, base_url, model, correlation_id, max_retries
+    ):
         for attempt in range(max_retries):
             try:
-                client = OpenAI(
-                    api_key=api_key,
-                    base_url="https://api.groq.com/openai/v1",
-                    timeout=60.0,  # 60 second timeout
+                result = AIGoalGeneratorService._execute_generation_attempt(
+                    prompt, api_key, base_url, model, correlation_id, attempt
                 )
-                response_stream = client.chat.completions.create(
-                    model=GROQ_MODEL,
-                    messages=[
-                        {
-                            "role": "system",
-                            "content": "You are a helpful project management assistant.",
-                        },
-                        {"role": "user", "content": prompt},
-                    ],
-                    stream=True,
-                    temperature=0.7,
-                )
-                full_content = ""
-                for chunk in response_stream:
-                    if (
-                        hasattr(chunk, "choices")
-                        and chunk.choices
-                        and chunk.choices[0].delta.content is not None
-                    ):
-                        full_content += chunk.choices[0].delta.content
-
-                if not full_content:
-                    raise ValueError("No response received from AI.")
-
-                return AIGoalGeneratorService.extract_json_response(full_content)
+                return result
 
             except (httpx.RemoteProtocolError, httpx.ReadTimeout, ConnectionError) as e:
-                if attempt < max_retries - 1:
-                    wait_time = (attempt + 1) * 2  # 2, 4, 6 seconds
-                    time.sleep(wait_time)
-                    continue
-                else:
+                if attempt >= max_retries - 1:
+                    AIGoalGeneratorService._log_retry_exhaustion(
+                        correlation_id, max_retries, e
+                    )
                     raise ValueError(
                         f"AI service unavailable after {max_retries} attempts. Please try again later. Error: {str(e)}"
                     )
+
+                AIGoalGeneratorService._log_and_wait_for_retry(
+                    correlation_id, attempt, max_retries, e
+                )
+
+    @staticmethod
+    def _log_retry_exhaustion(correlation_id, max_retries, e):
+        logger.error(
+            "AI request exhausted retries",
+            extra={
+                "correlation_id": correlation_id,
+                "attempts": max_retries,
+                "error_type": type(e).__name__,
+                "error_detail": str(e)[:500],
+            },
+        )
+
+    @staticmethod
+    def _log_and_wait_for_retry(correlation_id, attempt, max_retries, e):
+        if attempt < max_retries - 1:
+            wait_time = min((2**attempt) + random.uniform(0, 1), 30)
+            logger.warning(
+                "AI request retrying",
+                extra={
+                    "correlation_id": correlation_id,
+                    "attempt": attempt + 1,
+                    "max_retries": max_retries,
+                    "error_type": type(e).__name__,
+                    "wait_seconds": round(wait_time, 2),
+                },
+            )
+            time.sleep(wait_time)
+
+    @staticmethod
+    def _execute_generation_attempt(
+        prompt: str,
+        api_key: str,
+        base_url: str,
+        model: str,
+        correlation_id: str = "",
+        attempt: int = 0,
+    ) -> list[dict[str, Any]]:
+        """
+        Executes a single generation attempt with the AI provider.
+        
+        Initializes the client, creates a completion request, and delegates stream processing.
+        
+        Args:
+            prompt: The full prompt string for the AI.
+            api_key: Configured AI API key.
+            base_url: Configured AI base URL.
+            model: The specific AI model string.
+            correlation_id: Tracking ID for logging.
+            attempt: Current attempt index for retry tracking.
+            
+        Returns:
+            list[dict]: A list of parsed task dictionaries.
+            
+        Raises:
+            ValueError: If the AI returns an empty response or an error occurs.
+        """
+        start_time = time.time()
+        client = AIGoalGeneratorService._initialize_ai_client(api_key, base_url)
+
+        try:
+            response_stream = AIGoalGeneratorService._create_chat_completion(
+                client, model, prompt
+            )
+
+            # Delegate chunk processing
+            full_content = AIGoalGeneratorService._process_response_stream(
+                response_stream
+            )
+
+            AIGoalGeneratorService._log_generation_success(
+                correlation_id, attempt, full_content, start_time
+            )
+
+            return AIGoalGeneratorService.extract_json_response(full_content)
+
+        except Exception as e:
+            AIGoalGeneratorService._log_api_failure(
+                correlation_id, attempt, start_time, e
+            )
+            raise ValueError(f"AI Provider Error: {str(e)}")
+
+    @staticmethod
+    def _log_generation_success(correlation_id, attempt, full_content, start_time):
+        latency_ms = (time.time() - start_time) * 1000
+
+        if not full_content:
+            logger.warning(
+                "AI returned empty response",
+                extra={
+                    "correlation_id": correlation_id,
+                    "latency_ms": round(latency_ms, 1),
+                },
+            )
+            raise ValueError("No response received from AI.")
+
+        logger.info(
+            "AI request succeeded",
+            extra={
+                "correlation_id": correlation_id,
+                "attempt": attempt + 1,
+                "response_length": len(full_content),
+                "latency_ms": round(latency_ms, 1),
+                "raw_response": full_content,
+            },
+        )
+
+    @staticmethod
+    def _log_api_failure(correlation_id, attempt, start_time, e):
+        latency_ms = (time.time() - start_time) * 1000
+        logger.error(
+            "AI provider error",
+            extra={
+                "correlation_id": correlation_id,
+                "attempt": attempt + 1,
+                "error_type": type(e).__name__,
+                "error_code": getattr(e, "status_code", None),
+                "latency_ms": round(latency_ms, 1),
+                "error_detail": str(e)[:500],
+            },
+            exc_info=True,
+        )
+
+    @staticmethod
+    def _initialize_ai_client(api_key, base_url):
+        return OpenAI(
+            api_key=api_key,
+            base_url=base_url,
+            timeout=60.0,  # 60 second timeout
+        )
+
+    @staticmethod
+    def _create_chat_completion(client, model, prompt):
+        return client.chat.completions.create(
+            model=model,
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are a helpful project management assistant.",
+                },
+                {"role": "user", "content": prompt},
+            ],
+            stream=True,
+            temperature=0.7,
+        )
+
+    @staticmethod
+    def _process_response_stream(response_stream: Iterable[Any]) -> str:
+        """
+        Processes the AI response stream and combines chunks into a single string.
+        
+        This method iterates over the response stream from the OpenAI/Groq client and 
+        extracts the content delta from each chunk.
+        
+        Example of a stream chunk:
+        {
+            "choices": [{"delta": {"content": "step 1"}}]
+        }
+        
+        Args:
+            response_stream: An iterable stream of response chunks from the AI provider.
+            
+        Returns:
+            str: The full concatenated content string returned by the AI.
+        """
+        full_content = ""
+        for chunk in response_stream:
+            if (
+                hasattr(chunk, "choices")
+                and chunk.choices
+                and chunk.choices[0].delta.content is not None
+            ):
+                full_content += chunk.choices[0].delta.content
+        return full_content
 
     @staticmethod
     def extract_json_response(text):
@@ -99,44 +292,57 @@ class AIGoalGeneratorService:
     def extract_context_from_files(files, api_key):
         context_parts = []
         for file in files:
-            ext = os.path.splitext(file.name)[1].lower()
             try:
-                if ext == ".pdf":
-                    reader = PdfReader(file)
-                    text = ""
-                    for page in reader.pages:
-                        page_text = page.extract_text() or ""
-                        if page_text:
-                            text += page_text + "\n"
-                    if text.strip():
-                        context_parts.append(
-                            f"--- Document Content ({file.name}) ---\n{text.strip()}"
-                        )
-                elif ext == ".docx":
-                    doc = Document(file)
-                    text = "\n".join([p.text for p in doc.paragraphs if p.text.strip()])
-                    if text.strip():
-                        context_parts.append(
-                            f"--- Document Content ({file.name}) ---\n{text.strip()}"
-                        )
-                elif ext in [".jpg", ".jpeg", ".png", ".webp"]:
-                    image_base64 = base64.b64encode(file.read()).decode("utf-8")
-                    mime_type = (
-                        file.content_type or f"image/{ext.lstrip('.')}"
-                    )  # example: image/jpeg
-                    image_summary = AIGoalGeneratorService.analyze_image_with_vision(
-                        image_base64, api_key, mime_type
-                    )
-                    if image_summary:
-                        context_parts.append(
-                            f"--- Image Content Description ({file.name}) ---\n{image_summary.strip()}"
-                        )
+                text = AIGoalGeneratorService._process_single_file(file, api_key)
+
+                if text:
+                    context_parts.append(text)
             except Exception as e:
                 logger.warning(
                     "Failed to process file %s: %s", file.name, str(e), exc_info=True
                 )
-                continue
+
         return "\n\n".join(context_parts)
+
+    @staticmethod
+    def _process_single_file(file, api_key):
+        ext = os.path.splitext(file.name)[1].lower()
+        if ext == ".pdf":
+            return AIGoalGeneratorService._extract_pdf_text(file)
+        elif ext == ".docx":
+            return AIGoalGeneratorService._extract_docx_text(file)
+        elif ext in [".jpg", ".jpeg", ".png", ".webp"]:
+            return AIGoalGeneratorService._extract_image_context(file, api_key, ext)
+
+    @staticmethod
+    def _extract_pdf_text(file):
+        reader = PdfReader(file)
+        text = ""
+        for page in reader.pages:
+            page_text = page.extract_text() or ""
+            if page_text:
+                text += page_text + "\n"
+        if text.strip():
+            return f"--- Document Content ({file.name}) ---\n{text.strip()}"
+
+    @staticmethod
+    def _extract_docx_text(file):
+        doc = Document(file)
+        text = "\n".join([p.text for p in doc.paragraphs if p.text.strip()])
+        if text.strip():
+            return f"--- Document Content ({file.name}) ---\n{text.strip()}"
+
+    @staticmethod
+    def _extract_image_context(file, api_key, ext):
+        image_base64 = base64.b64encode(file.read()).decode("utf-8")
+        mime_type = (
+            file.content_type or f"image/{ext.lstrip('.')}"
+        )  # example: image/jpeg
+        image_summary = AIGoalGeneratorService.analyze_image_with_vision(
+            image_base64, api_key, mime_type
+        )
+        if image_summary:
+            return f"--- Image Content Description ({file.name}) ---\n{image_summary.strip()}"
 
     @staticmethod
     def analyze_image_with_vision(base64_image, api_key, mime_type="image/jpeg"):
@@ -467,8 +673,8 @@ class TaskService:
             "Overdue": 0,
         }
 
-class ContributionService:
 
+class ContributionService:
     @staticmethod
     def get_yearly_productivity(user, year: int) -> list[dict]:
         raw_counts = ContributionService._fetch_daily_counts(user, year)
@@ -477,29 +683,38 @@ class ContributionService:
 
     @staticmethod
     def _fetch_daily_counts(user, year: int) -> dict[str, int]:
-        queryset = Task.objects.filter(goal__user=user, status='Completed', complete_date__year=year).values('complete_date').annotate(count=Count('id'))
+        queryset = (
+            Task.objects.filter(
+                goal__user=user, status="Completed", complete_date__year=year
+            )
+            .values("complete_date")
+            .annotate(count=Count("id"))
+        )
 
         # transform queryset into dict: {'YYYY-MM-DD': count}
         return {
-            row['complete_date'].strftime('%Y-%m-%d'): row['count']
-            for row in queryset if row['complete_date']
+            row["complete_date"].strftime("%Y-%m-%d"): row["count"]
+            for row in queryset
+            if row["complete_date"]
         }
 
     @staticmethod
-    def _ensure_boundary_dates(daily_counts: dict[str, int], year: int) -> dict[str, int]:
+    def _ensure_boundary_dates(
+        daily_counts: dict[str, int], year: int
+    ) -> dict[str, int]:
         """Ensures Jan 1st and Dec 31st exist in the data mapping."""
         daily_counts.setdefault(f"{year}-01-01", 0)
         daily_counts.setdefault(f"{year}-12-31", 0)
 
         return daily_counts
-    
+
     @staticmethod
     def _build_response_list(daily_counts: dict[str, int]) -> list[dict]:
         response_list = [
             {
                 "date": date_str,
                 "count": count,
-                "level": ContributionService._determine_level(count)
+                "level": ContributionService._determine_level(count),
             }
             for date_str, count in daily_counts.items()
         ]
@@ -510,10 +725,140 @@ class ContributionService:
     def _determine_level(task_count: int) -> int:
         if task_count >= 10:
             return 4
-        if task_count >= 5: 
+        if task_count >= 5:
             return 3
-        if task_count >= 3: 
+        if task_count >= 3:
             return 2
-        if task_count >= 1: 
+        if task_count >= 1:
             return 1
         return 0
+
+
+class GoalBreakDownService:
+    @staticmethod
+    def generate_breakdown(data, files):
+        """Orchestrates AI generation of tasks from a goal description."""
+        name = data.get("name")
+        description = data.get("description", "")
+        tag = data.get("tag", "")
+        deadline = data.get("deadline")
+
+        api_key = AIGoalGeneratorService.get_api_key()
+
+        base_url = AIGoalGeneratorService.get_base_url()
+
+        text_model = AIGoalGeneratorService.get_ai_text_model()
+
+        enhanced_desc = GoalBreakDownService._prepare_enhanced_description(
+            description, files, api_key
+        )
+
+        tasks = GoalBreakDownService._fetch_ai_tasks(
+            name, enhanced_desc, deadline, api_key, base_url, text_model
+        )
+        final_desc = GoalBreakDownService._fetch_ai_description(
+            name, enhanced_desc, deadline, api_key, base_url, text_model
+        )
+
+        return GoalBreakDownService._build_final_result(
+            name, final_desc, deadline, tag, tasks
+        )
+
+    @staticmethod
+    def _prepare_enhanced_description(description, files, api_key):
+        # Parse context from files
+        file_context = AIGoalGeneratorService.extract_context_from_files(files, api_key)
+        if file_context:
+            description = (
+                f"{description}\n\n[Additional Context from Files:]\n{file_context}"
+                if description
+                else file_context
+            )
+            return description
+        return description
+
+    @staticmethod
+    def _fetch_ai_tasks(name, description, deadline, api_key, base_url, text_model):
+        task_prompt = AIGoalGeneratorService.build_prompt_for_task(
+            name, description, deadline
+        )
+        return AIGoalGeneratorService.get_ai_response(
+            task_prompt, api_key, base_url, text_model
+        )
+
+    @staticmethod
+    def _fetch_ai_description(
+        name, description, deadline, api_key, base_url, text_model
+    ):
+        description_prompt = AIGoalGeneratorService.build_prompt_for_description(
+            name, description, deadline
+        )
+        raw_response = AIGoalGeneratorService.get_ai_response(
+            description_prompt, api_key, base_url, text_model
+        )
+        return GoalBreakDownService._parse_description_response(raw_response)
+
+    @staticmethod
+    def _parse_description_response(description_response):
+        # Parse description response
+        if isinstance(description_response, list):
+            # It's already a list, just take the first item
+            if description_response:
+                description = description_response[0]
+            else:
+                description = ""  # Handle empty list case
+            return description
+
+        return GoalBreakDownService._try_parse_json_description(description_response)
+
+    @staticmethod
+    def _try_parse_json_description(raw_description_response):
+        try:
+            parsed_description = json.loads(raw_description_response)
+
+            if isinstance(parsed_description, list) and parsed_description:
+                description = parsed_description[0]
+            else:
+                description = str(parsed_description)
+
+            return description
+
+        except (json.JSONDecodeError, TypeError):
+            # Fallback: It was just a plain string all along
+            return raw_description_response
+
+    VALID_STATUSES = {
+        "ToDo",
+        "InProgress",
+        "Completed",
+        "OnHold",
+        "Cancelled",
+        "Overdue",
+    }
+
+    @staticmethod
+    def _sanitize_task_status(task):
+        """Ensure task status is a valid value, fallback to 'ToDo' if not."""
+        raw_status = task.get("status", "")
+        if raw_status not in GoalBreakDownService.VALID_STATUSES:
+            logger.warning(
+                "AI returned invalid task status, falling back to 'ToDo'",
+                extra={"raw_status": raw_status, "task_name": task.get("name", "")},
+            )
+            task["status"] = "ToDo"
+        return task
+
+    @staticmethod
+    def _build_final_result(name, final_desc, deadline, tag, tasks):
+        sanitized_tasks = [GoalBreakDownService._sanitize_task_status(t) for t in tasks]
+
+        return {
+            "name": name,
+            "description": final_desc,
+            "status": "ToDo",
+            "deadline": deadline,
+            "tag": tag,
+            "completeCount": 0,
+            "taskCount": len(sanitized_tasks),
+            "tasks": sanitized_tasks,
+        }

@@ -35,3 +35,5 @@ media/
 # Other
 FE/web-ui/src/assets/tokens/.obsidian/
 .vercel
+# Scratch and local docs
+scratch/

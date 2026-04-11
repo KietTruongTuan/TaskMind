@@ -1,9 +1,7 @@
-import json
 import logging
 from datetime import datetime
 
 from django.shortcuts import get_object_or_404
-from django.utils import timezone
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
 from rest_framework import status
@@ -21,11 +19,12 @@ from .serializers import (
     TaskSerializer,
 )
 from .services import (
-    AIGoalGeneratorService,
     ContributionService,
+    GoalBreakDownService,
     GoalService,
     TaskService,
 )
+from .validators import GoalBreakdownValidator
 
 logger = logging.getLogger(__name__)
 
@@ -44,126 +43,35 @@ class GoalBreakdownView(APIView):
     and returns a list of actionable tasks to achieve that goal using the Groq API."""
 
     def post(self, request):
-        name = request.data.get("name")
-        description = request.data.get("description", "")
-        tag = request.data.get("tag")
-        deadline = request.data.get("deadline")
         files = request.FILES.getlist("files")
 
-        if not name:
+        validation_error = GoalBreakdownValidator.validate_request(request.data, files)
+        if validation_error:
             return Response(
-                {"error": "Please provide a goal's name"},
-                status=status.HTTP_400_BAD_REQUEST,
+                {"error": validation_error}, status=status.HTTP_400_BAD_REQUEST
             )
-
-        # if not description and not files:
-        #     return Response({"error": "Please provide a description or upload files to provide context."}, status=status.HTTP_400_BAD_REQUEST)
-
-        if not deadline:
-            return Response(
-                {"error": "Please provide a goal's deadline"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        if deadline < timezone.now().date().isoformat():
-            return Response(
-                {"error": "Deadline must be a future date"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        # File upload limits
-        MAX_FILES = 5
-        MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB per file
-        ALLOWED_EXTENSIONS = [".pdf", ".docx", ".jpg", ".jpeg", ".png", ".webp"]
-
-        if len(files) > MAX_FILES:
-            return Response(
-                {"error": f"Maximum {MAX_FILES} files allowed."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        for file in files:
-            if file.size > MAX_FILE_SIZE:
-                return Response(
-                    {"error": f"File '{file.name}' exceeds the 10MB size limit."},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-            ext = file.name.rsplit(".", 1)[-1].lower() if "." in file.name else ""
-            if f".{ext}" not in ALLOWED_EXTENSIONS:
-                return Response(
-                    {
-                        "error": f"File '{file.name}' has an unsupported format. Allowed: PDF, DOCX, JPG, PNG, WebP."
-                    },
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-
-        # if not tag:
-        #     return Response({"error": "Please provide a goal's tag"}, status=status.HTTP_400_BAD_REQUEST)
-
-        api_key = AIGoalGeneratorService.get_api_key()
-        if not api_key:
-            return Response(
-                {"error": "Together AI API Key is not configured."},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            )
-
-        # Parse context from files
-        file_context = AIGoalGeneratorService.extract_context_from_files(files, api_key)
-        if file_context:
-            description = (
-                f"{description}\n\n[Additional Context from Files:]\n{file_context}"
-                if description
-                else file_context
-            )
-
-        task_prompt = AIGoalGeneratorService.build_prompt_for_task(
-            name, description, deadline
-        )
-        description_prompt = AIGoalGeneratorService.build_prompt_for_description(
-            name, description, deadline
-        )
-        task_list = AIGoalGeneratorService.get_ai_response(task_prompt, api_key)
-
-        description_response = AIGoalGeneratorService.get_ai_response(
-            description_prompt, api_key
-        )
-
-        # FIX: Check if it is ALREADY a list before trying to parse
-        if isinstance(description_response, list):
-            # It's already a list, just take the first item
-            if description_response:
-                description = description_response[0]
-            else:
-                description = ""  # Handle empty list case
-        else:
-            # It is a string, so NOW we try to parse it
-            try:
-                parsed_description = json.loads(description_response)
-
-                if isinstance(parsed_description, list) and parsed_description:
-                    description = parsed_description[0]
-                else:
-                    description = str(parsed_description)
-
-            except (json.JSONDecodeError, TypeError):
-                # Fallback: It was just a plain string all along
-                description = description_response
 
         try:
-            result = {}
-            result["name"] = name
-            result["description"] = description
-            result["status"] = "ToDo"
-            result["deadline"] = deadline
-            result["tag"] = tag
-            result["completeCount"] = 0
-            result["taskCount"] = len(task_list)
-            result["tasks"] = task_list
+            result = GoalBreakDownService.generate_breakdown(request.data, files)
             return Response(result, status=status.HTTP_200_OK)
-        except ValueError as e:
+        except Exception as e:
+            return self._handle_view_error(e)
+
+    def _handle_view_error(self, e):
+        if isinstance(e, ValueError):
             return Response(
                 {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+        logger.error(
+            "Unexpected error in goal generation",
+            exc_info=True,
+            extra={"error_type": type(e).__name__, "error_detail": str(e)[:500]},
+        )
+        return Response(
+            {"error": f"Unexpected error: {str(e)}"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
 
 
 # The rest of the AI logic was moved to services.py
@@ -487,6 +395,7 @@ class TaskProductivityView(APIView):
             return int(year_str)
         return datetime.now().year
 
+
 @extend_schema_view(
     get=extend_schema(
         tags=["Goals"],
@@ -502,4 +411,3 @@ class GoalTagListView(APIView):
         """Retrieves all user's tags as an option for filtering."""
         user_tags_list = GoalService.get_unique_tags(request.user)
         return Response(user_tags_list, status=status.HTTP_200_OK)
-
