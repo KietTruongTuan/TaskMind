@@ -149,7 +149,7 @@ export function GoalReview({
   return (
     <Flex width="100%" justify="center" align="center" height="100%">
       <Flex
-        width={{ initial: "90%", xs: "85%" }}
+        width="100%"
         direction="column"
         py="5"
         gap="5"

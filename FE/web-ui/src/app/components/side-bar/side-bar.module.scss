@@ -1,0 +1,10 @@
+.sideBar {
+    background-color: var(--navbar);
+    border-right: 1px solid var(--card-border);
+}
+
+.sideBarMotion{
+    height: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+}

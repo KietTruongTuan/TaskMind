@@ -54,7 +54,7 @@ export function GoalAdd({
       <LoadingOverlay isLoading={isSubmitting} />
       <Flex width="100%" justify="center" align="center" height="92vh">
         <Flex
-          width={{ initial: "90%", xs: "50%" }}
+          width={{ initial: "100%", md: "50%" }}
           direction="column"
           py="5"
           gap="5"

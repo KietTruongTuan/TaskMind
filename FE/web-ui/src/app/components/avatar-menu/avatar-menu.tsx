@@ -38,6 +38,8 @@ export function AvatarMenu() {
               mr={{ initial: "3", md: "0" }}
               className={styles.avatarBox}
               fallback={username}
+              size="2"
+              style={{ cursor: "pointer" }}
             />
           </SkeletonLoading>
         </Flex>
@@ -50,7 +52,7 @@ export function AvatarMenu() {
           action={onLogOut}
         >
           <DropdownMenu.Item onSelect={(e) => e.preventDefault()}>
-            <Flex align="center" gap="3">
+            <Flex align="center" gap="3" style={{ cursor: "pointer" }}>
               <Text>Log Out</Text>
               <LogOut size={15} />
             </Flex>

@@ -16,15 +16,15 @@ export default async function AllTaskPage({
   const { taskService } = await useServerSideService();
   const taskListData = await taskService.getAll(params);
   const { tasks } = taskListData;
-  
+
   return (
-    <Flex width="100%" justify="center" height="100%">
-      <Flex width="100%" direction="column" pl="7" py="5" gap="5">
+    <Flex justify="center" height="100%">
+      <Flex width="100%" direction="column" py="5" gap="5">
         <Box>
           <Header
             text="All Tasks"
             subText="Use Kanban board to manage your tasks"
-            textSize="7"
+            textSize="7"  
             subTextSize="2"
           />
         </Box>
