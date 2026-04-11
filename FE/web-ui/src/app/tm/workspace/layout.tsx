@@ -9,10 +9,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     <TokenRefresherProvider>
       <LoadingOverlay isGlobal />
       <Flex height="100vh" width="100%" overflow="hidden">
-        <Flex width="5%">
-          <SideBar />
-        </Flex>
-        <Flex direction="column" height="100%" flexGrow="1" minHeight="0" width="95%">
+        <SideBar />
+        <Flex direction="column" height="100%" flexGrow="1" minHeight="0">
           <NavigationBar />
           <Box flexGrow="1" minHeight="0">
             <ScrollArea scrollbars="vertical">

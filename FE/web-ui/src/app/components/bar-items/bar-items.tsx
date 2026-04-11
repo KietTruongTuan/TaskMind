@@ -5,10 +5,9 @@ import { WebUrl } from "@/app/enum/web-url.enum";
 import { usePathname, useRouter } from "next/navigation";
 import { Home, Kanban, List, LogOut, Plus } from "lucide-react";
 import { ButtonType } from "@/app/enum/button-type.enum";
-import { authenticationService } from "@/app/constants";
 import { useRouteLoadingContext } from "@/app/contexts/route-loading-context/route-loading-context";
 import styles from "./bar-items.module.scss";
-import { AlertDialogPopUp } from "../alert-dialog-pop-up/alert-dialog-pop-up";
+import { AnimatePresence, motion } from "framer-motion";
 
 interface BarItem {
   icon: React.ElementType;
@@ -19,21 +18,21 @@ interface BarItem {
 
 export function BarItems({
   onItemClick,
-  isSideItem,
+  isOpen,
 }: {
   onItemClick?: () => void;
-  isSideItem?: boolean;
+  isOpen?: boolean;
 }) {
   const currentUrl = usePathname();
   const { route } = useRouteLoadingContext();
   const navBarItems: BarItem[] = [
     {
       icon: Home,
-      label: "Home",
+      label: "Dashboard",
       url: WebUrl.Dashboard,
       testId: "dashboard",
     },
-    { icon: Plus, label: "New", url: WebUrl.GoalAdd, testId: "add-goal" },
+    { icon: Plus, label: "New Goal", url: WebUrl.GoalAdd, testId: "add-goal" },
     {
       icon: List,
       label: "My Goals",
@@ -49,42 +48,62 @@ export function BarItems({
   ];
 
   return (
-    <Flex direction="column" width="100%" height="100%" justify="between">
-      <Flex direction="column" gap="5" width="100%">
-        {navBarItems.map((value, index) => {
-          const isActive = currentUrl === value.url;
-          const Icon = value.icon;
+    <Flex direction="column" gap="4" width="100%" align="center">
+      {navBarItems.map((value, index) => {
+        const isActive = currentUrl === value.url;
+        const Icon = value.icon;
 
-          return (
-            <CustomButton
-              key={index}
-              variant="ghost"
-              onClick={() => {
-                onItemClick?.();
-                route(value.url);
-              }}
-              buttonType={ButtonType.Tab}
-              isActive={isActive}
-              style={{
-                aspectRatio: "1 / 1",
-              }}
-              data-testid={`${value.testId}-tab`}
+        return (
+          <CustomButton
+            key={index}
+            variant="ghost"
+            style={
+              !isOpen
+                ? {
+                    aspectRatio: "1 / 1",
+                    height: "auto",
+                    width: "100%",
+                    cursor: "pointer",
+                  }
+                : {
+                    width: "100%",
+                    cursor: "pointer",
+                  }
+            }
+            onClick={() => {
+              onItemClick?.();
+              route(value.url);
+            }}
+            buttonType={ButtonType.Tab}
+            isActive={isActive}
+            data-testid={`${value.testId}-tab`}
+          >
+            <Flex
+              align="center"
+              justify={isOpen ? "start" : "center"}
+              gap="3"
+              width="100%"
             >
-              <Flex
-                direction="column"
-                align="center"
-                gap="1"
-                width={isSideItem ? "100%" : ""}
-              >
-                <Icon size={16} />
-                <Text weight="medium" size="1">
-                  {value.label}
-                </Text>
-              </Flex>
-            </CustomButton>
-          );
-        })}
-      </Flex>
+              <Icon size={18} />
+              <AnimatePresence initial={false}>
+                {isOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, width: 0 }}
+                    animate={{ opacity: 1, width: "auto" }}
+                    exit={{ opacity: 0, width: 0 }}
+                    transition={{ duration: 0.2, ease: "easeInOut" }}
+                    className={styles.itemMotion}
+                  >
+                    <Text weight="medium" size="2">
+                      {value.label}
+                    </Text>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </Flex>
+          </CustomButton>
+        );
+      })}
     </Flex>
   );
 }

@@ -34,9 +34,9 @@ export function ThemeToggle() {
         ) : (
           <motion.span
             key="moon"
-            initial={{ y: 20, opacity: 0, rotate: 45 }}
+            initial={{ y: 20, opacity: 0, rotate: -45 }}
             animate={{ y: 0, opacity: 1, rotate: 0 }}
-            exit={{ y: -20, opacity: 0, rotate: -45 }}
+            exit={{ y: 20, opacity: 0, rotate: 45 }}
             transition={{ duration: 0.3 }}
           >
             <Sun data-testid="light-icon" display="block" />

@@ -20,11 +20,10 @@ describe("Navigation bar", () => {
       </ThemeProvider>,
     );
 
-    expect(await screen.findByTestId("navbar-items")).toBeInTheDocument();
     expect(await screen.findByText("AI Goal Manager")).toBeInTheDocument();
   });
 
-  it("should go to add goal page when click the tab button", async () => {
+  it("should go to dashboard page when click the logo", async () => {
     render(
       <RouteLoadingProvider>
         <ThemeProvider>
@@ -32,8 +31,8 @@ describe("Navigation bar", () => {
         </ThemeProvider>
       </RouteLoadingProvider>,
     );
-    await userEvent.click(await screen.findByTestId("add-goal-tab"));
+    await userEvent.click(await screen.findByText("AI Goal Manager"));
 
-    expect(MOCK_ROUTER_PUSH).toHaveBeenCalledWith(WebUrl.GoalAdd);
+    expect(MOCK_ROUTER_PUSH).toHaveBeenCalledWith(WebUrl.Dashboard);
   });
 });
