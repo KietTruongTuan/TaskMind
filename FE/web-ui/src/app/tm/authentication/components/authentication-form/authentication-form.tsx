@@ -44,7 +44,7 @@ export function AuthenticationForm() {
   } = methods;
 
   const [activeForm, SetActiveForm] = useState<AuthenticationModule>(
-    AuthenticationModule.Login
+    AuthenticationModule.Login,
   );
 
   const formContents: Record<AuthenticationModule, formContentsProps> = {
@@ -72,7 +72,7 @@ export function AuthenticationForm() {
         route(WebUrl.Dashboard);
       } else {
         const res = await authenticationService.register(
-          data as RegistrationRequestBody
+          data as RegistrationRequestBody,
         );
         SetActiveForm(AuthenticationModule.Login);
         setIsSuccess(true);
@@ -110,7 +110,9 @@ export function AuthenticationForm() {
             <FormProvider {...methods}>
               <Form.Root
                 className={styles.formWrapper}
-                onSubmit={handleSubmit(onSubmit)}
+                onSubmit={handleSubmit(onSubmit, (errors) =>
+                  console.log("Validation Errors:", errors),
+                )}
               >
                 <Flex direction="column" gap="4">
                   {formContents[activeForm].formComponents}
@@ -120,7 +122,7 @@ export function AuthenticationForm() {
                         <Flex gap="2" align="center">
                           <Checkbox />
                           Remember me
-                        </Flex>{" "}
+                        </Flex>
                       </Text>
                       <Text className={styles.textButton}>
                         Forgot password?

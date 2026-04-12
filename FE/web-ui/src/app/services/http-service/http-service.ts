@@ -8,9 +8,8 @@ export class HttpService {
   private accessToken: string | null = null;
 
   constructor(baseURL?: string) {
-    const finalBaseUrl = this.resolveBaseUrl(baseURL);
     this.instance = axios.create({
-      baseURL: finalBaseUrl,
+      baseURL: baseURL,
       timeout: 60000,
       headers: {
         "Content-Type": "application/json",
@@ -19,7 +18,7 @@ export class HttpService {
     });
 
     this.refreshInstance = axios.create({
-      baseURL: finalBaseUrl,
+      baseURL: baseURL,
       timeout: 30000,
       headers: { "Content-Type": "application/json" },
       withCredentials: true,
@@ -28,17 +27,17 @@ export class HttpService {
     this.setUpInterceptor();
   }
 
-  private resolveBaseUrl(passedURL?: string): string {
-    if (passedURL) {
-      return passedURL;
-    }
+  // private resolveBaseUrl(passedURL?: string): string {
+  //   if (passedURL) {
+  //     return passedURL;
+  //   }
 
-    if (typeof window === "undefined") {
-      return process.env.FRONTEND_URL || "";
-    }
+  //   if (typeof window === "undefined") {
+  //     return process.env.FRONTEND_URL || "";
+  //   }
 
-    return "";
-  }
+  //   return "";
+  // }
 
   setAccessToken(token: string) {
     this.accessToken = token;
@@ -78,8 +77,8 @@ export class HttpService {
           error.response?.status === 401 &&
           !originalRequest._retry &&
           !originalRequest._isRefresh &&
-          !originalRequest.url?.includes(ApiUrl.LocalLogin) &&
-          !originalRequest.url?.includes(ApiUrl.LocalRefreshToken)
+          !originalRequest.url?.includes(ApiUrl.Login) &&
+          !originalRequest.url?.includes(ApiUrl.RefreshToken)
         ) {
           originalRequest._retry = true;
           const { authenticationService } = await import("@/app/constants");

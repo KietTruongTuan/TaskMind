@@ -10,12 +10,12 @@ import { ApiUrl } from "@/app/enum/api-url.enum";
 
 export class AuthenticationService extends HttpService {
   constructor() {
-    super();
+    super(process.env.NEXT_PUBLIC_API_BASE_URL);
   }
 
   async login(data: LoginRequestBody) {
     const res = await this.post<LoginResponseBody, LoginRequestBody>(
-      ApiUrl.LocalLogin,
+      ApiUrl.Login,
       data,
     );
     if (res.access) {
@@ -26,20 +26,20 @@ export class AuthenticationService extends HttpService {
 
   async register(data: RegistrationRequestBody) {
     return this.post<RegistrationResponseBody, RegistrationRequestBody>(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}${ApiUrl.Register}`,
+      ApiUrl.Register,
       data,
     );
   }
 
   async refresh() {
     const res = await this.refreshInstance.post<RefreshTokenResponseBody>(
-      ApiUrl.LocalRefreshToken,
+      ApiUrl.RefreshToken,
     );
     return res;
   }
 
   async logout() {
     this.clearAccessToken();
-    return this.post(ApiUrl.LocalLogOut);
+    return this.post(ApiUrl.LogOut);
   }
 }
