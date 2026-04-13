@@ -14,6 +14,8 @@ export class AuthenticationService extends HttpService {
   }
 
   async login(data: LoginRequestBody) {
+    console.log("data", data);
+    console.log("url", process.env.NEXT_PUBLIC_API_BASE_URL);
     const res = await this.post<LoginResponseBody, LoginRequestBody>(
       ApiUrl.Login,
       data,

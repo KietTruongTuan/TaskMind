@@ -8,8 +8,10 @@ export class HttpService {
   private accessToken: string | null = null;
 
   constructor(baseURL?: string) {
+    const resolvedBaseURL = this.resolveBaseUrl(baseURL);
+    console.log("resolvedBaseURL", resolvedBaseURL);
     this.instance = axios.create({
-      baseURL: baseURL,
+      baseURL: resolvedBaseURL,
       timeout: 60000,
       headers: {
         "Content-Type": "application/json",
@@ -18,7 +20,7 @@ export class HttpService {
     });
 
     this.refreshInstance = axios.create({
-      baseURL: baseURL,
+      baseURL: resolvedBaseURL,
       timeout: 30000,
       headers: { "Content-Type": "application/json" },
       withCredentials: true,
@@ -27,17 +29,19 @@ export class HttpService {
     this.setUpInterceptor();
   }
 
-  // private resolveBaseUrl(passedURL?: string): string {
-  //   if (passedURL) {
-  //     return passedURL;
-  //   }
+  private resolveBaseUrl(passedURL?: string): string {
+    if (typeof window === "undefined") {
+      if (process.env.INTERNAL_API_BASE_URL) {
+        return process.env.INTERNAL_API_BASE_URL;
+      }
+    }
 
-  //   if (typeof window === "undefined") {
-  //     return process.env.FRONTEND_URL || "";
-  //   }
+    if (passedURL) {
+      return passedURL;
+    }
 
-  //   return "";
-  // }
+    return process.env.NEXT_PUBLIC_API_BASE_URL || "";
+  }
 
   setAccessToken(token: string) {
     this.accessToken = token;

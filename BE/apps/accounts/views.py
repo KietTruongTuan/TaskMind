@@ -86,8 +86,8 @@ class LoginView(APIView):
                 key='refresh_token',
                 value=str(refresh),
                 httponly=True,   # Cannot be accessed by JavaScript
-                secure=True,     # Required for HTTPS (production)
-                samesite='None', # Required for cross-origin requests (FE and BE on different domains)
+                secure=False,     # Required for HTTPS (production)
+                samesite='Lax', # Required for cross-origin requests (FE and BE on different domains)
                 max_age=settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME'].total_seconds(),
                 path='/',
             )
