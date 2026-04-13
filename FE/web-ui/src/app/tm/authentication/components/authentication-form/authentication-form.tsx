@@ -111,9 +111,7 @@ export function AuthenticationForm() {
             <FormProvider {...methods}>
               <Form.Root
                 className={styles.formWrapper}
-                onSubmit={handleSubmit(onSubmit, (errors) =>
-                  console.log("Validation Errors:", errors),
-                )}
+                onSubmit={handleSubmit(onSubmit)}
               >
                 <Flex direction="column" gap="4">
                   {formContents[activeForm].formComponents}

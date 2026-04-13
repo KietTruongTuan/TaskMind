@@ -5,14 +5,16 @@ import { ThemeProvider } from "@/app/contexts/theme-context/theme-context";
 import { WebUrl } from "@/app/enum/web-url.enum";
 import { RouteLoadingProvider } from "@/app/contexts/route-loading-context/route-loading-context";
 import { SideBar } from "./side-bar";
-
+import { SidebarProvider } from "@/app/contexts/sidebar-context/sidebar-context";
 
 describe("Side bar", () => {
   it("should open the Side bar", async () => {
     render(
       <ThemeProvider>
         <RouteLoadingProvider>
-          <SideBar />
+          <SidebarProvider>
+            <SideBar />
+          </SidebarProvider>
         </RouteLoadingProvider>
       </ThemeProvider>,
     );
@@ -28,7 +30,9 @@ describe("Side bar", () => {
     render(
       <RouteLoadingProvider>
         <ThemeProvider>
-          <SideBar />
+          <SidebarProvider>
+            <SideBar />
+          </SidebarProvider>
         </ThemeProvider>
       </RouteLoadingProvider>,
     );

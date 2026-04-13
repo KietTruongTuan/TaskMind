@@ -23,7 +23,7 @@ describe("AuthenticationService", () => {
 
     const result = await authenticationService.login(MOCK_LOGIN_REQUEST_DATA);
     expect(spy).toHaveBeenCalledWith(
-      ApiUrl.LocalLogin,
+      ApiUrl.Login,
       MOCK_LOGIN_REQUEST_DATA,
     );
 
@@ -49,7 +49,7 @@ describe("AuthenticationService", () => {
       .mockResolvedValue(MOCK_ACCESS_TOKEN);
 
     const result = await authenticationService.refresh();
-    expect(spy).toHaveBeenCalledWith(ApiUrl.LocalRefreshToken);
+    expect(spy).toHaveBeenCalledWith(ApiUrl.RefreshToken);
 
     expect(result).toEqual(MOCK_ACCESS_TOKEN);
   });

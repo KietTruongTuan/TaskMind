@@ -9,7 +9,6 @@ export class HttpService {
 
   constructor(baseURL?: string) {
     const resolvedBaseURL = this.resolveBaseUrl(baseURL);
-    console.log("resolvedBaseURL", resolvedBaseURL);
     this.instance = axios.create({
       baseURL: resolvedBaseURL,
       timeout: 60000,
@@ -62,9 +61,7 @@ export class HttpService {
         if (token && request.headers) {
           request.headers.Authorization = `Bearer ${token}`;
         }
-        if (process.env.NODE_ENV === "development") {
-          // console.log(request);
-        }
+        if (process.env.NODE_ENV === "development") {}
         return request;
       },
       (error) => {
