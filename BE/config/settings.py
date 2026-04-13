@@ -18,7 +18,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-# Current BASE_DIR: BE/
+# Current settings : BE/
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Load environment variables from .env file
@@ -55,10 +55,12 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
     "corsheaders",
+    "django_q",
 
     # My apps
     'apps.accounts',
     'apps.goals',
+    'apps.knowledge_base'
 ]
 
 MIDDLEWARE = [
@@ -252,13 +254,31 @@ CSRF_COOKIE_SAMESITE = 'None'
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 
-# ============ Logging Configuration ============
-# Logs are printed to stdout (visible via `docker logs capstone-backend -f`)
-# The 'apps.goals.services' logger captures all AI request lifecycle events
-# with structured extra fields: correlation_id, model, latency_ms, error_type, etc.
+# rag custom settings
+RAG_EMBED_MODEL_NAME = os.environ.get('RAG_EMBED_MODEL_NAME')
+RAG_LLM_MODEL_NAME = os.environ.get('RAG_LLM_MODEL_NAME')
+RAG_LLM_API_URL = os.environ.get('RAG_LLM_API_URL')
+RAG_LLM_API_KEY = os.environ.get('RAG_LLM_API_KEY')
 
+# File upload limits
+MAX_FILES = 5
+MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB per file
+ALLOWED_EXTENSIONS = [".pdf", ".docx", ".jpg", ".jpeg", ".png", ".webp"]
 
-
+# --- Django Q2 Configuration ---
+Q_CLUSTER = {
+    'name': 'rag_pipeline_cluster',
+    'workers': 2,              # Number of background processes running simultaneously
+    'recycle': 500,            # Restarts workers after 500 tasks to prevent memory leaks
+    'timeout': 120,            # Max seconds a task can run before it's killed (2 mins)
+    'retry': 180,              # How long to wait before trying a failed task again
+    'compress': True,          # Compresses the messages in the database
+    'save_limit': 250,         # Keeps a history of the last 250 tasks in the DB
+    'queue_limit': 500,        # Max tasks that can be queued up at once
+    'cpu_affinity': 1,         # Optimizes CPU usage
+    'label': 'Django Q2',
+    'orm': 'default'           # CRITICAL: Tells Q2 to use your NeonDB as the queue
+}
 
 class _StructuredFormatter(_logging.Formatter):
     """Appends extra={} fields as key=value pairs so they appear in log output."""

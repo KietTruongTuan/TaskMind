@@ -25,4 +25,5 @@ urlpatterns = [
     path('v1/goals', include('apps.goals.urls')),
     path('v1/tasks', include('apps.goals.tasks_urls')),
     path('v1/accounts', include('apps.accounts.urls')),
+    path('v1/knowledge_base', include('apps.knowledge_base.urls'))
 ]
