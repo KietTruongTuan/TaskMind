@@ -18,7 +18,7 @@ export default async function AllTaskPage({
   const { tasks } = taskListData;
 
   return (
-    <Flex justify="center" height="100%">
+    <Flex justify="center" height="100%" width="100%">
       <Flex width="100%" direction="column" py="5" gap="5">
         <Box>
           <Header
