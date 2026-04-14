@@ -1,0 +1,31 @@
+.iconBox {
+    border-radius: var(--spacing-small);
+}
+
+.subText {
+    color: var(--text-secondary)
+}
+
+.onHold {
+    color: var(--status-on-hold);
+}
+
+.completed {
+    color: var(--status-completed);
+}
+
+.inProgress {
+    color: var(--status-in-progress);
+}
+
+.cancel {
+    color: var(--status-cancel);
+}
+
+.overdue {
+    color: var(--status-overdue);
+}
+
+.routeText {
+    cursor: pointer;
+}

@@ -1,0 +1,31 @@
+services:
+  backend:
+    build:
+      context: ./BE
+      target: development
+    container_name: capstone-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./BE:/app
+      - ./BE/db.sqlite3:/app/db.sqlite3
+    environment:
+      - DEBUG=1
+      - NEXT_PUBLIC_API_URL=http://backend:8000
+
+  frontend:
+    build:
+      context: ./FE/web-ui
+      target: development
+    container_name: capstone-frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./FE/web-ui:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    environment:
+      - WATCHPACK_POLLING=true
+      - CHOKIDAR_USEPOLLING=true
+      - INTERNAL_API_BASE_URL=http://backend:8000

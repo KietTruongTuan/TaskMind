@@ -1,0 +1,52 @@
+  name: cd build and push docker image
+
+  on:
+    push:
+      branches:
+        - dev
+
+  jobs:
+    build-and-push:
+      runs-on: ubuntu-latest
+
+      steps:
+        - name: Checkout repository
+          uses: actions/checkout@v4
+
+        - name: Set image tag (commit SHA)
+          id: vars
+          run: echo "SHA_TAG=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+
+        - name: Log in to Docker Hub
+          uses: docker/login-action@v3
+          with:
+            username: ${{ secrets.DOCKERHUB_USERNAME }}
+            password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+        - name: Build backend image
+          run: |
+            docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/capstone-backend-dev:latest ./BE
+            docker tag ${{ secrets.DOCKERHUB_USERNAME }}/capstone-backend-dev:latest \
+                      ${{ secrets.DOCKERHUB_USERNAME }}/capstone-backend:${{ steps.vars.outputs.SHA_TAG }}
+
+        - name: Push backend image
+          run: |
+            docker push ${{ secrets.DOCKERHUB_USERNAME }}/capstone-backend-dev:latest
+            docker push ${{ secrets.DOCKERHUB_USERNAME }}/capstone-backend:${{ steps.vars.outputs.SHA_TAG }}
+
+        - name: Build frontend image
+          run: |
+            docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/capstone-frontend-dev:latest ./FE/web-ui
+            docker tag ${{ secrets.DOCKERHUB_USERNAME }}/capstone-frontend-dev:latest \
+                      ${{ secrets.DOCKERHUB_USERNAME }}/capstone-frontend:${{ steps.vars.outputs.SHA_TAG }}
+
+        - name: Push frontend image
+          run: |
+            docker push ${{ secrets.DOCKERHUB_USERNAME }}/capstone-frontend-dev:latest
+            docker push ${{ secrets.DOCKERHUB_USERNAME }}/capstone-frontend:${{ steps.vars.outputs.SHA_TAG }}
+
+        - name: Trigger backend deploy on Render
+          run: curl --request POST --fail --silent "${{ secrets.BACKEND_DEPLOY_HOOK }}"
+        
+        - name: Trigger frontend deploy on Render
+          run: curl --request POST --fail --silent "${{ secrets.FRONTEND_DEPLOY_HOOK }}"

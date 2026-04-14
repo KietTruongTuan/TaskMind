@@ -1,0 +1,85 @@
+@use '../../assets/dist/tokens';
+
+:root {
+  /* Constants variable */
+  --button-primary: #000000;
+  --button-secondary: #FFFFFF;
+  --navbar-text-primary: #FFFFFF;
+  --navbar-text-secondary: #BFDBFE;
+  --status-to-do: #9CA3AF;
+  --status-in-progress: #3B82F6;
+  --status-on-hold: #F59E0B;
+  --status-completed: #10B981;
+  --status-cancel: #EF4444;
+  --status-overdue: #B91C1C;
+  --message-error-light: #f8d1d1;
+  --message-error: #d60000;
+  --message-success-light: #d1fadc;
+  --message-success: #00d739;
+  --background-rgb: rgba(0, 0, 0, 0.077);
+
+  /* Light theme variables (default) */
+  --background: #F8FAFC;
+  --text-primary: #0F172A;
+  --text-secondary: #64748B;
+  --navbar: #eeeeff76;
+  --topbar: #FFFFFF;
+  --card-primary: #FFFFFF;
+  --card-secondary: #F1F5F9;
+  --card-border: #E2E8F0;
+  --button-hover: #dfe8f082;
+  --button-active: #b0b2b482;
+  --contribution-graph-0: #ebedf0;
+  --contribution-graph-1: #a7f3d0;
+  --contribution-graph-2: #6ee7b7;
+  --contribution-graph-3: #34D399;
+  --contribution-graph-4: #10B981;
+  --font-family-sans: #{tokens.$typography-font-family-sans};
+  --font-family-mono: #{tokens.$typography-font-family-mono};
+  --font-size-base: #{tokens.$typography-font-size-base};
+  --line-height-base: #{tokens.$typography-line-height-base};
+  --spacing-small: #{tokens.$spacing-small};
+  --spacing-medium: #{tokens.$spacing-medium};
+  --spacing-large: #{tokens.$spacing-large};
+  --spacing-xlarge: #{tokens.$spacing-xlarge};
+  --border-radius-pill: #{tokens.$border-radius-pill};
+  --border-radius-small: #{tokens.$border-radius-small};
+  --border-width-default: #{tokens.$border-width-default};
+}
+
+.dark {
+  /* Dark theme variables */
+  --background: #0F172A;
+  --text-primary: #FFFFFF;
+  --text-secondary: #94A3B8;
+  --navbar: #1c2430;
+  --topbar: #1f2937;
+  --card-primary: #1f29377f;
+  --card-secondary: #1F2937;
+  --card-border: #334155;
+  --button-hover: #374151dd;
+  --contribution-graph-0: #161b22;
+  --contribution-graph-1: #064e3b;
+  --contribution-graph-2: #065f46;
+  --contribution-graph-3: #059669;
+  --contribution-graph-4: #10B981;
+  --font-family-sans: #{tokens.$typography-font-family-sans};
+  --font-family-mono: #{tokens.$typography-font-family-mono};
+  --font-size-base: #{tokens.$typography-font-size-base};
+  --line-height-base: #{tokens.$typography-line-height-base};
+  --spacing-small: #{tokens.$spacing-small};
+  --spacing-medium: #{tokens.$spacing-medium};
+  --spacing-large: #{tokens.$spacing-large};
+  --spacing-xlarge: #{tokens.$spacing-xlarge};
+  --border-radius-pill: #{tokens.$border-radius-pill};
+  --border-radius-small: #{tokens.$border-radius-small};
+  --border-width-default: #{tokens.$border-width-default};
+}
+
+html,
+body {
+  min-height: 100vh;
+  max-width: 100vw;
+  margin: 0;
+  padding: 0;
+}

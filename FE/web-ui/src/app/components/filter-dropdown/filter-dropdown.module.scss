@@ -1,0 +1,17 @@
+.filterDropDown {
+    background-color: var(--card-primary);
+    color: var(--text-primary);
+    border: 1px solid var(--card-border);
+    cursor: pointer;
+}
+
+.filterDropDownContent {
+    background-color: var(--background);
+    color: var(--text-primary);
+    border: 1px solid var(--card-border);
+}
+
+.filterCheckbox {
+    color: var(--button-primary);
+    cursor: pointer;
+}

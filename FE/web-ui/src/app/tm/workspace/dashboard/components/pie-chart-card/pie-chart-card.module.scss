@@ -1,0 +1,9 @@
+.pieChart {
+    :global(text), :global(tspan) {
+        fill: var(--text-primary) !important;
+    }
+
+    :global(.MuiPieArc-root) {
+        stroke: none !important;
+    }
+}
