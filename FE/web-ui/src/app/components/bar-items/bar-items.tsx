@@ -2,8 +2,8 @@
 import { Flex, Text } from "@radix-ui/themes";
 import { CustomButton } from "../custom-button/custom-button";
 import { WebUrl } from "@/app/enum/web-url.enum";
-import { usePathname, useRouter } from "next/navigation";
-import { Home, Kanban, List, LogOut, Plus } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { BookOpen, Home, Kanban, List, Plus } from "lucide-react";
 import { ButtonType } from "@/app/enum/button-type.enum";
 import { useRouteLoadingContext } from "@/app/contexts/route-loading-context/route-loading-context";
 import styles from "./bar-items.module.scss";
@@ -44,6 +44,12 @@ export function BarItems({
       label: "All Tasks",
       url: WebUrl.TaskBoard,
       testId: "task-board",
+    },
+    {
+      icon: BookOpen,
+      label: "Knowledge Base",
+      url: WebUrl.KnowledgeBase,
+      testId: "knowledge-base",
     },
   ];
 

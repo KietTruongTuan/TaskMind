@@ -53,7 +53,7 @@ export default async function MyGoalPage({
   );
 
   return (
-    <Flex width="100%" justify="center" height="92vh">
+    <Flex width="100%" justify="center" height="100%">
       <Flex width="100%" direction="column" py="5"gap="5">
         <Box>
           <Header

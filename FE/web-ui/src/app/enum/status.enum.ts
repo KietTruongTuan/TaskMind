@@ -6,3 +6,9 @@ export enum Status {
   Cancelled = "Cancelled",
   Overdue = "Overdue",
 }
+
+export enum FileStatus {
+  Processing = "Processing",
+  Done = "Done",
+  Failed = "Failed",
+}
