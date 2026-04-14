@@ -1,13 +1,22 @@
 import { render, screen } from "@testing-library/react";
+import React from "react";
 import { NavigationBar } from "./navigation-bar";
 import userEvent from "@testing-library/user-event";
 import { MOCK_ROUTER_PUSH } from "../../../../jest.setup";
 import { ThemeProvider } from "@/app/contexts/theme-context/theme-context";
 import { WebUrl } from "@/app/enum/web-url.enum";
 import { RouteLoadingProvider } from "@/app/contexts/route-loading-context/route-loading-context";
+import { SidebarProvider } from "@/app/contexts/sidebar-context/sidebar-context";
 
 jest.mock("../avatar-menu/avatar-menu", () => ({
   AvatarMenu: () => <div>Avatar Menu</div>,
+}));
+
+jest.mock("@/app/contexts/sidebar-context/sidebar-context", () => ({
+  useSidebarContext: () => ({ isOpen: true, setIsOpen: jest.fn() }),
+  SidebarProvider: ({ children }: { children: React.ReactNode }) => (
+    <>{children}</>
+  ),
 }));
 
 describe("Navigation bar", () => {
@@ -15,7 +24,9 @@ describe("Navigation bar", () => {
     render(
       <ThemeProvider>
         <RouteLoadingProvider>
-          <NavigationBar />
+          <SidebarProvider>
+            <NavigationBar />
+          </SidebarProvider>
         </RouteLoadingProvider>
       </ThemeProvider>,
     );
@@ -27,7 +38,9 @@ describe("Navigation bar", () => {
     render(
       <RouteLoadingProvider>
         <ThemeProvider>
-          <NavigationBar />
+          <SidebarProvider>
+            <NavigationBar />
+          </SidebarProvider>
         </ThemeProvider>
       </RouteLoadingProvider>,
     );

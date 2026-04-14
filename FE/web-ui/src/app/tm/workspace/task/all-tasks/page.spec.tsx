@@ -14,6 +14,7 @@ import { taskService } from "@/app/constants";
 import { Status } from "@/app/enum/status.enum";
 import userEvent from "@testing-library/user-event";
 import { ReactNode } from "react";
+import { SidebarProvider } from "@/app/contexts/sidebar-context/sidebar-context";
 
 interface MockKanbanProps {
   onCardDragEnd: (args: {
@@ -150,7 +151,9 @@ describe("AllTaskPage", () => {
     render(
       <ToastProvider>
         <ThemeProvider>
-          <RouteLoadingProvider>{page}</RouteLoadingProvider>
+          <SidebarProvider>
+            <RouteLoadingProvider>{page}</RouteLoadingProvider>
+          </SidebarProvider>
         </ThemeProvider>
       </ToastProvider>,
     );
@@ -172,7 +175,9 @@ describe("AllTaskPage", () => {
     render(
       <ToastProvider>
         <ThemeProvider>
-          <RouteLoadingProvider>{page}</RouteLoadingProvider>
+          <SidebarProvider>
+            <RouteLoadingProvider>{page}</RouteLoadingProvider>
+          </SidebarProvider>
         </ThemeProvider>
       </ToastProvider>,
     );
@@ -202,7 +207,9 @@ describe("AllTaskPage", () => {
     render(
       <ToastProvider>
         <ThemeProvider>
-          <RouteLoadingProvider>{page}</RouteLoadingProvider>
+          <SidebarProvider>
+            <RouteLoadingProvider>{page}</RouteLoadingProvider>
+          </SidebarProvider>
         </ThemeProvider>
       </ToastProvider>,
     );

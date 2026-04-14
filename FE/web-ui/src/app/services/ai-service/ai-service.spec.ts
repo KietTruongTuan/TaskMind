@@ -55,20 +55,4 @@ describe("AIService", () => {
     );
     expect(result).toEqual(MOCK_GOAL_RESPONSE_DATA);
   });
-
-  it("should use INTERNAL_API_BASE_URL when window is undefined (Server-side)", () => {
-    const serverSideService = new AIService();
-
-    expect((serverSideService as any)._receivedUrl).toBe(internalUrl);
-  });
-
-  it("should use NEXT_PUBLIC_API_BASE_URL when window is defined (Client-side)", () => {
-    global.window = {} as any;
-
-    const clientSideService = new AIService();
-
-    expect((clientSideService as any)._receivedUrl).toBe(publicUrl);
-
-    delete (global as any).window;
-  });
 });

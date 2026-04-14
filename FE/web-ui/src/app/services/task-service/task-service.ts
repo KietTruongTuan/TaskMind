@@ -5,19 +5,14 @@ import {
   CreateTaskRequestBody,
   DraftTaskRequestBody,
   Task,
-  TaskListResponseBody,
+  TaskListResponseBody, 
   TaskProductivityResponseBody,
 } from "@/app/constants";
 import { SearchParams } from "@/app/enum/search-params.enum";
 
 export class TaskService extends HttpService {
   constructor() {
-    super(
-      typeof window === "undefined"
-        ? process.env.INTERNAL_API_BASE_URL ||
-            process.env.NEXT_PUBLIC_API_BASE_URL
-        : process.env.NEXT_PUBLIC_API_BASE_URL,
-    );
+    super(process.env.NEXT_PUBLIC_API_BASE_URL);
   }
 
   async create(data: CreateTaskRequestBody) {

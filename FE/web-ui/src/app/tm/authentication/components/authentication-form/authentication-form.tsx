@@ -44,7 +44,7 @@ export function AuthenticationForm() {
   } = methods;
 
   const [activeForm, SetActiveForm] = useState<AuthenticationModule>(
-    AuthenticationModule.Login
+    AuthenticationModule.Login,
   );
 
   const formContents: Record<AuthenticationModule, formContentsProps> = {
@@ -72,7 +72,7 @@ export function AuthenticationForm() {
         route(WebUrl.Dashboard);
       } else {
         const res = await authenticationService.register(
-          data as RegistrationRequestBody
+          data as RegistrationRequestBody,
         );
         SetActiveForm(AuthenticationModule.Login);
         setIsSuccess(true);
@@ -81,6 +81,7 @@ export function AuthenticationForm() {
     } catch (err) {
       setIsSuccess(false);
       const error = err as ApiError;
+      console.error("Login Error: ", err);
       showToast(error.message);
     }
   };
@@ -120,7 +121,7 @@ export function AuthenticationForm() {
                         <Flex gap="2" align="center">
                           <Checkbox />
                           Remember me
-                        </Flex>{" "}
+                        </Flex>
                       </Text>
                       <Text className={styles.textButton}>
                         Forgot password?

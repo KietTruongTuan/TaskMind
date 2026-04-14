@@ -38,6 +38,7 @@ import {
 import { useToast } from "@/app/contexts/toast-context/toast-context";
 import { useThemeContext } from "@/app/contexts/theme-context/theme-context";
 import { useRouter } from "next/navigation";
+import { useSidebarContext } from "@/app/contexts/sidebar-context/sidebar-context";
 
 export function KanbanBoard({
   tasks: initialTasks,
@@ -52,6 +53,7 @@ export function KanbanBoard({
 }) {
   const { theme } = useThemeContext();
   const [tasks, setTasks] = useState(initialTasks);
+  const { isOpen: isSidebarOpen } = useSidebarContext();
 
   useEffect(() => {
     setTasks(initialTasks);
@@ -136,7 +138,20 @@ export function KanbanBoard({
   );
 
   return (
-    <ScrollArea size="1" type="hover" scrollbars="horizontal" style={{ maxWidth: isLocal ? '89vw' : '100vw' }}>
+    <ScrollArea
+      size="1"
+      type="hover"
+      scrollbars="horizontal"
+      style={{
+        maxWidth: isLocal
+          ? isSidebarOpen
+            ? "79vw"
+            : "89vw"
+          : isSidebarOpen
+            ? "83vw"
+            : "93vw",
+      }}
+    >
       <Kanban
         key={key}
         defaultItems={kanbanItems}

@@ -119,7 +119,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",    
     "http://localhost:3001",
     "http://localhost:8000",
-    "https://capstone-frontend-dev-latest.onrender.com",
+    "http://13.250.5.182",
 ]
 
 CORS_ALLOW_CREDENTIALS = True # Important: allows cookies to be sent
@@ -127,7 +127,7 @@ CORS_ALLOW_CREDENTIALS = True # Important: allows cookies to be sent
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:3000",
     "http://localhost:3001",
-    "https://capstone-frontend-dev-latest.onrender.com",
+    "http://13.250.5.182",
 ]
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators

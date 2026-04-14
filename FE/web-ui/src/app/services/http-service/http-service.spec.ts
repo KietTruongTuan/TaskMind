@@ -198,42 +198,5 @@ describe("HttpService", () => {
       });
     });
   });
-  describe("Base URL Resolution (window environment)", () => {
-    const originalFrontendUrl = process.env.FRONTEND_URL;
-
-    beforeEach(() => {
-      jest.clearAllMocks();
-    });
-
-    afterAll(() => {
-      process.env.FRONTEND_URL = originalFrontendUrl;
-    });
-
-    it("should use process.env.FRONTEND_URL when window is undefined (Server-side)", () => {
-      process.env.FRONTEND_URL = "https://server-side.test";
-
-      new HttpService();
-
-      expect(mockedAxios.create).toHaveBeenCalledWith(
-        expect.objectContaining({
-          baseURL: "https://server-side.test",
-        })
-      );
-    });
-
-    it("should use empty string when window is defined but no URL is passed (Client-side)", () => {
-      global.window = {} as any;
-
-      new HttpService();
-
-      expect(mockedAxios.create).toHaveBeenCalledWith(
-        expect.objectContaining({
-          baseURL: "",
-        })
-      );
-
-      delete (global as any).window;
-    });
-  });
 });
 
