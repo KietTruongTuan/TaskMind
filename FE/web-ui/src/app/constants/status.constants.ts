@@ -1,10 +1,9 @@
 import {
   CheckCheck,
-  CheckCircle2,
+  CheckCircle,
   CircleAlert,
   CircleDashed,
   Loader,
-  XCircleIcon,
 } from "lucide-react";
 import { FileStatus, Status } from "../enum/status.enum";
 
@@ -28,7 +27,7 @@ export const FileStatusDisplay: Record<
   { icon: React.ElementType; messageIcon: React.ElementType; color: string }
 > = {
   [FileStatus.Done]: {
-    icon: CheckCircle2,
+    icon: CheckCircle,
     messageIcon: CheckCheck,
     color: "var(--status-completed)",
   },
@@ -38,7 +37,7 @@ export const FileStatusDisplay: Record<
     color: "var(--status-in-progress)",
   },
   [FileStatus.Failed]: {
-    icon: XCircleIcon,
+    icon: CircleAlert,
     messageIcon: CircleAlert,
     color: "var(--status-cancel)",
   },

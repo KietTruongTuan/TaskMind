@@ -12,12 +12,16 @@ export function DocumentListItem({
   const Icon = FileStatusDisplay[document.status].icon;
   const MessageIcon = FileStatusDisplay[document.status].messageIcon;
   return (
-    <CardNoPadding py="3" px="4">
+    <CardNoPadding py="3" px="4" height="auto">
       <Flex width="100%" justify="between" align="center">
         <Flex gap="2" align="center">
           <FontAwesomeIcon
             icon={FileTypeDisplay[document.fileType].icon}
-            style={{ fontSize: "20px" }}
+            style={{
+              height: "40px",
+              width: "40px",
+              color: FileTypeDisplay[document.fileType].color,
+            }}
           />
           <Flex direction="column" gap="1">
             <Text weight="regular">{document.name}</Text>
@@ -52,7 +56,7 @@ export function DocumentListItem({
           </Flex>
         </Flex>
 
-        <Icon size={26} color={FileStatusDisplay[document.status].color} />
+        <Icon size={30} color={FileStatusDisplay[document.status].color} />
       </Flex>
     </CardNoPadding>
   );

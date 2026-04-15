@@ -14,9 +14,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <SideBar />
           <Flex direction="column" height="100%" flexGrow="1" minHeight="0">
             <NavigationBar />
-            <Box flexGrow="1" minHeight="0">
-              <ScrollArea scrollbars="vertical">
-                <Box px="7" pb="4">
+            <Box flexGrow="1" minHeight="0" height="100%">
+              <ScrollArea scrollbars="vertical" style={{ height: "100%" }}>
+                <Box px="7" pb="4" height="100%">
                   {children}
                 </Box>
               </ScrollArea>
