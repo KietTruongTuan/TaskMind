@@ -62,7 +62,7 @@ class DocumentUploadProcessView(GenericAPIView):
             settings.RAG_LLM_MODEL_NAME,
             settings.RAG_LLM_API_URL,
             settings.RAG_LLM_API_KEY,
-            885
+            1
         )
         
         return Response({

@@ -265,7 +265,7 @@ MAX_FILES = 5
 MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB per file
 ALLOWED_EXTENSIONS = [".pdf", ".docx", ".jpg", ".jpeg", ".png", ".webp"]
 
-# --- Django Q2 Configuration ---
+# Django Q2 Configuration
 Q_CLUSTER = {
     'name': 'rag_pipeline_cluster',
     'workers': 2,              # Number of background processes running simultaneously
