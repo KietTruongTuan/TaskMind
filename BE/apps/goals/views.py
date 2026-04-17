@@ -25,6 +25,12 @@ from .services import (
     TaskService,
 )
 from .validators import GoalBreakdownValidator
+from django.conf import settings
+
+# File upload limits
+MAX_FILES = settings.MAX_FILES
+MAX_FILE_SIZE = settings.MAX_FILE_SIZE
+ALLOWED_EXTENSIONS = settings.ALLOWED_EXTENSIONS
 
 logger = logging.getLogger(__name__)
 
