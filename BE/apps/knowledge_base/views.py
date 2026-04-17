@@ -1,5 +1,5 @@
 from rest_framework import status
-from rest_framework.generics import GenericAPIView
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.permissions import IsAuthenticated
@@ -8,35 +8,35 @@ from django_q.tasks import async_task
 from django_q.models import Task
 from django.conf import settings
 
-from .serializers import DocumentSerializer, DocumentUploadSerializer
+from .serializers import DocumentSerializer, DocumentUploadProcessSerializer
 from .models import Document, DocumentChunk, DocumentStatus
 
 # for type hint
 from django.core.files.uploadedfile import UploadedFile
 
 
-class DocumentUploadProcessView(GenericAPIView):
+class DocumentUploadProcessView(APIView):
     """
     Endpoint for Next.js to upload the document.
-    Accepts POST requests.
+    Accepts 
+        POST    -> Upload file(s) to run rag process and update knowlegde base
+        GET     -> Gets the list of all the files users uploaded
     """
+    
     # require user to logged in, to associate this document to their account
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]
-    
-    serializer_class = DocumentUploadSerializer
-    
-    def get_queryset(self):
-        return Document.objects.filter(user=self.request.user.id).order_by('-upload_date')
+    serializer_class = DocumentUploadProcessSerializer
     
     def get(self, request: Request, *args, **kwargs):
-        documents = self.get_queryset()
+        """return a list of files uploaded by the users, with their information"""
+        documents = Document.objects.filter(user=request.user.id).order_by('upload_date')
         serializer = DocumentSerializer(documents, many=True)
         return Response(serializer.data)
         
     def post(self, request: Request):
         # get uploaded files from request + validate uploaded file
-        upload_serializer = DocumentUploadSerializer(data=request.data)
+        upload_serializer = DocumentUploadProcessSerializer(data=request.data)
         if not upload_serializer.is_valid():
             return Response(upload_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         uploaded_file: UploadedFile = upload_serializer.validated_data['file'] 
@@ -56,7 +56,6 @@ class DocumentUploadProcessView(GenericAPIView):
                 dest.write(chunk)
         document_record.status = DocumentStatus.PROCESSING
                 
-        
         # run the rag pipeline in background
         task_id = async_task(
             'apps.knowledge_base.tasks.run_rag_processing_pipeline_task',

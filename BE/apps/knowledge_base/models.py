@@ -7,10 +7,10 @@ VECTOR_DIM = 384
 # Create your models here.
 
 class DocumentStatus(models.TextChoices):
-    UPLOADED    = "UPLOADED", 'Uploaded'        # file uploaded successfully, waiting in queue to be processed
-    PROCESSING  = 'PROCESSING', 'Processing'    # rag pipeline initiated, processing is underway
-    SUCCESS     = "SUCCESS", 'Success'          # Rag pipeline finished successfully, file is available for knowledge base
-    FAILED      = "FAILED", "Failed"            # Rag pipeline was not completed
+    PENDING     = 'Pending'         # file uploaded successfully, waiting in queue to be processed
+    PROCESSING  = 'Processing'      # rag pipeline initiated, processing is underway
+    SUCCESS     = 'Success'         # Rag pipeline finished successfully, file is available for knowledge base
+    FAILED      = "Failed"          # Rag pipeline was not completed
     
     
 class Document(models.Model):
