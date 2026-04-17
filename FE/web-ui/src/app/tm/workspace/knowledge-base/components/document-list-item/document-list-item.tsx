@@ -29,7 +29,7 @@ export function DocumentListItem({
               <Text size="1">{document.size}</Text>
               <Text size="1">•</Text>
               <Text size="1">
-                {document.uploadDate.toLocaleDateString("en-US", {
+                {new Date(document.uploadDate).toLocaleDateString("en-US", {
                   year: "numeric",
                   month: "short",
                   day: "numeric",
@@ -39,20 +39,19 @@ export function DocumentListItem({
                 })}
               </Text>
             </Flex>
-            {document.message && (
-              <Flex gap="1" align="center">
-                <MessageIcon
-                  size={14}
-                  color={FileStatusDisplay[document.status].color}
-                />
-                <Text
-                  size="1"
-                  style={{ color: FileStatusDisplay[document.status].color }}
-                >
-                  {document.message}
-                </Text>
-              </Flex>
-            )}
+
+            <Flex gap="1" align="center">
+              <MessageIcon
+                size={14}
+                color={FileStatusDisplay[document.status].color}
+              />
+              <Text
+                size="1"
+                style={{ color: FileStatusDisplay[document.status].color }}
+              >
+                {document.message || FileStatusDisplay[document.status].message}
+              </Text>
+            </Flex>
           </Flex>
         </Flex>
 

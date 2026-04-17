@@ -24,21 +24,37 @@ export const StatusDisplay: Record<Status, { title: string }> = {
 
 export const FileStatusDisplay: Record<
   FileStatus,
-  { icon: React.ElementType; messageIcon: React.ElementType; color: string }
+  {
+    icon: React.ElementType;
+    messageIcon: React.ElementType;
+    color: string;
+    message: string;
+  }
 > = {
-  [FileStatus.Done]: {
+  [FileStatus.Success]: {
     icon: CheckCircle,
     messageIcon: CheckCheck,
     color: "var(--status-completed)",
+    message:
+      "File processing complete. The document is now available in your knowledge base.",
+  },
+  [FileStatus.Pending]: {
+    icon: CircleDashed,
+    messageIcon: CircleDashed,
+    color: "var(--status-in-progress)",
+    message: "File uploaded successfully. Processing will start shortly.",
   },
   [FileStatus.Processing]: {
     icon: CircleDashed,
     messageIcon: Loader,
     color: "var(--status-in-progress)",
+    message: "Extracting and analyzing your document.",
   },
   [FileStatus.Failed]: {
     icon: CircleAlert,
     messageIcon: CircleAlert,
     color: "var(--status-cancel)",
+    message:
+      "An error occurred during file processing. Please try again later.",
   },
 };

@@ -8,7 +8,8 @@ export enum Status {
 }
 
 export enum FileStatus {
+  Pending = "Pending",
   Processing = "Processing",
-  Done = "Done",
+  Success = "Success",
   Failed = "Failed",
 }

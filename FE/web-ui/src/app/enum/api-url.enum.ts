@@ -17,5 +17,5 @@ export enum ApiUrl {
   TaskProductivity = "/v1/tasks/productivity",
 
   // Knowledge Base
-  KnowledgeBaseUpload = "/v1/knowledge-base/upload",
+  KnowledgeBase = "/v1/knowledge-base/documents",
 }

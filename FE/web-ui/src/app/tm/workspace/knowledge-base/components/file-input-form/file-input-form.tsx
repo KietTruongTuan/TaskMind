@@ -1,5 +1,4 @@
 "use client";
-
 import { CardNoPadding } from "@/app/components/card-no-padding/card-no-padding";
 import { Header } from "@/app/components/header/header";
 import { Input } from "@headlessui/react";
@@ -7,12 +6,16 @@ import { Flex, Text } from "@radix-ui/themes";
 import { CloudUpload } from "lucide-react";
 import { useRef, useState } from "react";
 import styles from "./file-input-form.module.scss";
+import { ApiError, knowledgeBaseService } from "@/app/constants";
+import { useToast } from "@/app/contexts/toast-context/toast-context";
+import { useRouter } from "next/navigation";
 
 export function FileInputForm() {
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-
+  const router = useRouter();
+  const { setIsSuccess, showToast } = useToast();
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(true);
@@ -37,12 +40,26 @@ export function FileInputForm() {
     }
   };
 
-  const handleFiles = (files: FileList) => {
+  const handleFiles = async (files: FileList) => {
     const formData = new FormData();
-    Array.from(files).forEach((file) => {
-      formData.append("files", file);
-    });
-    console.log("Files selected:", formData.get("files"));
+    // Array.from(files).forEach((file) => {
+    //   formData.append("files", file);
+    // });
+    formData.append("file", files[0]);
+    try {
+      setIsUploading(true);
+      const res = await knowledgeBaseService.upload(formData);
+      console.log(res);
+      setIsSuccess(true);
+      router.refresh();
+      showToast("Your file is successfully uploaded");
+    } catch (err) {
+      setIsSuccess(false);
+      const error = err as ApiError;
+      showToast(error.message);
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   return (
