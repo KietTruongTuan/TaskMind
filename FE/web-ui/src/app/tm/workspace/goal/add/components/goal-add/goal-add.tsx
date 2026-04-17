@@ -14,10 +14,12 @@ import { Dispatch, SetStateAction } from "react";
 import { LoadingOverlay } from "@/app/components/loading-overlay/loading-overlay";
 import {
   aiService,
+  ApiError,
   CreateGoalRequestBody,
   CreateGoalResponseBody,
 } from "@/app/constants";
 import { useGoalContext } from "@/app/contexts/goal-context/goal-context";
+import { useToast } from "@/app/contexts/toast-context/toast-context";
 
 export function GoalAdd({
   setStep,
@@ -31,111 +33,116 @@ export function GoalAdd({
 
   const {
     handleSubmit,
-    formState: { isValid, isSubmitting },
+    formState: { isValid },
     getValues,
   } = methods;
   const { setDraftGoal } = useGoalContext();
+  const { showToast, setIsSuccess } = useToast();
+
   const onSubmit = async () => {
-    const data = getValues();
-    let requestData: CreateGoalRequestBody | FormData = data;
+    try {
+      setStep(AddStep.ReviewDetail);
+      const data = getValues();
+      let requestData: CreateGoalRequestBody | FormData = data;
 
-    if (data.files && data.files.length > 0) {
-      const formData = new FormData();
-      formData.append("name", data.name);
-      if (data.description) formData.append("description", data.description);
-      if (data.deadline)
-        formData.append(
-          "deadline",
-          new Date(data.deadline).toISOString().split("T")[0],
-        );
-      if (data.tag) {
-        data.tag.forEach((t) => formData.append("tag", t));
+      if (data.files && data.files.length > 0) {
+        const formData = new FormData();
+        formData.append("name", data.name);
+        if (data.description) formData.append("description", data.description);
+        if (data.deadline)
+          formData.append(
+            "deadline",
+            new Date(data.deadline).toISOString().split("T")[0],
+          );
+        if (data.tag) {
+          data.tag.forEach((t) => formData.append("tag", t));
+        }
+        data.files.forEach((file) => {
+          formData.append("files", file);
+        });
+        requestData = formData;
       }
-      data.files.forEach((file) => {
-        formData.append("files", file);
+      const draftGoalData: CreateGoalResponseBody =
+        await aiService.createGoal(requestData);
+      setDraftGoal({
+        ...draftGoalData,
+        tasks: draftGoalData.tasks?.map((t, index) => ({
+          ...t,
+          index: index,
+        })),
       });
-      requestData = formData;
+    } catch (err) {
+      setIsSuccess(false);
+      const error = err as ApiError;
+      console.log(error);
+      showToast(error.message);
     }
-
-    const draftGoalData: CreateGoalResponseBody =
-      await aiService.createGoal(requestData);
-    setDraftGoal({
-      ...draftGoalData,
-      tasks: draftGoalData.tasks?.map((t, index) => ({
-        ...t,
-        index: index,
-      })),
-    });
-    setStep(AddStep.ReviewDetail);
   };
 
   return (
-    <>
-      <LoadingOverlay isLoading={isSubmitting} />
-      <Flex width="100%" justify="center" align="center" height="92vh">
-        <Flex
-          width={{ initial: "100%", md: "50%" }}
-          direction="column"
-          py="5"
-          gap="5"
-        >
-          <CardNoPadding py="5" px="5" isPrimary>
-            <FormProvider {...methods}>
-              <Form.Root
-                className={styles.formWrapper}
-                onSubmit={handleSubmit(onSubmit)}
-              >
-                <Flex direction="column" gap="4">
-                  <Flex
-                    direction="column"
-                    width="100%"
-                    gap="1"
-                    data-testid="goal-add-header"
-                  >
-                    <Header
-                      text="Let AI help you create a new goal"
-                      subText="Type your goal and let AI create a detailed step-by-step plan for you."
-                      textSize="2"
-                      subTextSize="2"
-                      icon={<Sparkles size={18} />}
-                    />
-                  </Flex>
-                  <GoalAddForm />
-                  <CustomButton
-                    type="submit"
-                    disabled={!isValid}
-                    buttonType={ButtonType.Primary}
-                    data-testid="goal-add-button"
-                  >
-                    <Sparkles size={18} />
-                    Create your plan
-                  </CustomButton>
-                  <CardNoPadding p="4">
-                    <Flex direction="column" width="100%" gap="1">
-                      <Flex direction="column" gap="2">
-                        <Text size="2" weight="medium">
-                          AI will help you:
+    <Flex width="100%" justify="center" align="center" height="92vh">
+      <Flex
+        width={{ initial: "100%", md: "50%" }}
+        direction="column"
+        py="5"
+        gap="5"
+      >
+        <CardNoPadding py="5" px="5" isPrimary>
+          <FormProvider {...methods}>
+            <Form.Root
+              className={styles.formWrapper}
+              onSubmit={handleSubmit(onSubmit)}
+            >
+              <Flex direction="column" gap="4">
+                <Flex
+                  direction="column"
+                  width="100%"
+                  gap="1"
+                  data-testid="goal-add-header"
+                >
+                  <Header
+                    text="Let AI help you create a new goal"
+                    subText="Type your goal and let AI create a detailed step-by-step plan for you."
+                    textSize="2"
+                    subTextSize="2"
+                    icon={<Sparkles size={18} />}
+                  />
+                </Flex>
+                <GoalAddForm />
+                <CustomButton
+                  type="submit"
+                  disabled={!isValid}
+                  buttonType={ButtonType.Primary}
+                  data-testid="goal-add-button"
+                >
+                  <Sparkles size={18} />
+                  Create your plan
+                </CustomButton>
+                <CardNoPadding p="4">
+                  <Flex direction="column" width="100%" gap="1">
+                    <Flex direction="column" gap="2">
+                      <Text size="2" weight="medium">
+                        AI will help you:
+                      </Text>
+                      <Flex direction="column" gap="1">
+                        <Text size="2" className={styles.subText}>
+                          • Break down your goal into specific steps
                         </Text>
-                        <Flex direction="column" gap="1">
-                          <Text size="2" className={styles.subText}>
-                            • Break down your goal into specific steps
-                          </Text>
-                          <Text size="2" className={styles.subText}>
-                            • Build a detailed timeline for your plan
-                          </Text>
-                          <Text size="2" className={styles.subText}>
-                            • Suggest supporting resources
-                          </Text>
-                        </Flex>
+                        <Text size="2" className={styles.subText}>
+                          • Build a detailed timeline for your plan
+                        </Text>
+                        <Text size="2" className={styles.subText}>
+                          • Suggest supporting resources
+                        </Text>
                       </Flex>
                     </Flex>
-                  </CardNoPadding>
-                </Flex>
-              </Form.Root>
-            </FormProvider>
-          </CardNoPadding>
-        </Flex>
+                  </Flex>
+                </CardNoPadding>
+              </Flex>
+            </Form.Root>
+          </FormProvider>
+        </CardNoPadding>
       </Flex>
-    </>
+    </Flex>
   );
 }

@@ -82,21 +82,15 @@ export function EditField({
 
   if (!isEditing) {
     return (
-      <Flex gap="1" align={isMultiLine ? "start" : "center"}>
+      <Flex
+        gap="1"
+        align={isMultiLine ? "start" : "center"}
+        onClick={(e) => {
+          e.stopPropagation();
+          onEditStart();
+        }}
+      >
         {children}
-        {isDetailCard && (
-          <Flex flexShrink="0" mt={isMultiLine ? "1" : ""}>
-            <Pen
-              size={iconSize}
-              cursor="pointer"
-              onClick={(e) => {
-                e.stopPropagation();
-                onEditStart();
-              }}
-              data-testid={`edit-${fieldName}-button`}
-            />
-          </Flex>
-        )}
       </Flex>
     );
   }

@@ -147,7 +147,7 @@ export function GoalReview({
     },
   ];
   return (
-    <Flex width="100%" justify="center" align="center" height="100%">
+    <Flex width="100%" justify="center" align="center" height="100%" px="7">
       <Flex
         width="100%"
         direction="column"
