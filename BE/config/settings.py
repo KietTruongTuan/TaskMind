@@ -106,6 +106,9 @@ if USE_POSTGRES:
             'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'taskmind'),
             'HOST': os.environ.get('POSTGRES_HOST', 'db'),
             'PORT': os.environ.get('POSTGRES_PORT', '5432'),
+            'OPTION': {
+                'sslmode': 'required',
+            },
         }
     }
 else:
@@ -259,6 +262,7 @@ RAG_EMBED_MODEL_NAME = os.environ.get('RAG_EMBED_MODEL_NAME')
 RAG_LLM_MODEL_NAME = os.environ.get('RAG_LLM_MODEL_NAME')
 RAG_LLM_API_URL = os.environ.get('RAG_LLM_API_URL')
 RAG_LLM_API_KEY = os.environ.get('RAG_LLM_API_KEY')
+RAG_ALLOWED_EXTENSIONS = [".pdf", ".docx"]
 
 # File upload limits
 MAX_FILES = 5
