@@ -38,7 +38,8 @@ services:
       - /app/node_modules
     depends_on:
       - backend
-    environment:
-      - WATCHPACK_POLLING=true
-      - CHOKIDAR_USEPOLLING=true
-      - INTERNAL_API_BASE_URL=http://backend:8000
+    env_file:
+      - ./FE/web-ui/.env.development
+
+volumes:
+  huggingface_cache:

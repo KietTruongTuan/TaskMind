@@ -4,6 +4,7 @@ __pycache__
 *.pyd
 .db.sqlite3
 .venv
-env
+.env
 .git
 .gitignore
+.env.*

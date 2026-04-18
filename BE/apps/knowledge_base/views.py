@@ -13,6 +13,7 @@ from .models import Document, DocumentChunk, DocumentStatus
 
 # for type hint
 from django.core.files.uploadedfile import UploadedFile
+from typing import List
 
 
 class DocumentUploadProcessView(APIView):
@@ -36,39 +37,43 @@ class DocumentUploadProcessView(APIView):
         
     def post(self, request: Request):
         # get uploaded files from request + validate uploaded file
-        upload_serializer = DocumentUploadProcessSerializer(data=request.data)
+        data = {"file": request.FILES.getlist('file')}
+        upload_serializer = DocumentUploadProcessSerializer(data=data)
         if not upload_serializer.is_valid():
             return Response(upload_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        uploaded_file: UploadedFile = upload_serializer.validated_data['file'] 
+        uploaded_files: List[UploadedFile] = upload_serializer.validated_data['file']
+        processed_files: List[Document] = []
         
-        # save a tracking record in db
-        document_record = Document.objects.create(
-            user=request.user,
-            filename = uploaded_file.name,
-            size_byte = uploaded_file.size,
-        )
-        
-        # store the file temporarily for processing
-        filepath = settings.BASE_DIR / "storage" / uploaded_file.name
-        with open(filepath, "wb+") as dest:
-            # store the file temporarily in storage
-            for chunk in uploaded_file:
-                dest.write(chunk)
-        document_record.status = DocumentStatus.PROCESSING
-                
-        # run the rag pipeline in background
-        task_id = async_task(
-            'apps.knowledge_base.tasks.run_rag_processing_pipeline_task',
-            filepath,   
-            settings.RAG_LLM_MODEL_NAME,
-            settings.RAG_LLM_API_URL,
-            settings.RAG_LLM_API_KEY,
-            document_record.id
-        )
-        document_record.task_id = task_id
-        document_record.save()
+        for uploaded_file in uploaded_files:
+            # save a tracking record in db
+            document_record = Document.objects.create(
+                user=request.user,
+                filename = uploaded_file.name,
+                size_byte = uploaded_file.size,
+            )
+            
+            # store the file temporarily for processing
+            filepath = settings.BASE_DIR / "storage" / uploaded_file.name
+            with open(filepath, "wb+") as dest:
+                # store the file temporarily in storage
+                for chunk in uploaded_file.chunks():
+                    dest.write(chunk)
+            document_record.status = DocumentStatus.PENDING
+                    
+            # run the rag pipeline in background
+            task_id = async_task(
+                'apps.knowledge_base.tasks.run_rag_processing_pipeline_task',
+                str(filepath),
+                settings.RAG_LLM_MODEL_NAME,
+                settings.RAG_LLM_API_URL,
+                settings.RAG_LLM_API_KEY,
+                document_record.id
+            )
+            document_record.task_id = task_id
+            document_record.save()
+            processed_files.append(document_record)
         
         return Response({
             "message": "Document uploaded sucessfully, processing is underway.",
-            "document": DocumentSerializer(document_record).data
+            "document": DocumentSerializer(processed_files, many=True).data
         }, status=status.HTTP_202_ACCEPTED)
