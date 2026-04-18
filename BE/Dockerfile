@@ -2,6 +2,7 @@ FROM python:3.12-slim AS basebe
 
 # dont write .pyc files
 ENV PYTHONDONTWRITEBYTECODE=1
+# print logs directly to console
 ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
