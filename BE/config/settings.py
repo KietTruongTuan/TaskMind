@@ -106,11 +106,12 @@ if USE_POSTGRES:
             'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'taskmind'),
             'HOST': os.environ.get('POSTGRES_HOST', 'db'),
             'PORT': os.environ.get('POSTGRES_PORT', '5432'),
-            'OPTION': {
-                'sslmode': 'required',
-            },
         }
     }
+    if os.environ.get('REQUIRE_DB_SSL', 'False').lower() == 'true':
+            DATABASES['default']['OPTIONS'] = {
+                'sslmode': 'require',
+            }
 else:
     DATABASES = {
         'default': {
