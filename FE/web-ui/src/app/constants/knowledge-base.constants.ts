@@ -10,7 +10,3 @@ export interface KnowledgeBaseResponseBody {
   status: FileStatus;
   message?: string;
 }
-
-export interface KnowledgeBaseUploadResponseBody {
-  message: string;
-}

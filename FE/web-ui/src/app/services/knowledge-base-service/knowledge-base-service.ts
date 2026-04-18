@@ -1,5 +1,5 @@
 import { HttpService } from "../http-service/http-service";
-import { KnowledgeBaseResponseBody, KnowledgeBaseUploadResponseBody } from "@/app/constants";
+import { KnowledgeBaseResponseBody } from "@/app/constants";
 import { ApiUrl } from "@/app/enum/api-url.enum";
 
 export class KnowledgeBaseService extends HttpService {
@@ -8,7 +8,7 @@ export class KnowledgeBaseService extends HttpService {
   }
 
   async upload(data: FormData) {
-    const res = await this.post<KnowledgeBaseUploadResponseBody, FormData>(
+    const res = await this.post<KnowledgeBaseResponseBody, FormData>(
       ApiUrl.KnowledgeBase,
       data,
       { headers: { "Content-Type": undefined } },

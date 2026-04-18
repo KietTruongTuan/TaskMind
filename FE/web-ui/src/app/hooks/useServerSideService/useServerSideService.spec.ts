@@ -1,6 +1,12 @@
 import { cookies } from "next/headers";
 import { useServerSideService } from "./useServerSideService"; // Update with actual path
-import { aiService, authenticationService, goalService, taskService } from "../../constants";
+import {
+  aiService,
+  authenticationService,
+  goalService,
+  knowledgeBaseService,
+  taskService,
+} from "../../constants";
 
 jest.mock("next/headers", () => ({
   cookies: jest.fn(),
@@ -14,6 +20,9 @@ jest.mock("../../constants", () => ({
     setAccessToken: jest.fn(),
   },
   taskService: {
+    setAccessToken: jest.fn(),
+  },
+  knowledgeBaseService: {
     setAccessToken: jest.fn(),
   },
   authenticationService: {
@@ -73,6 +82,7 @@ describe("useServerSideService", () => {
       goalService,
       aiService,
       taskService,
+      knowledgeBaseService,
       accessToken: "new_mock_access_token",
     });
   });
@@ -99,7 +109,7 @@ describe("useServerSideService", () => {
     expect(goalService.setAccessToken).not.toHaveBeenCalled();
     expect(aiService.setAccessToken).not.toHaveBeenCalled();
     expect(taskService.setAccessToken).not.toHaveBeenCalled();
-
+    expect(knowledgeBaseService.setAccessToken).not.toHaveBeenCalled();
     expect(result.accessToken).toBeUndefined();
   });
 });
