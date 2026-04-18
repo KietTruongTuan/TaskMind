@@ -42,10 +42,9 @@ export function FileInputForm() {
 
   const handleFiles = async (files: FileList) => {
     const formData = new FormData();
-    // Array.from(files).forEach((file) => {
-    //   formData.append("files", file);
-    // });
-    formData.append("file", files[0]);
+    Array.from(files).forEach((file) => {
+      formData.append("files", file);
+    });
     try {
       setIsUploading(true);
       const res = await knowledgeBaseService.upload(formData);
