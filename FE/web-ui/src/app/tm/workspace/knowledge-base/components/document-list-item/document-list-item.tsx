@@ -1,3 +1,4 @@
+"use client";
 import { CardNoPadding } from "@/app/components/card-no-padding/card-no-padding";
 import { KnowledgeBaseResponseBody } from "@/app/constants/knowledge-base.constants";
 import { Flex, Text } from "@radix-ui/themes";

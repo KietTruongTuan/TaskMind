@@ -1,9 +1,7 @@
 import { Header } from "@/app/components/header/header";
 import { Box, Flex, Grid } from "@radix-ui/themes";
 import { DocumentList } from "./components/document-list/document-list";
-import { FileStatus } from "@/app/enum/status.enum";
 import { KnowledgeBaseResponseBody } from "@/app/constants/knowledge-base.constants";
-import { FileType } from "@/app/enum/file-type.enum";
 import { FileInputForm } from "./components/file-input-form/file-input-form";
 import { useServerSideService } from "@/app/hooks/useServerSideService/useServerSideService";
 
