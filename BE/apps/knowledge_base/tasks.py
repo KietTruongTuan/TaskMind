@@ -12,11 +12,16 @@ def run_rag_processing_pipeline_task(
     llm_model_api_key: str,
     source_document_id: int,
 ):
-    raw_content = RAGFileProcessService.read_pdf(filepath)
-    structure_chunks = RAGFileProcessService.phase1_structure_chunking(raw_content)
+    # keep track of the document being processed
     source_document = Document.objects.get(id=source_document_id)
     source_document.status = DocumentStatus.PROCESSING
     source_document.save(update_fields=['status'])
+    
+    # phase 1 structure chunking
+    raw_content = RAGFileProcessService.read_pdf(filepath)
+    structure_chunks = RAGFileProcessService.phase1_structure_chunking(raw_content)
+    
+    # phase 2 semantic chunking
     try:
         llm_client = OpenAI(
             base_url=llm_model_url,

@@ -30,13 +30,16 @@ class DocumentSerializer(serializers.ModelSerializer):
         
         
 class DocumentUploadProcessSerializer(serializers.Serializer):
-    file = serializers.FileField()
+    file = serializers.ListField(
+        child=serializers.FileField(),
+        allow_empty=False,
+        error_messages={"empty": "No files was uploaded"}
+    )
     
-    def validate_file(self, file):
-        if not file:
-            raise serializers.ValidationError("No file was uploaded")
-        if not any([file.name.endswith(ext) for ext in settings.RAG_ALLOWED_EXTENSIONS]):
-            raise serializers.ValidationError(f"Invalid file type. Allowed types are {settings.RAG_ALLOWED_EXTENSIONS}")
-        if file.size > settings.MAX_FILE_SIZE:
-            raise serializers.ValidationError(f"File size limit exceeded. Max allowed is {settings.MAX_FILE_SIZE}")
+    def validate_files(self, files):
+        for file in files:
+            if not any([file.name.endswith(ext) for ext in settings.RAG_ALLOWED_EXTENSIONS]):
+                raise serializers.ValidationError(f"Invalid file type for {file.name}. Allowed types are {settings.RAG_ALLOWED_EXTENSIONS}")
+            if file.size > settings.MAX_FILE_SIZE:
+                raise serializers.ValidationError(f"File size limit exceeded for {file.name}. Max allowed is {settings.MAX_FILE_SIZE}")
         return file

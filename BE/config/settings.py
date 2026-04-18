@@ -281,7 +281,7 @@ Q_CLUSTER = {
     'queue_limit': 500,        # Max tasks that can be queued up at once
     'cpu_affinity': 1,         # Optimizes CPU usage
     'label': 'Django Q2',
-    'orm': 'default'           # CRITICAL: Tells Q2 to use your NeonDB as the queue
+    'orm': 'default',          # CRITICAL: Tells Q2 to use your NeonDB as the queue
 }
 
 class _StructuredFormatter(_logging.Formatter):
