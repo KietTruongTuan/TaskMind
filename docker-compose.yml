@@ -1,4 +1,18 @@
 services:
+  db:
+    image: pgvector/pgvector:pg16 # This is the official Postgres image with pgvector pre-installed
+    container_name: capstone-db
+    restart: always
+    environment:
+      POSTGRES_USER: taskmind
+      POSTGRES_PASSWORD: taskmind_password
+      POSTGRES_DB: taskmind
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data # Persists DB data
+      - ./BE/init.sql:/docker-entrypoint-initdb.d/init.sql # run db initalize script
+
   backend:
     build:
       context: ./BE
@@ -10,6 +24,9 @@ services:
       - ./BE:/app
     env_file:
       - ./BE/.env
+    depends_on:
+      - db
+    command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
 
   backend-worker:
     build:
@@ -25,6 +42,7 @@ services:
       - ./BE/.env
     depends_on:
       - backend
+      - db
 
   frontend:
     build:
@@ -43,3 +61,4 @@ services:
 
 volumes:
   huggingface_cache:
+  postgres_data:
