@@ -15,4 +15,7 @@ export enum ApiUrl {
   // Tasks
   Task = "/v1/tasks",
   TaskProductivity = "/v1/tasks/productivity",
+
+  // Knowledge Base
+  KnowledgeBase = "/v1/knowledge-base/documents",
 }

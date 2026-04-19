@@ -3,6 +3,7 @@ import {
   aiService,
   authenticationService,
   goalService,
+  knowledgeBaseService,
   taskService,
 } from "@/app/constants";
 
@@ -26,7 +27,14 @@ export async function useServerSideService() {
     goalService.setAccessToken(accessToken);
     aiService.setAccessToken(accessToken);
     taskService.setAccessToken(accessToken);
+    knowledgeBaseService.setAccessToken(accessToken);
   }
 
-  return { goalService, aiService, taskService, accessToken };
+  return {
+    goalService,
+    aiService,
+    taskService,
+    knowledgeBaseService,
+    accessToken,
+  };
 }

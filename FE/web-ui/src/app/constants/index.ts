@@ -5,3 +5,5 @@ export * from "./goal.constants";
 export * from "./task.constants";
 export * from "./mock.constants";
 export * from "./status.constants";
+export * from "./knowledge-base.constants";
+export * from "./file-type.constants";

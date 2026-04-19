@@ -1,4 +1,5 @@
-import { Status } from "../enum/status.enum";
+import { FileType } from "../enum/file-type.enum";
+import { FileStatus, Status } from "../enum/status.enum";
 import {
   LoginRequestBody,
   LoginResponseBody,
@@ -13,6 +14,7 @@ import {
   GoalListItemResponseBody,
   GoalListResponseBody,
 } from "./goal.constants";
+import { KnowledgeBaseResponseBody } from "./knowledge-base.constants";
 import {
   CreateTaskRequestBody,
   DraftTask,
@@ -210,3 +212,44 @@ export const MOCK_REGISTER_REQUEST_DATA: RegistrationRequestBody = {
 export const MOCK_REGISTER_RESPONSE_DATA: RegistrationResponseBody = {
   message: "Register successfully",
 };
+
+export const MOCK_KNOWLEDGE_BASE_UPLOAD_RESPONSE_DATA: KnowledgeBaseResponseBody = {
+  id: "1",
+  name: "File1.pdf",
+  fileType: FileType.Pdf,
+  size: "1 MB",
+  uploadDate: getFutureDate(),
+  status: FileStatus.Pending,
+  message: "File uploaded successfully",
+};
+
+export const MOCK_KNOWLEDGE_BASE_LIST_RESPONSE_DATA: KnowledgeBaseResponseBody[] = [
+  MOCK_KNOWLEDGE_BASE_UPLOAD_RESPONSE_DATA,
+  {
+    id: "2",
+    name: "File2.pdf",
+    fileType: FileType.Pdf,
+    size: "2 MB",
+    uploadDate: getFutureDate(),
+    status: FileStatus.Processing,
+    message: "File uploaded successfully",
+  },
+  {
+    id: "3",
+    name: "File3.pdf",
+    fileType: FileType.Pdf,
+    size: "3 MB",
+    uploadDate: getFutureDate(),
+    status: FileStatus.Success,
+    message: "File uploaded successfully",
+  },
+  {
+    id: "4",
+    name: "File4.pdf",
+    fileType: FileType.Pdf,
+    size: "4 MB",
+    uploadDate: getFutureDate(),
+    status: FileStatus.Failed,
+    message: "File uploaded successfully",
+  },
+];

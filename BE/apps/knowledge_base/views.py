@@ -37,7 +37,7 @@ class DocumentUploadProcessView(APIView):
         
     def post(self, request: Request):
         # get uploaded files from request + validate uploaded file
-        data = {"file": request.FILES.getlist('file')}
+        data = {"file": request.FILES.getlist('files')}
         upload_serializer = DocumentUploadProcessSerializer(data=data)
         if not upload_serializer.is_valid():
             return Response(upload_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
