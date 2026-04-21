@@ -187,20 +187,35 @@ class RAGContextService:
     """Provide context for task prompt from knowledge base"""
     
     @staticmethod
-    def context_query(name: str, description: str, top_k: int, user: User | None = None) -> List[str]:
-        """Get top k most related chunks from knowledge base"""
-        query_text = '. '.join([name, description])
-        embed_model = EmbeddingModel.get_embed_model()
-        query_embed = RAGFileProcessService.generate_embedding(embed_model, query_text)
+    def context_query_wrapper(name: str, description: str, top_k: int, user: User | None = None) -> List[str]:
+        def context_query(name: str, description: str, top_k: int, user: User | None = None) -> List[str]:
+            """Get top k most related chunks from knowledge base"""
+            query_text = '. '.join([name, description])
+            embed_model = EmbeddingModel.get_embed_model()
+            query_embed = RAGFileProcessService.generate_embedding(embed_model, query_text)
+            
+            logger.info(f"Calling user instance: {user}")
+            
+            # only get context from user's document or built-in ones
+            security_filter = (Q(source_document__user=user.id) | Q(source_document__user__isnull=True)) if user else Q(source_document__user__isnull=True)
+            relevant_chunks: List[DocumentChunk] = list(
+                DocumentChunk.objects.filter(security_filter).order_by(
+                    CosineDistance('embedding', query_embed)
+                )[:top_k]
+            )
+            
+            return [str(chunk.content) for chunk in relevant_chunks]
         
-        logger.info(f"Calling user instance: {user}")
-        
-        # only get context from user's document or built-in ones
-        security_filter = (Q(source_document__user=user.id) | Q(source_document__user__isnull=True)) if user else Q(source_document__user__isnull=True)
-        relavant_chunks: List[DocumentChunk] = list(
-            DocumentChunk.objects.filter(security_filter).order_by(
-                CosineDistance('embedding', query_embed)
-            )[:top_k]
-        )
-        
-        return [str(chunks.content) for chunks in relavant_chunks]
+        relevant_context = ""
+        if getattr(settings, "ENABLE_GOAL_RAG_CONTEXT", True):
+            try:
+                relevant_context = (
+                    context_query(name, description, top_k, user) or []
+                )
+            except Exception as e:
+                logger.warning(
+                    "Failed to retrieve RAG context for goal generation: %s",
+                    str(e),
+                    exc_info=True,
+                )
+        return relevant_context

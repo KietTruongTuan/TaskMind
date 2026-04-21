@@ -386,7 +386,7 @@ class AIGoalGeneratorService:
 
     @staticmethod
     def build_prompt_for_task(name, description, deadline, user: User | None = None):
-        relavant_context = RAGContextService.context_query(name, description, settings.TOP_K_CONTEXT, user)
+        relevant_context = RAGContextService.context_query_wrapper(name, description, settings.TOP_K_CONTEXT, user)
         return f"""You are an excellent project management assistant.
             Here is a new goal:
             Name: '{name}'
@@ -396,7 +396,7 @@ class AIGoalGeneratorService:
             Each step should be a clear, achievable task within deadline.
             
             Here are some context, prioritize using these context for your response, if it is empty, then you can ignore it:
-            {relavant_context}
+            {relevant_context}
             
             Must return the list of tasks as a JSON array of strings.
             
