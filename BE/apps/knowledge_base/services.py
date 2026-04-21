@@ -184,7 +184,7 @@ Text block:
     
     
 class RAGContextService:
-    """Provide copntext for task prompt from knowledge base"""
+    """Provide context for task prompt from knowledge base"""
     
     @staticmethod
     def context_query(name: str, description: str, top_k: int, user: User | None = None) -> List[str]:
