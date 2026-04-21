@@ -23,6 +23,7 @@ export function GoalAddForm() {
         type="text"
         placeholder="Describe your goal in detail, your current situation, and what you want to achieve..."
         isMultiLine
+        isFileInput
         errors={errors.description as FieldError}
       />
       <Flex width="100%" gap="4">

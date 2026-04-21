@@ -1,11 +1,13 @@
 import * as Form from "@radix-ui/react-form";
 import * as Label from "@radix-ui/react-label";
-import { Box, Flex, Text } from "@radix-ui/themes";
+import { AlertDialog, Box, Flex, Text } from "@radix-ui/themes";
 import { FieldError, RegisterOptions, useFormContext } from "react-hook-form";
 import styles from "./input-field.module.scss";
 import { useEffect, useState } from "react";
-import { EyeIcon, EyeOffIcon, Plus, X } from "lucide-react";
+import { EyeIcon, EyeOffIcon, File, Plus, X } from "lucide-react";
 import { Input, Textarea } from "@headlessui/react";
+import { Header } from "../header/header";
+import { InputFileArea } from "../input-file-area/input-file-area";
 
 export interface InputPropsType {
   name: string;
@@ -15,6 +17,7 @@ export interface InputPropsType {
   errors?: FieldError;
   isMultiLine?: boolean;
   isMultiInput?: boolean;
+  isFileInput?: boolean;
 }
 
 export function InputField({
@@ -25,6 +28,7 @@ export function InputField({
   errors,
   isMultiLine = false,
   isMultiInput = false,
+  isFileInput = false,
 }: InputPropsType) {
   const { register, setValue, trigger } = useFormContext();
   const [showPassword, setShowPassword] = useState(false);
@@ -65,47 +69,83 @@ export function InputField({
             </Text>
           </Label.Root>
         </Form.Label>
-        {isMultiInput ? (
-          <>
-            <Input
-              placeholder={placeholder}
-              className={styles.fieldInput}
-              onChange={(e) => {
-                setQuery(e.target.value);
-              }}
-              value={query}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  onAddTag();
-                }
-              }}
-              onBlur={() => trigger(name)}
-              data-testid={`${name}-field`}
-            />
-            <Input type="hidden" {...register(name, rules)} />
-          </>
-        ) : (
-          <Form.Control asChild>
-            {isMultiLine ? (
-              <Textarea
-                placeholder={placeholder}
-                {...register(name, rules)}
-                className={styles.fieldInput}
-                rows={6}
-                data-testid={`${name}-field`}
-              />
-            ) : (
+        <Flex width="100%" position="relative">
+          {isMultiInput ? (
+            <>
               <Input
-                type={inputType}
                 placeholder={placeholder}
-                {...register(name, rules)}
                 className={styles.fieldInput}
+                onChange={(e) => {
+                  setQuery(e.target.value);
+                }}
+                value={query}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    onAddTag();
+                  }
+                }}
+                onBlur={() => trigger(name)}
                 data-testid={`${name}-field`}
               />
-            )}
-          </Form.Control>
-        )}
+              <Input type="hidden" {...register(name, rules)} />
+            </>
+          ) : (
+            <Form.Control asChild>
+              {isMultiLine ? (
+                <Textarea
+                  placeholder={placeholder}
+                  {...register(name, rules)}
+                  className={styles.fieldInput}
+                  rows={6}
+                  data-testid={`${name}-field`}
+                />
+              ) : (
+                <Input
+                  type={inputType}
+                  placeholder={placeholder}
+                  {...register(name, rules)}
+                  className={styles.fieldInput}
+                  data-testid={`${name}-field`}
+                />
+              )}
+            </Form.Control>
+          )}
+          {isFileInput && (
+            <AlertDialog.Root>
+              <AlertDialog.Trigger data-testid="alert-dialog-trigger">
+                <Flex
+                  align="center"
+                  justify="center"
+                  className={styles.iconWrapper}
+                  position="absolute"
+                  p="2"
+                  top="5%"
+                  right="1%"
+                >
+                  <File size={16} />
+                </Flex>
+              </AlertDialog.Trigger>
+              <AlertDialog.Content
+                maxWidth={{ initial: "90%", sm: "50%"}}
+                height="50vh"
+                className={styles.dialogContent}
+              >
+                <Flex p="4" width="100%" height="100%" direction="column">
+                  <Flex justify="end" width="100%">
+                    <AlertDialog.Cancel>
+                      <X />
+                    </AlertDialog.Cancel>
+                  </Flex>
+                  <Flex width="100%" height="100%" direction="column" gap="2">  
+                    <Header text="Upload file" textSize="3" />
+                    <InputFileArea handleUpload={() => {}} />
+                  </Flex>
+                </Flex>
+              </AlertDialog.Content>
+            </AlertDialog.Root>
+          )}
+        </Flex>
 
         <Box
           onClick={() => setShowPassword((prev) => !prev)}
@@ -125,10 +165,10 @@ export function InputField({
               selected.length > 0 && errors
                 ? "35%"
                 : selected.length > 0
-                ? "39%"
-                : errors
-                ? "43%"
-                : "60%"
+                  ? "39%"
+                  : errors
+                    ? "43%"
+                    : "60%"
             }
             onMouseDown={(e) => e.preventDefault()}
             onClick={onAddTag}
