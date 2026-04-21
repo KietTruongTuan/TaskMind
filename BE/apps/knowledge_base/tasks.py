@@ -27,7 +27,7 @@ def run_rag_processing_pipeline_task(
         _embed_and_save_chunks(semantic_chunks, embed_model, source_document)
     except Exception as e:
         _handle_document_failure(source_document, str(e))
-        raise e
+        raise
     else:
         _update_document_status(source_document, DocumentStatus.SUCCESS)
     finally:
