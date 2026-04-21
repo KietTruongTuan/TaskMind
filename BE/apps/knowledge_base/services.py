@@ -197,10 +197,10 @@ class RAGContextService:
         
         # only get context from user's document or built-in ones
         security_filter = (Q(source_document__user=user.id) | Q(source_document__user__isnull=True)) if user else Q(source_document__user__isnull=True)
-        relavant_chunks: List[DocumentChunk] = list(
+        relevant_chunks: List[DocumentChunk] = list(
             DocumentChunk.objects.filter(security_filter).order_by(
                 CosineDistance('embedding', query_embed)
             )[:top_k]
         )
         
-        return [str(chunks.content) for chunks in relavant_chunks]
+        return [str(chunks.content) for chunks in relevant_chunks]
