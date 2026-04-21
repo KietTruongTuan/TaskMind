@@ -47,6 +47,7 @@ class GoalBreakdownView(APIView):
     """
     API endpoint that takes a goal's name, description, tag, and deadline,
     and returns a list of actionable tasks to achieve that goal using the Groq API."""
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
         files = request.FILES.getlist("files")
@@ -58,7 +59,7 @@ class GoalBreakdownView(APIView):
             )
 
         try:
-            result = GoalBreakDownService.generate_breakdown(request.data, files)
+            result = GoalBreakDownService.generate_breakdown(request.data, files, request.user)
             return Response(result, status=status.HTTP_200_OK)
         except Exception as e:
             return self._handle_view_error(e)

@@ -54,7 +54,7 @@ class Task(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     goal = models.ForeignKey(Goal, on_delete=models.CASCADE, related_name="tasks")
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=255)
     deadline = models.DateField(null=True, blank=True)
     complete_date = models.DateField(null=True, blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="ToDo")

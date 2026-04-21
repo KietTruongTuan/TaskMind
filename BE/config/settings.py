@@ -265,6 +265,14 @@ RAG_LLM_API_URL = os.environ.get('RAG_LLM_API_URL')
 RAG_LLM_API_KEY = os.environ.get('RAG_LLM_API_KEY')
 RAG_ALLOWED_EXTENSIONS = [".pdf", ".docx"]
 
+# ? Note: chunk size trade-off
+# ? - larger chunk -> less number of chunk -> less api call + wider context
+# ? - smaller chunk -> more number of chunk -> greater data granularity of data -> deeper + more detailed semantic
+CHUNK_MAX_SIZE = 30_000 # (characters)
+CHUNK_OVERLAP = 1       # (paragraphs)
+
+TOP_K_CONTEXT = 10  # the number of context to get from knowledge base to supply for plan generation 
+
 # File upload limits
 MAX_FILES = 5
 MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB per file
@@ -336,6 +344,11 @@ LOGGING = {
             'propagate': False,
         },
         'apps.goals.views': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'apps.knowledge_base.services': {
             'handlers': ['console'],
             'level': 'INFO',
             'propagate': False,

@@ -31,7 +31,7 @@ class DocumentUploadProcessView(APIView):
     
     def get(self, request: Request, *args, **kwargs):
         """return a list of files uploaded by the users, with their information"""
-        documents = Document.objects.filter(user=request.user.id).order_by('upload_date')
+        documents = Document.objects.filter(user=request.user.id).order_by('-upload_date')
         serializer = DocumentSerializer(documents, many=True)
         return Response(serializer.data)
         

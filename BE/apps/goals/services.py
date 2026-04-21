@@ -18,6 +18,9 @@ from openai import OpenAI
 from pypdf import PdfReader
 
 from .models import Goal, Task
+from apps.accounts.models import User
+from apps.knowledge_base.services import RAGContextService
+from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
@@ -382,7 +385,8 @@ class AIGoalGeneratorService:
             return None
 
     @staticmethod
-    def build_prompt_for_task(name, description, deadline):
+    def build_prompt_for_task(name, description, deadline, user: User | None = None):
+        relevant_context = RAGContextService.context_query_wrapper(name, description, settings.TOP_K_CONTEXT, user)
         return f"""You are an excellent project management assistant.
             Here is a new goal:
             Name: '{name}'
@@ -390,6 +394,9 @@ class AIGoalGeneratorService:
             Deadline: '{deadline}'
             Please help me break down this goal name and description into specific, actionable steps from {timezone.now().date().isoformat()} to "{deadline}".
             Each step should be a clear, achievable task within deadline.
+            
+            Here are some context, prioritize using these context for your response, if it is empty, then you can ignore it:
+            {relevant_context}
             
             Must return the list of tasks as a JSON array of strings.
             
@@ -736,7 +743,7 @@ class ContributionService:
 
 class GoalBreakDownService:
     @staticmethod
-    def generate_breakdown(data, files):
+    def generate_breakdown(data, files, user: User | None = None):
         """Orchestrates AI generation of tasks from a goal description."""
         name = data.get("name")
         description = data.get("description", "")
@@ -754,7 +761,7 @@ class GoalBreakDownService:
         )
 
         tasks = GoalBreakDownService._fetch_ai_tasks(
-            name, enhanced_desc, deadline, api_key, base_url, text_model
+            name, enhanced_desc, deadline, api_key, base_url, text_model, user
         )
         final_desc = GoalBreakDownService._fetch_ai_description(
             name, enhanced_desc, deadline, api_key, base_url, text_model
@@ -778,10 +785,11 @@ class GoalBreakDownService:
         return description
 
     @staticmethod
-    def _fetch_ai_tasks(name, description, deadline, api_key, base_url, text_model):
+    def _fetch_ai_tasks(name, description, deadline, api_key, base_url, text_model, user: User | None = None):
         task_prompt = AIGoalGeneratorService.build_prompt_for_task(
-            name, description, deadline
+            name, description, deadline, user
         )
+        logger.info(f"Calling to AI for generating task with prompt: {task_prompt}")
         return AIGoalGeneratorService.get_ai_response(
             task_prompt, api_key, base_url, text_model
         )
