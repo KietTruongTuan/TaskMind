@@ -13,7 +13,7 @@ from django.db.models import Q
 from pgvector.django import CosineDistance
 
 from .embedding_model import EmbeddingModel
-from .models import DocumentChunk, DocumentStatus
+from .models import DocumentChunk
 from apps.accounts.models import User
 
 logger = logging.getLogger(__name__)
