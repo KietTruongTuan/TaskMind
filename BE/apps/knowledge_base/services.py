@@ -6,12 +6,20 @@ import json
 import re
 from typing import List
 from enum import Enum
+import logging
 
-# ? Note: chunk size trade-off
-# ? - larger chunk -> less number of chunk -> less api call + wider context
-# ? - smaller chunk -> more number of chunk -> greater data granularity of data -> deeper + more detailed semantic
-CHUNK_MAX_SIZE = 30_000 # (characters)
-CHUNK_OVERLAP = 1       # (paragraphs)
+from django.conf import settings
+from django.db.models import Q
+from pgvector.django import CosineDistance
+
+from .embedding_model import EmbeddingModel
+from .models import DocumentChunk, DocumentStatus
+from apps.accounts.models import User
+
+logger = logging.getLogger(__name__)
+
+CHUNK_MAX_SIZE = settings.CHUNK_MAX_SIZE
+CHUNK_OVERLAP = settings.CHUNK_OVERLAP
 
 class SplitLevel(Enum):
     SENTENCES = 1
@@ -19,6 +27,7 @@ class SplitLevel(Enum):
     FIXED_CHUNKS = 3
 
 class RAGFileProcessService:
+    """set of methods for rag processing of user uploaded document"""
     @staticmethod
     def read_pdf(file_path: str) -> str:
         """Read + convert the provided pdf file into text in markdown format"""
@@ -172,3 +181,25 @@ Text block:
     @staticmethod
     def generate_embedding(embedding_model: SentenceTransformer, chunk: str) -> List:
         return embedding_model.encode(chunk).tolist()
+    
+    
+class RAGContextService:
+    """Provide copntext for task prompt from knowledge base"""
+    
+    @staticmethod
+    def context_query(name: str, description: str, top_k: int, user: User | None = None) -> List[str]:
+        """Get top k most related chunks from knowledge base"""
+        query_text = '. '.join([name, description])
+        embed_model = EmbeddingModel.get_embed_model()
+        query_embed = RAGFileProcessService.generate_embedding(embed_model, query_text)
+        
+        logger.info(f"Calling user instance: {user}")
+        
+        # only get context from user's document or built-in ones
+        security_filter = Q(source_document__user=user.id) | Q(source_document__user__isnull=True) if user else Q(source_document__user__isnull=True)
+        relavant_chunks: List[DocumentChunk] = list(DocumentChunk.objects.filter(security_filter
+        ).order_by(
+            CosineDistance('embedding', query_embed)
+        ))[:top_k]
+        
+        return [str(chunks.content) for chunks in relavant_chunks]
