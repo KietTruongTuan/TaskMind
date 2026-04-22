@@ -1,21 +1,38 @@
-from rest_framework import status
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.request import Request
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.parsers import MultiPartParser, FormParser
-from django_q.tasks import async_task
-from django_q.models import Task
-from django.conf import settings
+from typing import List
 
-from .serializers import DocumentSerializer, DocumentUploadProcessSerializer
-from .models import Document, DocumentChunk, DocumentStatus
+from django.conf import settings
 
 # for type hint
 from django.core.files.uploadedfile import UploadedFile
-from typing import List
+from django_q.models import Task
+from django_q.tasks import async_task
+from drf_spectacular.utils import extend_schema, extend_schema_view
+from rest_framework import status
+from rest_framework.parsers import FormParser, MultiPartParser
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.request import Request
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from .models import Document, DocumentStatus
+from .serializers import DocumentSerializer, DocumentUploadProcessSerializer
 
 
+@extend_schema_view(
+    get=extend_schema(
+        tags=["Knowledge base"],
+        summary="Get list of all uploaded document",
+        description="Get a list of all uploaded document order by upload date filtered by user id.",
+        responses={200: DocumentSerializer(many=True)},
+    ),
+    post=extend_schema(
+        tags=["Knowledge base"],
+        summary="Upload document",
+        description="Upload pdf, docx document for RAG processing",
+        request=DocumentUploadProcessSerializer,
+        responses={201: DocumentUploadProcessSerializer},
+    ),
+)
 class DocumentUploadProcessView(APIView):
     """
     Endpoint for Next.js to upload the document.
