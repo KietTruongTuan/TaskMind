@@ -7,6 +7,10 @@ from django.utils import timezone
 
 class GoalGenerateRequestSerializer(serializers.Serializer):
     """Request serializer for AI goal generation endpoint"""
+    history = serializers.ListField(
+        required=False,
+        help_text="Array of previos chat messages: [{'role': 'user', 'content': '...'}, {'role': 'assistant', 'content': '...'}]"
+    )
     message = serializers.CharField(
         help_text="User's response to AI's clarification questions",
         required=False,
