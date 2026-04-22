@@ -50,15 +50,30 @@ class AIGoalGeneratorService:
         return model
 
     @staticmethod
-    def get_ai_response(prompt, api_key, base_url, model, max_retries=3):
+    def get_ai_response(
+        system_prompt,
+        history,
+        latest_user_prompt,
+        api_key,
+        base_url,
+        model,
+        max_retries=3,
+    ):
         """Get AI response with retry logic for network issues"""
         correlation_id = str(uuid4())[:8]
         AIGoalGeneratorService._log_request_start(
-            correlation_id, model, prompt, max_retries
+            correlation_id, model, latest_user_prompt, max_retries
         )
 
         return AIGoalGeneratorService._retry_with_backoff(
-            prompt, api_key, base_url, model, correlation_id, max_retries
+            system_prompt,
+            history,
+            latest_user_prompt,
+            api_key,
+            base_url,
+            model,
+            correlation_id,
+            max_retries,
         )
 
     @staticmethod
@@ -75,12 +90,26 @@ class AIGoalGeneratorService:
 
     @staticmethod
     def _retry_with_backoff(
-        prompt, api_key, base_url, model, correlation_id, max_retries
+        system_prompt,
+        history,
+        latest_user_prompt,
+        api_key,
+        base_url,
+        model,
+        correlation_id,
+        max_retries,
     ):
         for attempt in range(max_retries):
             try:
                 result = AIGoalGeneratorService._execute_generation_attempt(
-                    prompt, api_key, base_url, model, correlation_id, attempt
+                    system_prompt,
+                    history,
+                    latest_user_prompt,
+                    api_key,
+                    base_url,
+                    model,
+                    correlation_id,
+                    attempt,
                 )
                 return result
 
@@ -127,7 +156,9 @@ class AIGoalGeneratorService:
 
     @staticmethod
     def _execute_generation_attempt(
-        prompt: str,
+        system_prompt,
+        history,
+        latest_user_prompt,
         api_key: str,
         base_url: str,
         model: str,
@@ -136,9 +167,9 @@ class AIGoalGeneratorService:
     ) -> list[dict[str, Any]]:
         """
         Executes a single generation attempt with the AI provider.
-        
+
         Initializes the client, creates a completion request, and delegates stream processing.
-        
+
         Args:
             prompt: The full prompt string for the AI.
             api_key: Configured AI API key.
@@ -146,10 +177,10 @@ class AIGoalGeneratorService:
             model: The specific AI model string.
             correlation_id: Tracking ID for logging.
             attempt: Current attempt index for retry tracking.
-            
+
         Returns:
             list[dict]: A list of parsed task dictionaries.
-            
+
         Raises:
             ValueError: If the AI returns an empty response or an error occurs.
         """
@@ -158,7 +189,7 @@ class AIGoalGeneratorService:
 
         try:
             response_stream = AIGoalGeneratorService._create_chat_completion(
-                client, model, prompt
+                client, model, system_prompt, history, latest_user_prompt
             )
 
             # Delegate chunk processing
@@ -228,16 +259,19 @@ class AIGoalGeneratorService:
         )
 
     @staticmethod
-    def _create_chat_completion(client, model, prompt):
+    def _create_chat_completion(
+        client, model, system_prompt, history, latest_user_prompt
+    ):
+        messages_array = [{"role": "system", "content": system_prompt}]
+
+        if history:
+            messages_array.extend(history)
+
+        messages_array.append({"role": "user", "content": latest_user_prompt})
+
         return client.chat.completions.create(
             model=model,
-            messages=[
-                {
-                    "role": "system",
-                    "content": "You are a helpful project management assistant.",
-                },
-                {"role": "user", "content": prompt},
-            ],
+            messages=messages_array,
             stream=True,
             temperature=0.7,
         )
@@ -246,18 +280,18 @@ class AIGoalGeneratorService:
     def _process_response_stream(response_stream: Iterable[Any]) -> str:
         """
         Processes the AI response stream and combines chunks into a single string.
-        
-        This method iterates over the response stream from the OpenAI/Groq client and 
+
+        This method iterates over the response stream from the OpenAI/Groq client and
         extracts the content delta from each chunk.
-        
+
         Example of a stream chunk:
         {
             "choices": [{"delta": {"content": "step 1"}}]
         }
-        
+
         Args:
             response_stream: An iterable stream of response chunks from the AI provider.
-            
+
         Returns:
             str: The full concatenated content string returned by the AI.
         """
@@ -278,10 +312,8 @@ class AIGoalGeneratorService:
         if match:
             json_array_response = match.group(0)
             try:
-                tasks = json.loads(json_array_response)
-                if not isinstance(tasks, list):
-                    raise ValueError("AI did not return a JSON array as expected.")
-                return tasks
+                parsed = json.loads(json_array_response)
+                return parsed
             except (json.JSONDecodeError, ValueError):
                 raise ValueError(
                     f"AI returned invalid format. Extracted: {json_array_response}"
@@ -385,16 +417,23 @@ class AIGoalGeneratorService:
             return None
 
     @staticmethod
-    def build_prompt_for_task(name, description, deadline, user: User | None = None, message: str = ""):
-        relevant_context = RAGContextService.context_query_wrapper(name, description, settings.TOP_K_CONTEXT, user)
+    def build_prompt_for_task(
+        name, description, deadline, user: User | None = None, message: str = ""
+    ):
+        relevant_context = RAGContextService.context_query_wrapper(
+            name, description, settings.TOP_K_CONTEXT, user
+        )
 
-        user_message_part = f"\nUser's clarification/message: '{message}'\n" if message else ""
+        user_message_part = (
+            f"User's clarification/message: '{message}'\n" if message else ""
+        )
 
         return f"""You are an excellent project management assistant.
             Here is a new goal:
             Name: '{name}'
             Description: '{description}'
             Deadline: '{deadline}'
+            {user_message_part}
             Please help me break down this goal name and description into specific, actionable steps from {timezone.now().date().isoformat()} to "{deadline}".
             Each step should be a clear, achievable task within deadline.
             Also, rewrite the goal description into a summary that explains the expected outcomes.
@@ -776,7 +815,7 @@ class GoalBreakDownService:
             else data.get("tag", [])
         )
         deadline = data.get("deadline")
-        message = data.get("message", "") 
+        message = data.get("message", "")
 
         api_key = AIGoalGeneratorService.get_api_key()
 
@@ -788,10 +827,20 @@ class GoalBreakDownService:
             description, files, api_key
         )
 
+        history = data.get("history", [])
+
         ai_result = GoalBreakDownService._fetch_ai_breakdown(
-            name, enhanced_desc, deadline, message, api_key, base_url, text_model, user
+            name,
+            enhanced_desc,
+            deadline,
+            message,
+            history,
+            api_key,
+            base_url,
+            text_model,
+            user,
         )
-        
+
         tasks = ai_result.get("tasks", [])
         final_desc = ai_result.get("description", description)
         response_message = ai_result.get("message", "")
@@ -814,13 +863,28 @@ class GoalBreakDownService:
         return description
 
     @staticmethod
-    def _fetch_ai_breakdown(name, description, deadline, message, api_key, base_url, text_model, user: User | None = None):
-        task_prompt = AIGoalGeneratorService.build_prompt_for_task(
+    def _fetch_ai_breakdown(
+        name,
+        description,
+        deadline,
+        message,
+        history,
+        api_key,
+        base_url,
+        text_model,
+        user: User | None = None,
+    ):
+        latest_user_prompt = AIGoalGeneratorService.build_prompt_for_task(
             name, description, deadline, user, message
         )
-        logger.info(f"Calling to AI for generating task with prompt: {task_prompt}")
+
+        system_prompt = "You are a helpful project management assistant."
+
+        logger.info(
+            f"Calling to AI for generating task with prompt: {latest_user_prompt}"
+        )
         return AIGoalGeneratorService.get_ai_response(
-            task_prompt, api_key, base_url, text_model
+            system_prompt, history, latest_user_prompt, api_key, base_url, text_model
         )
 
     @staticmethod
@@ -886,7 +950,7 @@ class GoalBreakDownService:
         return task
 
     @staticmethod
-    def _build_final_result(response_message,name, final_desc, deadline, tag, tasks):
+    def _build_final_result(response_message, name, final_desc, deadline, tag, tasks):
         sanitized_tasks = [GoalBreakDownService._sanitize_task_status(t) for t in tasks]
 
         return {
