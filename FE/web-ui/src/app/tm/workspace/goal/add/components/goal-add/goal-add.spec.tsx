@@ -9,6 +9,7 @@ import userEvent from "@testing-library/user-event";
 import { AddStep } from "@/app/enum/step.enum";
 import { RouteLoadingProvider } from "@/app/contexts/route-loading-context/route-loading-context";
 import { GoalProvider } from "@/app/contexts/goal-context/goal-context";
+import { ToastProvider } from "@/app/contexts/toast-context/toast-context";
 
 jest.mock("@/app/constants", () => ({
   ...jest.requireActual("@/app/constants"),
@@ -37,7 +38,9 @@ describe("AddForm", () => {
     render(
       <GoalProvider>
         <RouteLoadingProvider>
-          <GoalAdd setStep={mockSetStep} />
+          <ToastProvider>
+            <GoalAdd setStep={mockSetStep} />
+          </ToastProvider>
         </RouteLoadingProvider>
       </GoalProvider>,
     );
@@ -73,7 +76,9 @@ describe("AddForm", () => {
     render(
       <GoalProvider>
         <RouteLoadingProvider>
-          <GoalAdd setStep={mockSetStep} />
+          <ToastProvider>
+            <GoalAdd setStep={mockSetStep} />
+          </ToastProvider>
         </RouteLoadingProvider>
       </GoalProvider>,
     );

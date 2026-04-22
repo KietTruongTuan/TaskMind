@@ -33,7 +33,7 @@ export function InputFileDialog({
 
   return (
     <AlertDialog.Root open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-      <AlertDialog.Trigger data-testid="alert-dialog-trigger">
+      <AlertDialog.Trigger data-testid="dialog-trigger">
         <Flex
           align="center"
           justify="center"

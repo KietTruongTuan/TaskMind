@@ -57,7 +57,7 @@ describe("MyGoalPage", () => {
         <RouteLoadingProvider>{page}</RouteLoadingProvider>
       </ThemeProvider>,
     );
-    expect(await screen.findByText("No goal found")).toBeInTheDocument();
+    expect(await screen.findByText("No goals found")).toBeInTheDocument();
   });
 
   it("should render list of goals", async () => {
