@@ -37,8 +37,28 @@ export function GoalAdd({
   const { setDraftGoal } = useGoalContext();
   const onSubmit = async () => {
     const data = getValues();
+    let requestData: CreateGoalRequestBody | FormData = data;
+
+    if (data.files && data.files.length > 0) {
+      const formData = new FormData();
+      formData.append("name", data.name);
+      if (data.description) formData.append("description", data.description);
+      if (data.deadline)
+        formData.append(
+          "deadline",
+          new Date(data.deadline).toISOString().split("T")[0],
+        );
+      if (data.tag) {
+        data.tag.forEach((t) => formData.append("tag", t));
+      }
+      data.files.forEach((file) => {
+        formData.append("files", file);
+      });
+      requestData = formData;
+    }
+
     const draftGoalData: CreateGoalResponseBody =
-      await aiService.createGoal(data);
+      await aiService.createGoal(requestData);
     setDraftGoal({
       ...draftGoalData,
       tasks: draftGoalData.tasks?.map((t, index) => ({

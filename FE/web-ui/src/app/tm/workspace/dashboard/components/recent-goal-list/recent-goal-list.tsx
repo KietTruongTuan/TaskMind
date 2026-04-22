@@ -1,7 +1,7 @@
 import { CardNoPadding } from "@/app/components/card-no-padding/card-no-padding";
 import { Header } from "@/app/components/header/header";
 import { GoalResponseBody } from "@/app/constants";
-import { Flex } from "@radix-ui/themes";
+import { Flex, Text } from "@radix-ui/themes";
 import { ElementType } from "react";
 
 export interface GoalCardPropsData extends GoalResponseBody {
@@ -16,6 +16,7 @@ export function RecentGoalList<T>({
   header,
   icon,
   subHeader,
+  nullMessage,
   cardTypeComponent,
   data,
 }: {
@@ -23,6 +24,7 @@ export function RecentGoalList<T>({
   header: string;
   icon?: ElementType;
   subHeader: string;
+  nullMessage: string;
   cardTypeComponent: ElementType;
   data: T[];
 }) {
@@ -39,15 +41,26 @@ export function RecentGoalList<T>({
           icon={Icon ? <Icon size={18} /> : undefined}
         />
       </Flex>
-      <Flex
-        width="100%"
-        direction={isFlexible ? { initial: "column", md: "row" } : "column"}
-        gap="3"
-      >
-        {data.map((value, index) => (
-          <Card key={index} {...value} />
-        ))}
-      </Flex>
+      {data.length === 0 ? (
+        <Flex
+          align="center"
+          justify="center"
+          width="100%"
+          height="100%"
+        >
+          <Text size="1">{nullMessage}</Text>
+        </Flex>
+      ) : (
+        <Flex
+          width="100%"
+          direction={isFlexible ? { initial: "column", md: "row" } : "column"}
+          gap="3"
+        >
+          {data.map((value, index) => (
+            <Card key={index} {...value} />
+          ))}
+        </Flex>
+      )}
     </CardNoPadding>
   );
 }

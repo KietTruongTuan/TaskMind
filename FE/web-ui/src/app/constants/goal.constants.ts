@@ -6,6 +6,7 @@ export interface CreateGoalRequestBody {
   description?: string;
   tag?: string[];
   deadline: Date;
+  files?: File[];
 }
 
 export interface SaveGoalRequestBody {

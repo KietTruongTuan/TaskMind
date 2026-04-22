@@ -124,6 +124,7 @@ export default async function DashboardPage() {
                   <RecentGoalList
                     header="Due soon"
                     subHeader="Tasks Nearing Deadline"
+                    nullMessage="No due soon tasks available"
                     icon={Clock}
                     data={tasksDueSoon}
                     cardTypeComponent={KanbanItem}
@@ -140,6 +141,7 @@ export default async function DashboardPage() {
               <RecentGoalList
                 header="Recent Goals"
                 subHeader="Track the progress of current goals"
+                nullMessage="No recent goals available"
                 icon={TrendingUp}
                 data={recentGoals}
                 cardTypeComponent={GoalCard}
@@ -148,6 +150,7 @@ export default async function DashboardPage() {
             <RecentGoalList
               header="Recent Achievements"
               subHeader="The goals you have completed"
+              nullMessage="No completed goals available"
               icon={Crown}
               data={recentCompletedGoals}
               cardTypeComponent={GoalCompletedCard}

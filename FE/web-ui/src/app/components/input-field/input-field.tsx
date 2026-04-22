@@ -1,13 +1,15 @@
 import * as Form from "@radix-ui/react-form";
 import * as Label from "@radix-ui/react-label";
-import { AlertDialog, Box, Flex, Text } from "@radix-ui/themes";
+import { Box, Flex, Text } from "@radix-ui/themes";
 import { FieldError, RegisterOptions, useFormContext } from "react-hook-form";
 import styles from "./input-field.module.scss";
 import { useEffect, useState } from "react";
 import { EyeIcon, EyeOffIcon, File, Plus, X } from "lucide-react";
 import { Input, Textarea } from "@headlessui/react";
-import { Header } from "../header/header";
-import { InputFileArea } from "../input-file-area/input-file-area";
+import { FileType } from "@/app/enum/file-type.enum";
+import { FileTypeDisplay } from "@/app/constants";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { InputFileDialog } from "../input-file-dialog/input-file-dialog";
 
 export interface InputPropsType {
   name: string;
@@ -34,12 +36,16 @@ export function InputField({
   const [showPassword, setShowPassword] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
   const [query, setQuery] = useState("");
+  const [files, setFiles] = useState<File[]>([]);
 
   useEffect(() => {
     if (isMultiInput) {
       setValue(name, selected);
     }
-  }, [selected, name, setValue, isMultiInput]);
+    if (isFileInput) {
+      setValue(`files`, files);
+    }
+  }, [selected, name, setValue, isMultiInput, isFileInput, files]);
 
   const onAddTag = () => {
     const trimmed = query.trim();
@@ -52,9 +58,12 @@ export function InputField({
     setSelected(selected.filter((_, i) => i !== index));
   };
 
+  const onDeleteFile = (index: number) => {
+    setFiles((prev) => prev.filter((_, i) => i !== index));
+  };
+
   const isPassword = type === "password";
   const inputType = isPassword && showPassword ? "text" : type;
-
   return (
     <Form.Field
       name={name}
@@ -69,6 +78,32 @@ export function InputField({
             </Text>
           </Label.Root>
         </Form.Label>
+        {files && files.length > 0 && (
+          <Flex wrap="wrap" gap="2" width="100%">
+            {files.map((file, index) => (
+              <Flex key={index} align="center" gap="1">
+                <Flex>
+                  <FontAwesomeIcon
+                    icon={
+                      FileTypeDisplay[file.name.split(".")[1] as FileType].icon
+                    }
+                    color={
+                      FileTypeDisplay[file.name.split(".")[1] as FileType].color
+                    }
+                  />
+                  <Text size="1" style={{ fontStyle: "italic" }}>
+                    {file.name}
+                  </Text>
+                </Flex>
+                <X
+                  size={14}
+                  cursor="pointer"
+                  onClick={() => onDeleteFile(index)}
+                />
+              </Flex>
+            ))}
+          </Flex>
+        )}
         <Flex width="100%" position="relative">
           {isMultiInput ? (
             <>
@@ -111,40 +146,7 @@ export function InputField({
               )}
             </Form.Control>
           )}
-          {isFileInput && (
-            <AlertDialog.Root>
-              <AlertDialog.Trigger data-testid="alert-dialog-trigger">
-                <Flex
-                  align="center"
-                  justify="center"
-                  className={styles.iconWrapper}
-                  position="absolute"
-                  p="2"
-                  top="5%"
-                  right="1%"
-                >
-                  <File size={16} />
-                </Flex>
-              </AlertDialog.Trigger>
-              <AlertDialog.Content
-                maxWidth={{ initial: "90%", sm: "50%"}}
-                height="50vh"
-                className={styles.dialogContent}
-              >
-                <Flex p="4" width="100%" height="100%" direction="column">
-                  <Flex justify="end" width="100%">
-                    <AlertDialog.Cancel>
-                      <X />
-                    </AlertDialog.Cancel>
-                  </Flex>
-                  <Flex width="100%" height="100%" direction="column" gap="2">  
-                    <Header text="Upload file" textSize="3" />
-                    <InputFileArea handleUpload={() => {}} />
-                  </Flex>
-                </Flex>
-              </AlertDialog.Content>
-            </AlertDialog.Root>
-          )}
+          {isFileInput && <InputFileDialog files={files} setFiles={setFiles} />}
         </Flex>
 
         <Box
