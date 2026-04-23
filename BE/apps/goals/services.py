@@ -463,7 +463,7 @@ class AIGoalGeneratorService:
                 ]
             }}
 
-            IMPORTANT: If you ask a clarification question in the "message", you MUST provide 2 to 4 highly relevant, distinct options in the "options" array for the user to choose from. If NO further clarification is needed, return an empty array `[]` for "options".
+            IMPORTANT: If you ask a clarification question in the "message", you MUST provide 2 to 4 highly relevant, distinct options in the "options" array for the user to choose from. When asking a question, ALWAYS append a friendly sentence to the end of your "message" stating: "If you have another preference or answer, feel free to type it in the chatbox!". If NO further clarification is needed, return an empty array `[]` for "options".
             
             The return language should match the name and description language.
             
@@ -851,9 +851,10 @@ class GoalBreakDownService:
         tasks = ai_result.get("tasks", [])
         final_desc = ai_result.get("description", description)
         response_message = ai_result.get("message", "")
+        options = ai_result.get("options", [])
 
         return GoalBreakDownService._build_final_result(
-            response_message, name, final_desc, deadline, tag, tasks
+            response_message, options, name, final_desc, deadline, tag, tasks
         )
 
     @staticmethod
@@ -957,11 +958,12 @@ class GoalBreakDownService:
         return task
 
     @staticmethod
-    def _build_final_result(response_message, name, final_desc, deadline, tag, tasks):
+    def _build_final_result(response_message, options, name, final_desc, deadline, tag, tasks):
         sanitized_tasks = [GoalBreakDownService._sanitize_task_status(t) for t in tasks]
 
         return {
             "message": response_message,
+            "options": options,
             "name": name,
             "description": final_desc,
             "status": "ToDo",
