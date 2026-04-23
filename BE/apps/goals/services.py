@@ -448,6 +448,11 @@ class AIGoalGeneratorService:
             Must return the result strictly as a valid JSON object with the following structure:
             {{
                 "message": "<your clarification question or the completion message>",
+                "options": [
+                    "<suggested answer 1>", 
+                    "<suggested answer 2>", 
+                    "<suggested answer 3>"
+                ],
                 "description": "<the rewritten goal description>",
                 "tasks": [
                     {{
@@ -457,6 +462,8 @@ class AIGoalGeneratorService:
                     }}
                 ]
             }}
+
+            IMPORTANT: If you ask a clarification question in the "message", you MUST provide 2 to 4 highly relevant, distinct options in the "options" array for the user to choose from. If NO further clarification is needed, return an empty array `[]` for "options".
             
             The return language should match the name and description language.
             
