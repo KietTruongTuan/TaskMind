@@ -8,10 +8,16 @@ import { Flex, Grid, ScrollArea } from "@radix-ui/themes";
 import { LoadingText } from "@/app/components/loading-text/loading-text";
 import { ThreeDotLoading } from "@/app/components/three-dot-loading/three-dot-loading";
 import { GoalChat } from "../goal-chat/goal-chat";
+import { useEffect } from "react";
 
 export function AddGoalWrapper() {
   const [step, setStep] = useState<AddStep>(AddStep.FillInformation);
   const { draftGoal } = useGoalContext();
+  const [draftCreateGoal, setDraftCreateGoal] = useState(draftGoal);
+
+  useEffect(() => { 
+    setDraftCreateGoal(draftGoal);
+  }, [draftGoal]);
 
   const stepComponents = {
     [AddStep.FillInformation]: <GoalAdd setStep={setStep} />,
@@ -25,12 +31,12 @@ export function AddGoalWrapper() {
       >
         <GoalChat />
         <ScrollArea scrollbars="vertical" style={{ maxHeight: "94vh" }}>
-          {draftGoal ? (
+          {draftCreateGoal ? (
             <GoalReview
               setStep={setStep}
               goalData={{
-                ...draftGoal,
-                completedCount: draftGoal.completedCount || 0,
+                ...draftCreateGoal,
+                completedCount: draftCreateGoal.completedCount || 0,
               }}
               isDraft
             />

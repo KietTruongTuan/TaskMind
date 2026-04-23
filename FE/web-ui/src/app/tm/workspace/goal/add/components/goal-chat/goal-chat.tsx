@@ -8,22 +8,26 @@ import { ThreeDotLoading } from "@/app/components/three-dot-loading/three-dot-lo
 import { Textarea } from "@headlessui/react";
 import { CustomButton } from "@/app/components/custom-button/custom-button";
 import { ButtonType } from "@/app/enum/button-type.enum";
-
-type Message = {
-  id: string;
-  role: "user" | "bot";
-  content: string;
-};
+import {
+  aiService,
+  ChatMessage,
+  CreateGoalRequestBody,
+  CreateGoalResponseBody,
+} from "@/app/constants";
+import { useGoalContext } from "@/app/contexts/goal-context/goal-context";
+import { ChatRole } from "@/app/enum/chat-role.enum";
+import { ApiError } from "@/app/constants";
 
 export function GoalChat() {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "1",
-      role: "bot",
-      content:
-        "Hi! I'm your AI assistant. How would you like to adjust or expand on this goal plan?",
-    },
-  ]);
+  const {
+    draftGoal,
+    createRequest,
+    setDraftGoal,
+    clearDraftGoal,
+    isDraftGoalFromChat,
+  } = useGoalContext();
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [historyMessages, setHistoryMessages] = useState<ChatMessage[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const scrollViewportRef = useRef<HTMLDivElement>(null);
@@ -36,31 +40,71 @@ export function GoalChat() {
   };
 
   useEffect(() => {
+    if (!draftGoal) {
+      setIsTyping(true);
+      return;
+    }
+    if (messages.length > 0 && !isDraftGoalFromChat) {
+      return;
+    }
+    const botMsg: ChatMessage = {
+      role: ChatRole.Assistant,
+      content: draftGoal.message,
+    };
+    setMessages((prev) => [...prev, botMsg]);
+    setHistoryMessages((prev) => [
+      ...prev,
+      { ...botMsg, content: JSON.stringify(draftGoal) },
+    ]);
+    setIsTyping(false);
+  }, [draftGoal]);
+
+  useEffect(() => {
     scrollToBottom();
   }, [messages, isTyping]);
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!inputValue.trim() || isTyping) return;
 
-    const userMsg: Message = {
-      id: Date.now().toString(),
-      role: "user",
+    const userMsg: ChatMessage = {
+      role: ChatRole.User,
       content: inputValue.trim(),
     };
 
     setMessages((prev) => [...prev, userMsg]);
+    setHistoryMessages((prev) => [...prev, userMsg]);
     setInputValue("");
     setIsTyping(true);
-
-    setTimeout(() => {
-      const botMsg: Message = {
-        id: (Date.now() + 1).toString(),
-        role: "bot",
-        content: `Got it! I understand you want to "${userMsg.content}". I've recorded this preference. Is there anything else you'd like to tweak?`,
-      };
-      setMessages((prev) => [...prev, botMsg]);
+    if (!createRequest) {
       setIsTyping(false);
-    }, 1500);
+      return;
+    }
+    const oldDraftGoal = draftGoal;
+    try {
+      clearDraftGoal();
+      const chatRequest: CreateGoalRequestBody = {
+        ...createRequest,
+        message: userMsg.content,
+        history: historyMessages,
+      };
+      const res: CreateGoalResponseBody =
+        await aiService.createGoal(chatRequest);
+
+      setDraftGoal(res, true);
+    } catch (err) {
+      const error = err as ApiError;
+      setMessages((prev) => [
+        ...prev,
+        { role: ChatRole.Assistant, content: error.message },
+      ]);
+      setHistoryMessages((prev) => [
+        ...prev,
+        { role: ChatRole.Assistant, content: JSON.stringify(error) },
+      ]);
+      setDraftGoal(oldDraftGoal, true);
+    } finally {
+      setIsTyping(false);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -83,7 +127,7 @@ export function GoalChat() {
       <ScrollArea
         scrollbars="vertical"
         type="scroll"
-        style={{ flexGrow: 1, maxHeight: "84vh" }}
+        style={{ flexGrow: 1, maxHeight: "79vh" }}
         ref={scrollViewportRef}
       >
         <Flex
@@ -95,15 +139,17 @@ export function GoalChat() {
           justify="end"
           overflowY="auto"
         >
-          {messages.map((message) => (
+          {messages.map((message, index) => (
             <CardNoPadding
-              key={message.id}
+              key={index}
               height="auto"
               width="auto"
               maxWidth="85%"
               p="3"
               className={`${styles.messageBubble} ${
-                message.role === "user" ? styles.userMessage : styles.botMessage
+                message.role === ChatRole.User
+                  ? styles.userMessage
+                  : styles.botMessage
               }`}
             >
               {message.content}

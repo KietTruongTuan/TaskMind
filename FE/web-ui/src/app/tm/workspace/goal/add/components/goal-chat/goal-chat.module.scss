@@ -37,11 +37,11 @@
   border: none;
   outline: none;
   padding: 0;
-  font-style: italic;
   resize: none;
 
   &::placeholder {
     color: var(--text-secondary);
+    font-style: italic;
   }
 }
 

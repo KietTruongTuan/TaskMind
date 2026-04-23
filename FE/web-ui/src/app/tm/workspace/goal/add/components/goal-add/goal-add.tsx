@@ -36,7 +36,7 @@ export function GoalAdd({
     formState: { isValid },
     getValues,
   } = methods;
-  const { setDraftGoal } = useGoalContext();
+  const { setDraftGoal, setCreateRequest } = useGoalContext();
   const { showToast, setIsSuccess } = useToast();
 
   const onSubmit = async () => {
@@ -63,7 +63,9 @@ export function GoalAdd({
         requestData = formData;
       }
       const draftGoalData: CreateGoalResponseBody =
-        await aiService.createGoal(requestData);
+        await aiService.createGoal(data);
+      setCreateRequest(data);
+
       setDraftGoal({
         ...draftGoalData,
         tasks: draftGoalData.tasks?.map((t, index) => ({
@@ -74,7 +76,6 @@ export function GoalAdd({
     } catch (err) {
       setIsSuccess(false);
       const error = err as ApiError;
-      console.log(error);
       showToast(error.message);
     }
   };
