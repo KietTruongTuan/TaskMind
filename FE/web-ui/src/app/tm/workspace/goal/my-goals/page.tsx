@@ -54,7 +54,7 @@ export default async function MyGoalPage({
 
   return (
     <Flex width="100%" justify="center" height="100%">
-      <Flex width="100%" direction="column" py="5"gap="5">
+      <Flex width="100%" direction="column" py="5" gap="5">
         <Box>
           <Header
             text="My Goals"
@@ -69,9 +69,9 @@ export default async function MyGoalPage({
         </Flex>
 
         <ScrollArea type="auto" scrollbars="vertical">
-          <Flex gap="3" wrap="wrap">
-            {goals.length > 0 ? (
-              goals.map((goal) => (
+          {goals.length > 0 ? (
+            <Flex gap="3" wrap="wrap">
+              {goals.map((goal) => (
                 <Box
                   key={goal.id}
                   flexBasis={{
@@ -85,15 +85,13 @@ export default async function MyGoalPage({
                 >
                   <GoalListItem goal={goal} />
                 </Box>
-              ))
-            ) : (
-              <Flex height="100%" width="100%" justify="center" align="center">
-                <Text size="2" align="center" mt="3">
-                  No goal found
-                </Text>
-              </Flex>
-            )}
-          </Flex>
+              ))}
+            </Flex>
+          ) : (
+            <Flex height="100%" width="100%" justify="center" align="center">
+              <Text size="2">No goals found</Text>
+            </Flex>
+          )}
         </ScrollArea>
       </Flex>
     </Flex>

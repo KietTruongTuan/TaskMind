@@ -1,0 +1,18 @@
+.dialogContent {
+    border: 1px solid var(--card-border);
+    padding: 0;
+}
+
+.iconWrapper {
+    color: var(--text-secondary);
+    z-index: 1;
+    transition: color 0.2s ease;
+    background-color: var(--button-hover);
+    border-radius: var(--border-radius-small);
+    cursor: pointer;
+
+    &:hover {
+        color: var(--text-primary);
+        background-color: var(--button-active);
+    }
+}

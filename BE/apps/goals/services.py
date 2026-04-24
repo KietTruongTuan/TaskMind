@@ -747,7 +747,11 @@ class GoalBreakDownService:
         """Orchestrates AI generation of tasks from a goal description."""
         name = data.get("name")
         description = data.get("description", "")
-        tag = data.get("tag", "")
+        tag = (
+            data.getlist("tag")
+            if hasattr(data, "getlist")
+            else data.get("tag", [])
+        )
         deadline = data.get("deadline")
 
         api_key = AIGoalGeneratorService.get_api_key()

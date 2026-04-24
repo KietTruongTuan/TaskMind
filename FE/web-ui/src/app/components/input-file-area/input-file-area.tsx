@@ -2,18 +2,41 @@
 import { Input } from "@headlessui/react";
 import { Flex, Text } from "@radix-ui/themes";
 import { CloudUpload } from "lucide-react";
-import { useState, useRef } from "react";
+import { useState, useRef, SetStateAction, Dispatch } from "react";
 import styles from "./input-file-area.module.scss";
+import { FileType } from "@/app/enum/file-type.enum";
+import { useToast } from "@/app/contexts/toast-context/toast-context";
 
 export function InputFileArea({
   handleUpload,
+  isValid = () => true,
+  allowedFileTypes,
+  setIsDialogOpen,
   isLoading = false,
 }: {
-  handleUpload: (files: FileList) => void;
+  handleUpload: (files: File[]) => void;
+  isValid?: (files: File[]) => boolean;
+  setIsDialogOpen?: Dispatch<SetStateAction<boolean>>;
+  allowedFileTypes: FileType[];
   isLoading?: boolean;
 }) {
   const [isDragging, setIsDragging] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const { setIsSuccess, showToast } = useToast();
+  const checkFileType = (files: File[]) => {
+    const invalidFile = files.find((file) => {
+      const ext = file.name.split(".").pop()?.toLowerCase() as FileType;
+      return !allowedFileTypes.includes(ext);
+    });
+
+    if (invalidFile) {
+      setIsDialogOpen?.(false);
+      setIsSuccess(false);
+      showToast("File type is not allowed");
+      return false;
+    }
+    return true;
+  };
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(true);
@@ -26,15 +49,20 @@ export function InputFileArea({
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
-    const files = e.dataTransfer.files;
-    if (files.length > 0) {
-      handleUpload(files);
+    if (e.dataTransfer.files.length > 0) {
+      const files = Array.from(e.dataTransfer.files);
+      if (checkFileType(files) && isValid(files)) {
+        handleUpload(files);
+      }
     }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      handleUpload(e.target.files);
+      const files = Array.from(e.target.files);
+      if (checkFileType(files) && isValid(files)) {
+        handleUpload(files);
+      }
     }
   };
 
@@ -44,7 +72,7 @@ export function InputFileArea({
         ref={inputRef}
         type="file"
         multiple
-        accept=".pdf,.docx"
+        accept={allowedFileTypes.map((type) => `.${type}`).join(",")}
         style={{ display: "none" }}
         onChange={handleChange}
         disabled={isLoading}
@@ -89,7 +117,7 @@ export function InputFileArea({
               </Text>
             </Flex>
             <Text size="1" color="gray" style={{ textAlign: "center" }}>
-              Support: PDF, DOCX (Max 10MB each file)
+              Support: {allowedFileTypes.join(", ")} (Maximum 5 files, 10 MB each)
             </Text>
           </Flex>
         )}

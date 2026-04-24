@@ -1,4 +1,5 @@
 import {
+  faFileImage,
   faFilePdf,
   faFileWord,
   IconDefinition,
@@ -16,5 +17,17 @@ export const FileTypeDisplay: Record<
   [FileType.Docx]: {
     icon: faFileWord,
     color: "var(--docx-icon-color)",
+  },
+  [FileType.Jpg]: {
+    icon: faFileImage,
+    color: "var(--image-icon-color)",
+  },
+  [FileType.Jpeg]: {
+    icon: faFileImage,
+    color: "var(--image-icon-color)",
+  },
+  [FileType.Png]: {
+    icon: faFileImage,
+    color: "var(--image-icon-color)",
   },
 };

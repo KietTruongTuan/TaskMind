@@ -54,6 +54,23 @@ describe("Task list", () => {
     jest.clearAllMocks();
   });
 
+  it("should render with no tasks", async () => {
+    render(
+      <ThemeProvider>
+        <ToastProvider>
+          <GoalProvider>
+            <TaskList
+              onTaskCountChange={() => {}}
+              setTasksLocal={() => {}}
+            />
+          </GoalProvider>
+        </ToastProvider>
+      </ThemeProvider>,
+    );
+
+    expect(screen.getByText("No tasks found")).toBeInTheDocument();
+  });
+
   it("should delete task", async () => {
     (taskService.remove as jest.Mock).mockResolvedValueOnce(undefined);
 

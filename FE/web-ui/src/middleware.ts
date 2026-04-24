@@ -16,10 +16,18 @@ export async function middleware(request: NextRequest) {
     "/tm/workspace",
     "/tm/workspace/dashboard",
     "/tm/workspace/goal/add",
-    "/tm/workspace/goal/board",
-    "/tm/workspace/task/board",
+    "/tm/workspace/goal/my-goals",
+    "/tm/workspace/goal/:path*",
+    "/tm/workspace/task/all-tasks",
+    "/tm/workspace/knowledge-base",
   ];
-  if (!refreshToken && protectedPaths.some((path) => url.pathname === path)) {
+  if (!refreshToken && protectedPaths.some((path) => {
+    if (path.endsWith(":path*")) {
+      const basePath = path.replace(":path*", "");
+      return url.pathname.startsWith(basePath);
+    }
+    return url.pathname === path;
+  })) {
     return NextResponse.redirect(new URL(WebUrl.Authentication, request.url));
   }
 
@@ -34,7 +42,9 @@ export const config = {
     "/tm/authentication",
     "/tm/workspace/dashboard",
     "/tm/workspace/goal/add",
-    "/tm/workspace/goal/board",
-    "/tm/workspace/task/board",
+    "/tm/workspace/goal/my-goals",
+    "/tm/workspace/goal/:path*",
+    "/tm/workspace/task/all-tasks",
+    "/tm/workspace/knowledge-base",
   ],
 };

@@ -81,7 +81,6 @@ export function AuthenticationForm() {
     } catch (err) {
       setIsSuccess(false);
       const error = err as ApiError;
-      console.error("Login Error: ", err);
       showToast(error.message);
     }
   };

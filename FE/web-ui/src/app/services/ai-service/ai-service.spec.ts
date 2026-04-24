@@ -52,6 +52,28 @@ describe("AIService", () => {
     expect(spy).toHaveBeenCalledWith(
       ApiUrl.GoalGenerate,
       MOCK_GOAL_REQUEST_DATA,
+      { "headers": undefined }
+    );
+    expect(result).toEqual(MOCK_GOAL_RESPONSE_DATA);
+  });
+
+  it("should call post with the correct URL and data when formData", async () => {
+    const spy = jest
+      .spyOn(AIService.prototype, "post")
+      .mockResolvedValue(MOCK_GOAL_RESPONSE_DATA);
+    const formData = new FormData();
+    formData.append("name", MOCK_GOAL_REQUEST_DATA.name);
+    formData.append("description", MOCK_GOAL_REQUEST_DATA.description || "");
+    formData.append("deadline", new Date(MOCK_GOAL_REQUEST_DATA.deadline).toISOString().split("T")[0]);
+    formData.append("tag", MOCK_GOAL_REQUEST_DATA.tag?.toString() || "");
+    formData.append("files", new File(["test"], "test.txt", { type: "text/plain" }));
+
+    const result = await aiService.createGoal(formData);
+
+    expect(spy).toHaveBeenCalledWith(
+      ApiUrl.GoalGenerate,
+      formData,
+      { "headers": { "Content-Type": undefined } }
     );
     expect(result).toEqual(MOCK_GOAL_RESPONSE_DATA);
   });

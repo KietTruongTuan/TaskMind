@@ -35,15 +35,15 @@ export function TaskList({
   setTasksLocal?: Dispatch<SetStateAction<Task[] | DraftTask[] | undefined>>;
 }) {
   const [localTasks, setLocalTasks] = useState<
-    Task[] | DraftTask[] | undefined
-  >(tasks);
+    Task[] | DraftTask[]
+  >(tasks || []);
   const [isAddingTask, setIsAddingTask] = useState(false);
   const { showToast, setIsSuccess } = useToast();
   const { draftGoal, setDraftGoal } = useGoalContext();
   const router = useRouter();
 
   useEffect(() => {
-    setLocalTasks(tasks);
+    setLocalTasks(tasks || []);
   }, [tasks]);
 
   const handleDelete = async (id?: string) => {
@@ -150,44 +150,50 @@ export function TaskList({
             </Flex>
           </CustomButton>
         </Flex>
-        {localTasks?.map((value, index) => {
-          const isRealTask = "id" in value && value.id;
-          const taskKey = isRealTask ? value.id : (value as DraftTask).index;
-          return (
-            <Flex key={taskKey} align="center" gap="1">
-              <TaskListItem
-                task={value}
-                onTaskStatusChange={onTaskStatusChange}
-                index={index}
-                setTasksLocal={setTasksLocal}
-              />
-              <Trash2
-                size={16}
-                cursor="pointer"
-                className={styles.overdue}
-                onClick={() => {
-                  if (isRealTask) {
-                    handleDelete(value.id);
-                  } else if ("index" in value) {
-                    onTaskCountChange && onTaskCountChange(true);
-                    setLocalTasks((prev) =>
-                      prev?.filter((t: DraftTask) => t.index !== value.index),
-                    );
-                    if (draftGoal) {
-                      setDraftGoal({
-                        ...draftGoal,
-                        tasks: draftGoal.tasks?.filter(
-                          (t: DraftTask) => t.index !== value.index,
-                        ),
-                      } as CreateGoalResponseBody);
+        {localTasks?.length > 0 ? (
+          localTasks.map((value, index) => {
+            const isRealTask = "id" in value && value.id;
+            const taskKey = isRealTask ? value.id : (value as DraftTask).index;
+            return (
+              <Flex key={taskKey} align="center" gap="1">
+                <TaskListItem
+                  task={value}
+                  onTaskStatusChange={onTaskStatusChange}
+                  index={index}
+                  setTasksLocal={setTasksLocal}
+                />
+                <Trash2
+                  size={16}
+                  cursor="pointer"
+                  className={styles.overdue}
+                  onClick={() => {
+                    if (isRealTask) {
+                      handleDelete(value.id);
+                    } else if ("index" in value) {
+                      onTaskCountChange && onTaskCountChange(true);
+                      setLocalTasks((prev) =>
+                        prev?.filter((t: DraftTask) => t.index !== value.index),
+                      );
+                      if (draftGoal) {
+                        setDraftGoal({
+                          ...draftGoal,
+                          tasks: draftGoal.tasks?.filter(
+                            (t: DraftTask) => t.index !== value.index,
+                          ),
+                        } as CreateGoalResponseBody);
+                      }
                     }
-                  }
-                }}
-                data-testid={`delete-task-${index}-button`}
-              />
-            </Flex>
-          );
-        })}
+                  }}
+                  data-testid={`delete-task-${index}-button`}
+                />
+              </Flex>
+            );
+          })
+        ) : (
+          <Flex align="center" justify="center" width="100%" height="100%">
+            <Text size="2">No tasks found</Text>
+          </Flex>
+        )}
 
         {isAddingTask && (
           <Flex align="center" gap="1">
