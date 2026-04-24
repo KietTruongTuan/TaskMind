@@ -1,5 +1,5 @@
 import { Flex, TextArea, TextField, Text } from "@radix-ui/themes";
-import { Pen, X } from "lucide-react";
+import { X } from "lucide-react";
 import { KeyboardEvent, useState, useEffect } from "react";
 
 import styles from "./edit-field.module.scss";
@@ -89,6 +89,7 @@ export function EditField({
           e.stopPropagation();
           onEditStart();
         }}
+        style={{ cursor: "pointer" }}
       >
         {children}
       </Flex>

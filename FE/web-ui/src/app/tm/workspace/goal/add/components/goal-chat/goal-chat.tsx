@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Flex, Text, ScrollArea, Box } from "@radix-ui/themes";
-import { SendHorizonal, Bot } from "lucide-react";
+import { SendHorizonal, Bot, CornerDownRightIcon } from "lucide-react";
 import styles from "./goal-chat.module.scss";
 import { CardNoPadding } from "@/app/components/card-no-padding/card-no-padding";
 import { LoadingText } from "@/app/components/loading-text/loading-text";
@@ -18,6 +18,10 @@ import { useGoalContext } from "@/app/contexts/goal-context/goal-context";
 import { ChatRole } from "@/app/enum/chat-role.enum";
 import { ApiError } from "@/app/constants";
 
+interface UIChatMessage extends ChatMessage {
+  options?: string[];
+}
+
 export function GoalChat() {
   const {
     draftGoal,
@@ -26,7 +30,7 @@ export function GoalChat() {
     clearDraftGoal,
     isDraftGoalFromChat,
   } = useGoalContext();
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [messages, setMessages] = useState<UIChatMessage[]>([]);
   const [historyMessages, setHistoryMessages] = useState<ChatMessage[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
@@ -47,9 +51,10 @@ export function GoalChat() {
     if (messages.length > 0 && !isDraftGoalFromChat) {
       return;
     }
-    const botMsg: ChatMessage = {
+    const botMsg: UIChatMessage = {
       role: ChatRole.Assistant,
       content: draftGoal.message,
+      options: draftGoal.options,
     };
     setMessages((prev) => [...prev, botMsg]);
     setHistoryMessages((prev) => [
@@ -63,15 +68,18 @@ export function GoalChat() {
     scrollToBottom();
   }, [messages, isTyping]);
 
-  const handleSend = async () => {
-    if (!inputValue.trim() || isTyping) return;
+  const handleSend = async (value: string) => {
+    if (!value.trim() || isTyping) return;
 
     const userMsg: ChatMessage = {
       role: ChatRole.User,
-      content: inputValue.trim(),
+      content: value.trim(),
     };
 
-    setMessages((prev) => [...prev, userMsg]);
+    setMessages((prev) => [
+      ...prev.map((msg) => ({ ...msg, options: undefined })),
+      userMsg,
+    ]);
     setHistoryMessages((prev) => [...prev, userMsg]);
     setInputValue("");
     setIsTyping(true);
@@ -87,10 +95,17 @@ export function GoalChat() {
         message: userMsg.content,
         history: historyMessages,
       };
+      console.log("historyMessages", historyMessages);
       const res: CreateGoalResponseBody =
         await aiService.createGoal(chatRequest);
 
-      setDraftGoal(res, true);
+      setDraftGoal(
+        {
+          ...res,
+          tasks: res.tasks?.map((t, index) => ({ ...t, index })),
+        },
+        true,
+      );
     } catch (err) {
       const error = err as ApiError;
       setMessages((prev) => [
@@ -110,7 +125,7 @@ export function GoalChat() {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      handleSend();
+      handleSend(inputValue);
     }
   };
 
@@ -140,20 +155,46 @@ export function GoalChat() {
           overflowY="auto"
         >
           {messages.map((message, index) => (
-            <CardNoPadding
-              key={index}
-              height="auto"
-              width="auto"
-              maxWidth="85%"
-              p="3"
-              className={`${styles.messageBubble} ${
-                message.role === ChatRole.User
-                  ? styles.userMessage
-                  : styles.botMessage
-              }`}
-            >
-              {message.content}
-            </CardNoPadding>
+            <Flex key={index} direction="column" gap="2" width="100%">
+              <CardNoPadding
+                height="auto"
+                width="auto"
+                maxWidth="85%"
+                p="3"
+                className={`${styles.messageBubble} ${
+                  message.role === ChatRole.User
+                    ? styles.userMessage
+                    : styles.botMessage
+                }`}
+              >
+                {message.content}
+              </CardNoPadding>
+              {message.options && message.options.length > 0 && (
+                <Flex
+                  gap="2"
+                  direction="column"
+                  align={message.role === ChatRole.User ? "end" : "start"}
+                  maxWidth="75%"
+                >
+                  {message.options.map((opt, optIndex) => (
+                    <Flex
+                      key={optIndex}
+                      onClick={() => handleSend(opt)}
+                      align="center"
+                      gap="2"
+                    >
+                      <CornerDownRightIcon
+                        size={20}
+                        style={{ color: "var(--text-secondary)" }}
+                      />
+                      <CardNoPadding p="2" className={styles.optionCard}>
+                        <Text size="1">{opt}</Text>
+                      </CardNoPadding>
+                    </Flex>
+                  ))}
+                </Flex>
+              )}
+            </Flex>
           ))}
 
           {isTyping && (
@@ -185,7 +226,7 @@ export function GoalChat() {
         />
         <CustomButton
           buttonType={ButtonType.Primary}
-          onClick={handleSend}
+          onClick={() => handleSend(inputValue)}
           disabled={!inputValue.trim() || isTyping}
         >
           <SendHorizonal size={16} />

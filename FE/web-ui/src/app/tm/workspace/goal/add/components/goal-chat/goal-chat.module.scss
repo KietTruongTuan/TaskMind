@@ -24,6 +24,17 @@
   color: var(--background)
 }
 
+.optionCard {
+  cursor: pointer;
+  border: 1px solid var(--card-border);
+  border-radius: var(--spacing-small);
+  transition: all 0.2s ease-in-out;
+
+  &:hover {
+    border-color: var(--text-primary);
+  }
+}
+
 .inputWrapper {
   background-color: var(--background);
   border: 1px solid var(--card-border);
