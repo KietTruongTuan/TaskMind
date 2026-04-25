@@ -11,7 +11,6 @@ import { ButtonType } from "@/app/enum/button-type.enum";
 import { CardNoPadding } from "@/app/components/card-no-padding/card-no-padding";
 import { AddStep } from "@/app/enum/step.enum";
 import { Dispatch, SetStateAction } from "react";
-import { LoadingOverlay } from "@/app/components/loading-overlay/loading-overlay";
 import {
   aiService,
   ApiError,

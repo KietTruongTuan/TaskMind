@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Flex, Text, ScrollArea, Box } from "@radix-ui/themes";
-import { SendHorizonal, Bot, CornerDownRightIcon } from "lucide-react";
+import { Flex, Text, ScrollArea } from "@radix-ui/themes";
+import { SendHorizonal, CornerDownRightIcon } from "lucide-react";
 import styles from "./goal-chat.module.scss";
 import { CardNoPadding } from "@/app/components/card-no-padding/card-no-padding";
 import { LoadingText } from "@/app/components/loading-text/loading-text";

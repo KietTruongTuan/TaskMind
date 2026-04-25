@@ -2,20 +2,19 @@
 import { AddStep } from "@/app/enum/step.enum";
 import { GoalAdd } from "../goal-add/goal-add";
 import { GoalReview } from "../../../components/goal-review/goal-review";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useGoalContext } from "@/app/contexts/goal-context/goal-context";
 import { Flex, Grid, ScrollArea } from "@radix-ui/themes";
 import { LoadingText } from "@/app/components/loading-text/loading-text";
 import { ThreeDotLoading } from "@/app/components/three-dot-loading/three-dot-loading";
 import { GoalChat } from "../goal-chat/goal-chat";
-import { useEffect } from "react";
 
 export function AddGoalWrapper() {
   const [step, setStep] = useState<AddStep>(AddStep.FillInformation);
   const { draftGoal } = useGoalContext();
   const [draftCreateGoal, setDraftCreateGoal] = useState(draftGoal);
 
-  useEffect(() => { 
+  useEffect(() => {
     setDraftCreateGoal(draftGoal);
   }, [draftGoal]);
 
