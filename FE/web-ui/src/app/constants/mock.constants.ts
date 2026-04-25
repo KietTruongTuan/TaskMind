@@ -43,6 +43,7 @@ export const MOCK_GOAL_RESPONSE_DATA: CreateGoalResponseBody = {
     { id: "1", name: "Task 1", status: Status.ToDo, deadline: getFutureDate() },
     { id: "2", name: "Task 2", status: Status.ToDo, deadline: getFutureDate() },
   ],
+  message: "Goal created successfully",
 };
 
 export const MOCK_TASK_RESPONSE_DATA: Task = {
@@ -129,6 +130,8 @@ export const MOCK_BLANK_GOAL_RESPONSE_DATA: CreateGoalResponseBody = {
   completedCount: 0,
   taskCount: 0,
   tasks: [],
+  message: "",
+  options: [],
 };
 
 export const MOCK_GOAL_LIST_DATA: GoalListItemResponseBody[] = [

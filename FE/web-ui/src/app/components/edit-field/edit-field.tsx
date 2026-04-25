@@ -1,5 +1,5 @@
 import { Flex, TextArea, TextField, Text } from "@radix-ui/themes";
-import { Pen, X } from "lucide-react";
+import { X } from "lucide-react";
 import { KeyboardEvent, useState, useEffect } from "react";
 
 import styles from "./edit-field.module.scss";
@@ -82,21 +82,18 @@ export function EditField({
 
   if (!isEditing) {
     return (
-      <Flex gap="1" align={isMultiLine ? "start" : "center"}>
+      <Flex
+        gap="1"
+        align={isMultiLine ? "start" : "center"}
+        onClick={(e) => {
+          if (!isDetailCard) return;
+          e.stopPropagation();
+          onEditStart();
+        }}
+        style={{ cursor: isDetailCard ? "pointer" : "default" }}
+        data-testid={`edit-${fieldName}-button`}
+      >
         {children}
-        {isDetailCard && (
-          <Flex flexShrink="0" mt={isMultiLine ? "1" : ""}>
-            <Pen
-              size={iconSize}
-              cursor="pointer"
-              onClick={(e) => {
-                e.stopPropagation();
-                onEditStart();
-              }}
-              data-testid={`edit-${fieldName}-button`}
-            />
-          </Flex>
-        )}
       </Flex>
     );
   }

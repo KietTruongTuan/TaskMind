@@ -22,7 +22,6 @@ export function FileInputForm() {
     try {
       setIsUploading(true);
       const res = await knowledgeBaseService.upload(formData);
-      console.log(res);
       setIsSuccess(true);
       router.refresh();
       showToast("Your file is successfully uploaded");

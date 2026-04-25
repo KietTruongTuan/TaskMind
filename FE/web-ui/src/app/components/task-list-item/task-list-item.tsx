@@ -95,7 +95,7 @@ export function TaskListItem({
           iconSize={12}
           fieldName="task-name"
           fieldSize="1"
-          fieldLength="50%"
+          fieldLength="80%"
           type="text"
           value={detail.name}
           isEditing={editingField === "name"}
@@ -118,6 +118,7 @@ export function TaskListItem({
             style={{
               textDecoration: isCompleted ? "line-through" : "",
             }}
+            size="1"
             className={isCompleted ? styles.subText : ""}
           >
             {detail.name}

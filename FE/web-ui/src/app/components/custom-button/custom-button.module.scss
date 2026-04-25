@@ -1,28 +1,42 @@
 .primaryButton {
   background: var(--button-primary);
   color: var(--button-secondary);
+  cursor: pointer;
+
+  &:disabled {
+    cursor: not-allowed !important;
+    background-color: var(--button-disabled);
+    color: var(--text-secondary)
+  }
 }
 
 .secondaryButton {
   background: var(--button-secondary);
   color: var(--button-primary);
   border: 1px solid var(--card-border);
+  cursor: pointer;
+
 }
 
 .warningButton {
   background: var(--status-cancel);
   color: var(--button-secondary);
+  cursor: pointer;
+
 }
 
 .warningOutlineButton {
   background: var(--button-secondary);
   border: 1px solid var(--status-cancel);
   color: var(--status-cancel);
+  cursor: pointer;
+
 }
 
 .tabButton {
   background: none;
   color: var(--text-primary);
+  cursor: pointer;
 
   &:hover {
     background-color: var(--button-hover);

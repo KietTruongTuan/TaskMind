@@ -1,5 +1,11 @@
 import { Status } from "../enum/status.enum";
 import { DraftTask, DraftTaskRequestBody, Task } from "./task.constants";
+import { ChatRole } from "../enum/chat-role.enum";
+
+export interface ChatMessage {
+  role: ChatRole;
+  content: string;
+}
 
 export interface CreateGoalRequestBody {
   name: string;
@@ -7,6 +13,8 @@ export interface CreateGoalRequestBody {
   tag?: string[];
   deadline: Date;
   files?: File[];
+  message?: string;
+  history?: ChatMessage[];
 }
 
 export interface SaveGoalRequestBody {
@@ -29,6 +37,8 @@ export interface DraftGoalRequestBody {
 
 export interface CreateGoalResponseBody extends GoalResponseBody {
   tasks?: DraftTask[];
+  message: string;
+  options?: string[];
 }
 
 export interface GoalDetailResponseBody extends GoalResponseBody {

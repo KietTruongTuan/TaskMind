@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen} from "@testing-library/react";
 import { AddGoalWrapper } from "./add-goal-wrapper";
 import { useGoalContext } from "@/app/contexts/goal-context/goal-context";
 import { AddStep } from "@/app/enum/step.enum";
@@ -6,6 +6,7 @@ import {
   GoalDetailResponseBody,
   MOCK_GOAL_RESPONSE_DATA,
 } from "@/app/constants";
+import userEvent from "@testing-library/user-event";
 
 jest.mock("@/app/contexts/goal-context/goal-context", () => ({
   useGoalContext: jest.fn(),
@@ -45,7 +46,7 @@ describe("AddGoalWrapper", () => {
     expect(screen.queryByTestId("goal-review")).not.toBeInTheDocument();
   });
 
-  it("should transition to GoalReview when step changes AND draftGoal exists", () => {
+  it("should transition to GoalReview when step changes AND draftGoal exists", async () => {
     (useGoalContext as jest.Mock).mockReturnValue({
       draftGoal: MOCK_GOAL_RESPONSE_DATA,
     });
@@ -55,7 +56,7 @@ describe("AddGoalWrapper", () => {
     expect(screen.getByTestId("goal-add")).toBeInTheDocument();
 
     const nextButton = screen.getByTestId("go-to-review-btn");
-    fireEvent.click(nextButton);
+    await userEvent.click(nextButton);
 
     expect(screen.queryByTestId("goal-add")).not.toBeInTheDocument();
     expect(screen.getByTestId("goal-review")).toBeInTheDocument();
@@ -64,17 +65,17 @@ describe("AddGoalWrapper", () => {
     ).toBeInTheDocument();
   });
 
-  it("should render nothing (null) if step is ReviewDetail but draftGoal is null", () => {
+  it("should render chat generating view if step is ReviewDetail but draftGoal is null", async () => {
     (useGoalContext as jest.Mock).mockReturnValue({ draftGoal: null });
 
-    const { container } = render(<AddGoalWrapper />);
+    render(<AddGoalWrapper />);
 
     const nextButton = screen.getByTestId("go-to-review-btn");
-    fireEvent.click(nextButton);
+    await userEvent.click(nextButton);
 
     expect(screen.queryByTestId("goal-add")).not.toBeInTheDocument();
     expect(screen.queryByTestId("goal-review")).not.toBeInTheDocument();
 
-    expect(container).toBeEmptyDOMElement();
+    expect(screen.getByText("Generating")).toBeInTheDocument();
   });
 });
