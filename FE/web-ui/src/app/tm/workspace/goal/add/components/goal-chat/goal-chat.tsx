@@ -59,7 +59,7 @@ export function GoalChat() {
     setMessages((prev) => [...prev, botMsg]);
     setHistoryMessages((prev) => [
       ...prev,
-      { ...botMsg, content: JSON.stringify(draftGoal) },
+      { role: ChatRole.Assistant, content: JSON.stringify(draftGoal) },
     ]);
     setIsTyping(false);
   }, [draftGoal]);
@@ -95,7 +95,6 @@ export function GoalChat() {
         message: userMsg.content,
         history: historyMessages,
       };
-      console.log("historyMessages", historyMessages);
       const res: CreateGoalResponseBody =
         await aiService.createGoal(chatRequest);
 
@@ -223,11 +222,13 @@ export function GoalChat() {
           placeholder="Chat with your AI assistant to adjust the goal plan..."
           disabled={isTyping}
           className={styles.textInput}
+          data-testid="goal-chat-input"
         />
         <CustomButton
           buttonType={ButtonType.Primary}
           onClick={() => handleSend(inputValue)}
           disabled={!inputValue.trim() || isTyping}
+          data-testid="goal-chat-send"
         >
           <SendHorizonal size={16} />
         </CustomButton>

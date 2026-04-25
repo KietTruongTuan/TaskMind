@@ -99,6 +99,7 @@ export function InputField({
                   size={14}
                   cursor="pointer"
                   onClick={() => onDeleteFile(index)}
+                  data-testid={`delete-file-button-${index}`}
                 />
               </Flex>
             ))}

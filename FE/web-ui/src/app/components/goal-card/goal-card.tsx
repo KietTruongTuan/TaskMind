@@ -156,7 +156,6 @@ export function GoalCard({
       }
     }
   };
-  console.log(tag);
   return (
     <CardNoPadding
       p={isDetailCard ? "5" : "3"}
@@ -199,7 +198,7 @@ export function GoalCard({
                   size={isDetailCard ? "6" : "2"}
                   weight="regular"
                   onClick={() => {
-                    if (id) {
+                    if (id && !isDetailCard) {
                       route(buildUrl(WebUrl.GoalDetail, id, undefined));
                     }
                   }}
@@ -241,17 +240,24 @@ export function GoalCard({
                     isDetailCard={isDetailCard}
                   >
                     <Flex gap="2" align="center">
-                      {(detail.tag || []).map((value, index) => (
-                        <Fragment key={index}>
-                          {index > 0 && (
-                            <Text size={isDetailCard ? "2" : "1"} weight="bold">
-                              {" "}
-                              ·{" "}
-                            </Text>
-                          )}
-                          <Text size={isDetailCard ? "2" : "1"}>{value}</Text>
-                        </Fragment>
-                      ))}
+                      {detail.tag && detail.tag.length > 0
+                        ? detail.tag.map((value, index) => (
+                            <Fragment key={index}>
+                              {index > 0 && (
+                                <Text
+                                  size={isDetailCard ? "2" : "1"}
+                                  weight="bold"
+                                >
+                                  {" "}
+                                  ·{" "}
+                                </Text>
+                              )}
+                              <Text size={isDetailCard ? "2" : "1"}>
+                                {value}
+                              </Text>
+                            </Fragment>
+                          ))
+                        : "No tag"}
                     </Flex>
                   </EditField>
                   {detail.status && isDetailCard && (
@@ -309,7 +315,7 @@ export function GoalCard({
                 iconSize={14}
                 fieldName="goal-description"
                 fieldSize="2"
-                fieldLength="50%"
+                fieldLength="80%"
                 type="text"
                 value={detail.description}
                 isEditing={editingField === "description"}

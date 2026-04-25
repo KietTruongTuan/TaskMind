@@ -86,10 +86,12 @@ export function EditField({
         gap="1"
         align={isMultiLine ? "start" : "center"}
         onClick={(e) => {
+          if (!isDetailCard) return;
           e.stopPropagation();
           onEditStart();
         }}
-        style={{ cursor: "pointer" }}
+        style={{ cursor: isDetailCard ? "pointer" : "default" }}
+        data-testid={`edit-${fieldName}-button`}
       >
         {children}
       </Flex>

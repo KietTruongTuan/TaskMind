@@ -45,6 +45,21 @@ describe("AddForm", () => {
       </GoalProvider>,
     );
     const user = userEvent.setup();
+    await user.click(await screen.findByTestId("dialog-trigger"));
+    const file = [
+      new File(["test content"], "test-file-0.pdf", {
+        type: "application/pdf",
+      }),
+      new File(["test content"], "test-file-1.pdf", {
+        type: "application/pdf",
+      }),
+    ];
+    const input = document.querySelector(
+      'input[type="file"]',
+    ) as HTMLInputElement;
+
+    await user.upload(input, file);
+    await user.click(await screen.findByTestId("delete-file-button-1"));
     await user.type(
       await screen.findByTestId("name-field"),
       MOCK_GOAL_REQUEST_DATA.name,
