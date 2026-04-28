@@ -144,15 +144,15 @@ class TestGoalGeneration:
         """Test successful goal generation with valid inputs"""
         # Mock AI responses
         mock_api_key.return_value = 'fake-api-key'
-        mock_ai_response.side_effect = [
-            # First call: tasks
-            [
+        mock_ai_response.return_value = {
+            "message": "Plan generated successfully",
+            "options": [],
+            "description": "A refined description of the goal",
+            "tasks": [
                 {"name": "Research Phase", "status": "ToDo", "deadline": future_deadline},
                 {"name": "Development Phase", "status": "ToDo", "deadline": future_deadline}
-            ],
-            # Second call: description
-            ["A refined description of the goal"]
-        ]
+            ]
+        }
 
         data = {
             "name": "Learn Django",
@@ -185,10 +185,12 @@ class TestGoalGeneration:
     def test_generate_goal_missing_description_returns_200(self, mock_ai_response, mock_api_key, auth_client, future_deadline):
         """Test success when description is missing (optional)"""
         mock_api_key.return_value = 'fake-api-key'
-        mock_ai_response.side_effect = [
-            [{"name": "Generated Task", "status": "ToDo", "deadline": future_deadline}],
-            ["A generated description of the goal"]
-        ]
+        mock_ai_response.return_value = {
+            "message": "Plan generated successfully",
+            "options": [],
+            "description": "A generated description of the goal",
+            "tasks": [{"name": "Generated Task", "status": "ToDo", "deadline": future_deadline}]
+        }
         
         data = {
             "name": "Test Goal",
@@ -207,10 +209,12 @@ class TestGoalGeneration:
         from django.core.files.uploadedfile import SimpleUploadedFile
         
         mock_api_key.return_value = 'fake-api-key'
-        mock_ai_response.side_effect = [
-            [{"name": "File Task", "status": "ToDo", "deadline": future_deadline}],
-            ["A refined description of the goal extracted from the file"]
-        ]
+        mock_ai_response.return_value = {
+            "message": "Plan generated successfully",
+            "options": [],
+            "description": "A refined description of the goal extracted from the file",
+            "tasks": [{"name": "File Task", "status": "ToDo", "deadline": future_deadline}]
+        }
         
         # Create a tiny valid dummy pdf file so pypdf doesn't crash on 'PdfReadError'
         # A simple string will fail PdfReader validation, so we mock extract_context_from_files
