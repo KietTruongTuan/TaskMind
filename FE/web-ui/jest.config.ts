@@ -39,6 +39,18 @@ const config: Config = {
     "^@/(.*)$": "<rootDir>/src/$1",
   },
   testMatch: ["**/*.spec.ts", "**/*.spec.tsx"],
+  reporters: [
+    "default",
+    [
+      "jest-html-reporter",
+      {
+        pageTitle: "Test Case Results",
+        outputPath: "./test-results.html",
+        includeFailureMsg: true,
+        includeConsoleLog: true,
+      },
+    ],
+  ],
 };
 
 export default createJestConfig(config);

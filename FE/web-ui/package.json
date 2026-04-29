@@ -10,6 +10,7 @@
     "lint": "next lint",
     "eslint --fix": "eslint --fix",
     "test:unit": "jest --coverage",
+    "test:integration": "jest integration-test --coverage",
     "test:e2e": "(cucumber-js e2e/  features  || true) && tsx e2e/helper/report/report.ts"
   },
   "dependencies": {
@@ -64,6 +65,7 @@
     "globals": "16.3.0",
     "jest": "30.0.4",
     "jest-environment-jsdom": "30.0.4",
+    "jest-html-reporter": "^4.4.0",
     "jiti": "2.5.1",
     "jwt-decode": "4.0.0",
     "lucide-react": "0.542.0",

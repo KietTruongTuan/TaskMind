@@ -32,7 +32,6 @@ describe("AddPage", () => {
   });
 
   it("should render page with draft goal", async () => {
-    localStorage.setItem("draftGoal", JSON.stringify(MOCK_GOAL_RESPONSE_DATA));
     const AddPage = await AddGoalPage();
     render(
       <RouteLoadingProvider>
