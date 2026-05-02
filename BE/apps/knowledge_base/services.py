@@ -197,7 +197,7 @@ class RAGContextService:
             logger.info(f"Calling user instance: {user}")
             
             # only get context from user's document or built-in ones
-            security_filter = (Q(source_document__user=user.id) | Q(source_document__user__isnull=True)) if user else Q(source_document__user__isnull=True)
+            security_filter = (Q(source_document__user=user.id) | Q(source_document__is_global=True)) if user else Q(source_document__user__isnull=True)
             status_filter = Q(
                 source_document__status=DocumentStatus.SUCCESS,
                 source_document__is_deleted=False
