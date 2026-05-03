@@ -1,6 +1,6 @@
 from django.conf import settings
 from rest_framework import serializers
-from .models import Document 
+from .models import Document
 
 
 class DocumentSerializer(serializers.ModelSerializer):
@@ -43,3 +43,10 @@ class DocumentUploadProcessSerializer(serializers.Serializer):
             if file.size > settings.MAX_FILE_SIZE:
                 raise serializers.ValidationError(f"File size limit exceeded for {file.name}. Max allowed is {settings.MAX_FILE_SIZE}")
         return file
+    
+class DocumentBulkDeleteSerializer(serializers.Serializer):
+    document_ids = serializers.ListField(
+        child=serializers.IntegerField(),
+        allow_empty=False,
+        help_text="Provide an array of documents ID to delete them",
+    )

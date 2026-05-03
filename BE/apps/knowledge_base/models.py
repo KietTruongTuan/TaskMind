@@ -29,7 +29,8 @@ class Document(models.Model):
     )
     task_id = models.CharField(max_length=100, blank=True, null=True)   # ID of the django-q2 task processing this file
     error_message = models.TextField(blank=True, null=True)
-    is_global = models.BooleanField(default=False)                      # knowledge chunks from global documents are available to all users 
+    is_global = models.BooleanField(default=False)                      # knowledge chunks from global documents are available to all users
+    is_deleted = models.BooleanField(default=False, blank=True)
     
     
 class DocumentChunk(models.Model):

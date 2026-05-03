@@ -13,7 +13,7 @@ from django.db.models import Q
 from pgvector.django import CosineDistance
 
 from .embedding_model import EmbeddingModel
-from .models import DocumentChunk
+from .models import DocumentChunk, DocumentStatus
 from apps.accounts.models import User
 
 logger = logging.getLogger(__name__)
@@ -197,9 +197,13 @@ class RAGContextService:
             logger.info(f"Calling user instance: {user}")
             
             # only get context from user's document or built-in ones
-            security_filter = (Q(source_document__user=user.id) | Q(source_document__user__isnull=True)) if user else Q(source_document__user__isnull=True)
+            security_filter = (Q(source_document__user=user.id) | Q(source_document__is_global=True)) if user else Q(source_document__user__isnull=True)
+            status_filter = Q(
+                source_document__status=DocumentStatus.SUCCESS,
+                source_document__is_deleted=False
+            )
             relevant_chunks: List[DocumentChunk] = list(
-                DocumentChunk.objects.filter(security_filter).order_by(
+                DocumentChunk.objects.filter(security_filter & status_filter).order_by(
                     CosineDistance('embedding', query_embed)
                 )[:top_k]
             )
