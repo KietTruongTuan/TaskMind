@@ -6,6 +6,15 @@
     animation: spin 1.2s linear infinite;
 }
 
+.fullWidthCheckbox {
+    width: 100%;
+    align-items: center;
+
+    :global(.rt-CheckboxGroupItemInner) {
+        width: 100%;
+    }
+}
+
 @keyframes spin {
     from {
         transform: rotate(0deg);
@@ -14,4 +23,12 @@
     to {
         transform: rotate(360deg);
     }
+}
+
+.textOverflow {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
 }

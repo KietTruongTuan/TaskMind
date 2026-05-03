@@ -1,5 +1,5 @@
 import { HttpService } from "../http-service/http-service";
-import { KnowledgeBaseResponseBody } from "@/app/constants";
+import { KnowledgeBaseDeleteRequestBody, KnowledgeBaseResponseBody } from "@/app/constants";
 import { ApiUrl } from "@/app/enum/api-url.enum";
 
 export class KnowledgeBaseService extends HttpService {
@@ -19,6 +19,13 @@ export class KnowledgeBaseService extends HttpService {
   async getFiles() {
     const res = await this.get<KnowledgeBaseResponseBody[]>(
       ApiUrl.KnowledgeBase,
+    );
+    return res;
+  }
+  async remove(data: KnowledgeBaseDeleteRequestBody) {
+    const res = await this.delete<undefined, KnowledgeBaseDeleteRequestBody>(
+      ApiUrl.KnowledgeBase,
+      data,
     );
     return res;
   }

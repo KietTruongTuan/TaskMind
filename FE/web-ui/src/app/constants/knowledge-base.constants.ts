@@ -10,3 +10,7 @@ export interface KnowledgeBaseResponseBody {
   status: FileStatus;
   message?: string;
 }
+
+export interface KnowledgeBaseDeleteRequestBody {
+  document_ids: number[];
+}

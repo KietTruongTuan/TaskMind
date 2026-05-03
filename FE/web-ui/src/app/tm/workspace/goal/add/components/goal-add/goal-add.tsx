@@ -73,6 +73,7 @@ export function GoalAdd({
         })),
       });
     } catch (err) {
+      setStep(AddStep.FillInformation);
       setIsSuccess(false);
       const error = err as ApiError;
       showToast(error.message);
