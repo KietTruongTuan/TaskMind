@@ -37,3 +37,6 @@ FE/web-ui/src/assets/tokens/.obsidian/
 .vercel
 # Scratch and local docs
 scratch/
+
+# OS
+.DS_Store
