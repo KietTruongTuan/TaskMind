@@ -209,9 +209,9 @@ class RAGContextService:
                 .order_by('distance')[:top_k]                                   # takes top k results
             )
             
-            return relevant_chunks
+            return [chunk.content for chunk in relevant_chunks]
         
-        relevant_context = ""
+        relevant_context: List[str] = []
         if getattr(settings, "ENABLE_GOAL_RAG_CONTEXT", True):
             try:
                 relevant_context = (
