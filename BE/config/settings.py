@@ -271,7 +271,7 @@ RAG_ALLOWED_EXTENSIONS = [".pdf", ".docx"]
 CHUNK_MAX_SIZE = 30_000 # (characters)
 CHUNK_OVERLAP = 1       # (paragraphs)
 
-TOP_K_CONTEXT = 10  # the maximum number of context to get from knowledge base to supply for plan generation 
+TOP_K_CONTEXT = 10  # the maximum number of contexts to get from knowledge base to supply for plan generation 
 
 CONTEXT_DISTANCE_THRESHOLD = 0.5 # the maximum distance between user query and the context queried from knowledge base
 
