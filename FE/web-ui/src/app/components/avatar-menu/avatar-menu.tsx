@@ -44,7 +44,7 @@ export function AvatarMenu() {
           </SkeletonLoading>
         </Flex>
       </DropdownMenu.Trigger>
-      <DropdownMenu.Content variant="soft">
+      <DropdownMenu.Content variant="soft" color="gray">
         <AlertDialogPopUp
           title="Are you sure"
           description="This action will log out your account"
@@ -54,7 +54,7 @@ export function AvatarMenu() {
           <DropdownMenu.Item onSelect={(e) => e.preventDefault()}>
             <Flex align="center" gap="3" style={{ cursor: "pointer" }}>
               <Text>Log Out</Text>
-              <LogOut size={15} />
+              <LogOut size={14} />
             </Flex>
           </DropdownMenu.Item>
         </AlertDialogPopUp>

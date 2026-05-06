@@ -61,7 +61,6 @@ export class HttpService {
         if (token && request.headers) {
           request.headers.Authorization = `Bearer ${token}`;
         }
-        if (process.env.NODE_ENV === "development") {}
         return request;
       },
       (error) => {
@@ -163,8 +162,8 @@ export class HttpService {
   }
 
   // DELETE request
-  async delete<Res>(url: string, request?: AxiosRequestConfig): Promise<Res> {
-    const response = await this.instance.delete<Res>(url, request);
+  async delete<Res, Req = undefined>(url: string, data?: Req, request?: AxiosRequestConfig): Promise<Res> {
+    const response = await this.instance.delete<Res>(url, { ...request, data });
     return response.data;
   }
 }

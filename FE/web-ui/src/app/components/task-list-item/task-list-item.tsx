@@ -90,7 +90,7 @@ export function TaskListItem({
   };
   return (
     <CardNoPadding py="2" px="3">
-      <Flex width="100%" height="100%" justify="between" align="center" gap="2">
+      <Flex width="100%" height="100%" justify="between" align="center">
         <EditField
           iconSize={12}
           fieldName="task-name"
@@ -119,7 +119,11 @@ export function TaskListItem({
               textDecoration: isCompleted ? "line-through" : "",
             }}
             size="1"
-            className={isCompleted ? styles.subText : ""}
+            className={
+              isCompleted
+                ? `${styles.subText} ${styles.textOverflow}`
+                : styles.textOverflow
+            }
           >
             {detail.name}
           </Text>
@@ -149,7 +153,7 @@ export function TaskListItem({
             }}
             isDropdown
           />
-          <Flex gap="1" className={styles.subText}>
+          <Flex gap="1" className={styles.subText} flexShrink="0">
             <EditField
               iconSize={12}
               fieldName="task-deadline"

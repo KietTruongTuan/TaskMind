@@ -122,10 +122,9 @@ describe("HttpService", () => {
 
       const res = await httpService.delete<typeof deleted>("/users/1");
 
-      expect(mockAxiosInstance.delete).toHaveBeenCalledWith(
-        "/users/1",
-        undefined,
-      );
+      expect(mockAxiosInstance.delete).toHaveBeenCalledWith("/users/1", {
+        data: undefined,
+      });
       expect(res).toEqual(deleted);
     });
   });
