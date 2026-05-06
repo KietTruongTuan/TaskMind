@@ -98,15 +98,18 @@ BE/
 │   │   ├── views.py       # Login, register, logout, token refresh
 │   │   ├── serializers.py
 │   │   └── tests/
-│   └── goals/             # Goal & Task management
-│       ├── views.py       # CRUD + AI generation
-│       ├── models.py      # Goal, Task models (UUID primary keys)
-│       ├── serializers.py
-│       ├── urls.py        # Goal routes
-│       ├── tasks_urls.py  # Task routes (/v1/tasks/)
+│   ├── goals/             # Goal & Task management
+│   │   ├── views.py       # CRUD + AI generation
+│   │   ├── models.py      # Goal, Task models (UUID primary keys)
+│   │   ├── serializers.py
+│   │   ├── urls.py        # Goal routes
+│   │   ├── tasks_urls.py  # Task routes (/v1/tasks/)
+│   │   └── tests/
+│   └── knowledge_base/    # Document chunking & RAG pipeline
+│       ├── views.py       # Document upload and management
+│       ├── models.py      # Document, DocumentChunk
+│       ├── services.py    # RAG chunking logic
 │       └── tests/
-│           ├── test_api.py   # Unit tests (mocked AI)
-│           └── test_e2e.py   # E2E tests (real AI)
 ├── config/
 │   ├── settings.py        # Django settings
 │   └── urls.py            # URL routing
@@ -127,37 +130,51 @@ pytest -v
 
 # Run with print statements visible
 pytest -v -s
+
+### Run Tests in Docker (Recommended)
+
+If you are running the backend using Docker Compose, use the following commands:
+
+```bash
+# Run all tests
+docker compose exec backend pytest
+
+# Run tests with coverage and generate HTML report
+docker compose exec backend pytest --cov=apps --cov-report=term-missing --html=report.html --self-contained-html
+```
 ```
 
 ### Run Specific Test Files
 
 ```bash
-# Unit tests (fast, mocked AI)
-pytest apps/goals/tests/test_api.py -v
-
-# E2E tests (requires real API_KEY, calls real AI)
-pytest apps/goals/tests/test_e2e.py -v -s
+# Goal tests (unit + integration + services)
+docker compose exec backend pytest apps/goals/tests/ -v
 
 # Account tests
-pytest apps/accounts/tests/ -v
+docker compose exec backend pytest apps/accounts/tests/ -v
+
+# Knowledge Base tests
+docker compose exec backend pytest apps/knowledge_base/tests/ -v
 ```
 
 ### Test Summary
 
-| Test File | Tests | Description |
+The backend utilizes `pytest` and `pytest-django` to execute a comprehensive suite following the Arrange-Act-Assert pattern. External dependencies (like Groq API and file systems) are mocked for unit and integration testing speed.
+
+| Application | Coverage | Description |
 |-----------|-------|-------------|
-| `test_api.py` | 35 | Unit tests with mocked AI |
-| `test_e2e.py` | 1 | Full flow: register → generate → save |
-| `accounts/test_api.py` | 4 | Auth tests |
+| `accounts` | ~99% | Auth flows, JWT generation, login edge cases |
+| `goals` | ~95% | CRUD, Cascade deletes, Goal generation (mocked), Validators |
+| `knowledge_base` | ~90% | Document upload, RAG chunking, Soft-deletes |
 
 ### Before Deployment Checklist
 
 ```bash
 # Run all tests to ensure nothing is broken
-pytest -v
+docker compose exec backend pytest --cov=apps
 
-# Expected: All tests should pass
-# ======================== 40 passed ========================
+# Expected: All tests should pass and coverage should be > 70%
+# ======================== 250+ passed ========================
 ```
 
 ---

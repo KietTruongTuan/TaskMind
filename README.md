@@ -17,7 +17,7 @@
 ```
 
 capstone/  
-├── BE/ # Backend - Django apps (accounts, goals, tasks)  
+├── BE/ # Backend - Django apps (accounts, goals, knowledge_base)  
 ├── FE/ # Frontend - Next.js app  
 │ └── web-ui/ # UI implementation  
 ├── e2e/ # End-to-end tests (Cucumber + Playwright)  
@@ -98,6 +98,8 @@ From the root (`package.json`):
 **Testing**
 - `pnpm test:unit` → run unit tests with Jest
 - `pnpm test:e2e` → run end-to-end tests with Cucumber
+- `docker compose exec backend pytest` → run backend tests in Docker
+- `docker compose exec backend pytest --cov=apps --cov-report=term-missing --html=report.html --self-contained-html` → run backend tests with coverage and generate HTML report
 
 ---
 
