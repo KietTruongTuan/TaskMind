@@ -203,14 +203,15 @@ class RAGContextService:
                 source_document__is_deleted=False
             )
             relevant_chunks: List[DocumentChunk] = list(
-                DocumentChunk.objects.filter(security_filter & status_filter).order_by(
-                    CosineDistance('embedding', query_embed)
-                )[:top_k]
+                DocumentChunk.objects.filter(security_filter & status_filter)
+                .annotate(distance=CosineDistance('embedding', query_embed))    # Annotate the distance on each row
+                .filter(distance__lte=settings.CONTEXT_DISTANCE_THRESHOLD)      # Filter out anything that is too far away (distance > threshold), i.e. unrelated context
+                .order_by('distance')[:top_k]                                   # takes top k results
             )
             
-            return [str(chunk.content) for chunk in relevant_chunks]
+            return [chunk.content for chunk in relevant_chunks]
         
-        relevant_context = ""
+        relevant_context: List[str] = []
         if getattr(settings, "ENABLE_GOAL_RAG_CONTEXT", True):
             try:
                 relevant_context = (
