@@ -143,6 +143,7 @@ export function GoalChat() {
         type="scroll"
         style={{ flexGrow: 1, maxHeight: "79vh" }}
         ref={scrollViewportRef}
+        data-testid="goal-chat-message-container"
       >
         <Flex
           p="5"

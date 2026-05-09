@@ -66,6 +66,7 @@ export function SearchBar({
       className={styles.searchBar}
       onChange={(e) => onSearch(e.target.value)}
       value={search}
+      data-testid="search-bar"
     >
       <TextField.Slot>
         <Search size={16} />

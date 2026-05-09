@@ -151,6 +151,7 @@ export function KanbanBoard({
             ? "83vw"
             : "93vw",
       }}
+      data-testid="kanban-board"
     >
       <Kanban
         key={key}
@@ -163,7 +164,7 @@ export function KanbanBoard({
               {kanbanState.columns.map((columnId) => (
                 <Flex key={columnId} className={styles.columnWrapper}>
                   <CardNoPadding key={columnId} p="2" isPrimary>
-                    <KanbanColumn id={columnId}>
+                    <KanbanColumn id={columnId} data-testid={`${columnId}-column`}>
                       <Flex direction="column" gap="3">
                         <KanbanColumnHeader>
                           <Flex align="center" gap="2">
