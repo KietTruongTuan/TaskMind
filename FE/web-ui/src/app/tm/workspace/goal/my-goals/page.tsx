@@ -29,9 +29,7 @@ export default async function MyGoalPage({
     {
       label: "Status",
       searchParamKey: SearchParams.Status,
-      options: Object.values(Status).map(
-        (status) => StatusDisplay[status].title,
-      ),
+      options: Object.values(Status),
     },
     {
       label: "Tag",
