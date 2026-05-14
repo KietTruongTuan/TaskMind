@@ -23,6 +23,7 @@ import { ButtonType } from "@/app/enum/button-type.enum";
 import { Status } from "@/app/enum/status.enum";
 import { AddStep } from "@/app/enum/step.enum";
 import { WebUrl } from "@/app/enum/web-url.enum";
+import { buildUrl } from "@/app/tm/utils";
 import { Flex } from "@radix-ui/themes";
 import { Kanban, ListChecks } from "lucide-react";
 import { Dispatch, SetStateAction, useState } from "react";
@@ -88,8 +89,8 @@ export function GoalReview({
   const handleSave = async () => {
     try {
       setIsRouteLoading(true);
-      await goalService.save(goalData as SaveGoalRequestBody);
-      route(WebUrl.Dashboard);
+      const data = await goalService.save(goalData as SaveGoalRequestBody);
+      route(buildUrl(WebUrl.GoalDetail, data.id));
       setIsSuccess(true);
       showToast("Your goal is successfully saved");
     } catch (err) {
@@ -148,13 +149,7 @@ export function GoalReview({
   ];
   return (
     <Flex width="100%" justify="center" align="center" height="100%" px="7">
-      <Flex
-        width="100%"
-        direction="column"
-        py="5"
-        gap="5"
-        height="100%"
-      >
+      <Flex width="100%" direction="column" py="5" gap="5" height="100%">
         {isDraft && (
           <Flex width="100%" justify="end" gap="1">
             <CustomButton

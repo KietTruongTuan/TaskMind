@@ -40,7 +40,7 @@
     "eslint.config.ts",
     "style-dictionary.config.js",
     ".next/dev/types/**/*.ts"
-  ],
+, "e2e/steps/login.steps.ts"  ],
   "exclude": [
     "node_modules",
     "e2e"

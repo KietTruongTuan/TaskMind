@@ -136,7 +136,7 @@ export function TaskList({
   };
 
   return (
-    <CardNoPadding p="5" isPrimary>
+    <CardNoPadding p="5" isPrimary data-testid="task-list">
       <Flex direction="column" width="100%" height="100%" gap="3">
         <Flex width="100%" height="100%" justify="end">
           <CustomButton
