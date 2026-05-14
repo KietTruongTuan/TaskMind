@@ -20,7 +20,7 @@ BeforeAll({ timeout: 30000 }, async function () {
 
   try {
     // wait for login to complete
-    await page.waitForURL(PAGE_ROUTES['Dashboard'], { timeout: 3000 });
+    await page.waitForURL(PAGE_ROUTES['Dashboard'], { timeout: 20000 });
   } catch (error) {
     await page.getByTestId('goto-button').click();
     await page.getByLabel('Username').fill('TestUser');

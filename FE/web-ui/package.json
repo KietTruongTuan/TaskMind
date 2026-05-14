@@ -2,6 +2,7 @@
   "name": "taskmind",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@10.14.0",
   "scripts": {
     "dev": "next dev --webpack -H 0.0.0.0 -p ${PORT:-3000}",
     "build": "next build --webpack",
@@ -49,6 +50,7 @@
     "@testing-library/jest-dom": "6.6.3",
     "@testing-library/react": "16.3.0",
     "@testing-library/user-event": "14.6.1",
+    "@types/fs-extra": "^11.0.4",
     "@types/jest": "30.0.0",
     "@types/node": "20",
     "@types/react": "19",
@@ -62,6 +64,7 @@
     "eslint": "9",
     "eslint-config-next": "15.4.1",
     "framer-motion": "12.23.12",
+    "fs-extra": "^11.3.5",
     "globals": "16.3.0",
     "jest": "30.0.4",
     "jest-environment-jsdom": "30.0.4",
@@ -82,5 +85,16 @@
     "tsx": "4.20.3",
     "typescript": "5",
     "typescript-eslint": "8.39.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@bundled-es-modules/glob",
+      "@parcel/watcher",
+      "esbuild",
+      "puppeteer",
+      "sharp",
+      "style-dictionary",
+      "unrs-resolver"
+    ]
   }
 }
