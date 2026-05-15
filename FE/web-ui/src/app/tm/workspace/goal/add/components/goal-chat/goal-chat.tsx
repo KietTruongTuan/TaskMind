@@ -136,12 +136,14 @@ export function GoalChat() {
       justify="end"
       p="3"
       gap="2"
+      gridRow="2"
+      gridColumn="1"
       className={styles.chatContainer}
     >
       <ScrollArea
         scrollbars="vertical"
         type="scroll"
-        style={{ flexGrow: 1, maxHeight: "79vh" }}
+        style={{ flexGrow: 1, maxHeight: "71vh" }}
         ref={scrollViewportRef}
         data-testid="goal-chat-message-container"
       >
