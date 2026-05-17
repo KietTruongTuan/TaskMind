@@ -99,7 +99,14 @@ From the root (`package.json`):
 - `pnpm test:unit` → run unit tests with Jest
 - `pnpm test:e2e` → run end-to-end tests with Cucumber
 - `docker compose exec backend pytest` → run backend tests in Docker
-- `docker compose exec backend pytest --cov=apps --cov-report=term-missing --html=report.html --self-contained-html` → run backend tests with coverage and generate HTML report
+- `docker compose exec backend pytest \
+  --cov=apps \
+  --cov-report=term-missing \
+  --cov-report=html \
+  --html=report.html \
+  --self-contained-html` → run backend tests with coverage and generate HTML report
+- `docker compose exec backend pytest apps/accounts/tests/ apps/goals/tests/test_api.py apps/goals/tests/test_models.py apps/goals/tests/test_serializers.py apps/goals/tests/test_services.py apps/goals/tests/test_validators.py apps/knowledge_base/tests/test_models.py apps/knowledge_base/tests/test_serializers.py apps/knowledge_base/tests/test_services.py apps/knowledge_base/tests/test_tasks.py --html=backend_unit_report.html --self-contained-html -v` → generate backend unit test report
+- `docker compose exec backend pytest apps/goals/tests/test_integration.py apps/goals/tests/test_security.py --html=backend_integration_report.html --self-contained-html -v` → generate backend integration test report
 
 ---
 

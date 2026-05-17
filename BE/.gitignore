@@ -8,5 +8,7 @@ db.sqlite3
 pyvenv.cfg
 storage
 report.html
+backend_unit_report.html
+backend_integration_report.html
 .coverage
 htmlcov/
