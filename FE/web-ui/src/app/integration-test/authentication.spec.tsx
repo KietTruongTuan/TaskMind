@@ -81,7 +81,7 @@ describe("Authentication Integration Test", () => {
     const emailInput = await screen.findByTestId("email-field");
     const passwordInput = await screen.findByTestId("password-field");
     const confirmPasswordInput = await screen.findByTestId(
-      "confirmPassword-field",
+      "confirm Password-field",
     );
 
     await user.type(usernameInput, "testuser");
@@ -98,7 +98,7 @@ describe("Authentication Integration Test", () => {
           username: "testuser",
           email: "test@example.com",
           password: "Password123",
-          confirmPassword: "Password123",
+          "confirm Password": "Password123",
         }),
       );
     });

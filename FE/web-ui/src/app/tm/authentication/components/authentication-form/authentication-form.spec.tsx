@@ -92,7 +92,7 @@ describe("Authentication Form", () => {
     );
 
     await userEvent.type(
-      await screen.findByTestId("confirmPassword-field"),
+      await screen.findByTestId("confirm Password-field"),
       "Testpassword1"
     );
     const submitButton = await screen.findByTestId("register-submit-button");

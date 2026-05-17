@@ -8,6 +8,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { Status } from "@/app/enum/status.enum";
 import { FilterDropDown } from "./filter-dropdown";
 import { ThemeProvider } from "@/app/contexts/theme-context/theme-context";
+import { StatusDisplay } from "@/app/constants";
 
 describe("FilterDropdown", () => {
   beforeEach(() => {
@@ -47,7 +48,7 @@ describe("FilterDropdown", () => {
     const filterTrigger = screen.getByTestId("filter-dropdown-trigger");
     await userEvent.click(filterTrigger);
     const statusCheckbox = screen.getByRole("checkbox", {
-      name: Status.ToDo,
+      name: StatusDisplay[Status.ToDo].title,
     });
     await userEvent.click(statusCheckbox);
     const tagCheckbox = screen.getByRole("checkbox", { name: "FE" });

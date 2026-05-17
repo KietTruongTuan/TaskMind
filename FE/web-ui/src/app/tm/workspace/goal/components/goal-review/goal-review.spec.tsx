@@ -1,9 +1,7 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { GoalReview } from "./goal-review";
-import { AddStep } from "@/app/enum/step.enum";
 import {
-  goalService,
   MOCK_BLANK_GOAL_RESPONSE_DATA,
   MOCK_GOAL_RESPONSE_DATA,
   taskService,
@@ -17,9 +15,6 @@ import { SidebarProvider } from "@/app/contexts/sidebar-context/sidebar-context"
 
 jest.mock("@/app/constants", () => ({
   ...jest.requireActual("@/app/constants"),
-  goalService: {
-    save: jest.fn(),
-  },
   taskService: {
     update: jest.fn(),
   },
@@ -51,7 +46,6 @@ beforeAll(() => {
 });
 
 describe("GoalReview", () => {
-  const mockSetStep = jest.fn();
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -64,7 +58,6 @@ describe("GoalReview", () => {
             <GoalProvider>
               <SidebarProvider>
                 <GoalReview
-                  setStep={mockSetStep}
                   goalData={MOCK_GOAL_RESPONSE_DATA}
                 />
               </SidebarProvider>
@@ -93,7 +86,6 @@ describe("GoalReview", () => {
             <GoalProvider>
               <SidebarProvider>
                 <GoalReview
-                  setStep={mockSetStep}
                   goalData={MOCK_BLANK_GOAL_RESPONSE_DATA}
                   isDraft
                 />
@@ -104,70 +96,7 @@ describe("GoalReview", () => {
       </ThemeProvider>,
     );
 
-    expect(await screen.findByText("Cancel")).toBeInTheDocument();
-  });
-
-  it("should navigate back to FillInformation step when Cancel is clicked", async () => {
-    const user = userEvent.setup();
-    render(
-      <ThemeProvider>
-        <ToastProvider>
-          <RouteLoadingProvider>
-            <GoalProvider>
-              <SidebarProvider>
-                <GoalReview
-                  setStep={mockSetStep}
-                  goalData={MOCK_GOAL_RESPONSE_DATA}
-                  isDraft
-                />
-              </SidebarProvider>
-            </GoalProvider>
-          </RouteLoadingProvider>
-        </ToastProvider>
-      </ThemeProvider>,
-    );
-
-    const cancelButton = screen.getByRole("button", { name: /cancel/i });
-    await user.click(cancelButton);
-
-    expect(mockSetStep).toHaveBeenCalledWith(AddStep.FillInformation);
-  });
-
-  it("should save the goal", async () => {
-    const user = userEvent.setup();
-    (goalService.save as jest.Mock).mockResolvedValueOnce(
-      MOCK_GOAL_RESPONSE_DATA,
-    );
-    render(
-      <ThemeProvider>
-        <ToastProvider>
-          <RouteLoadingProvider>
-            <GoalProvider>
-              <SidebarProvider>
-                <GoalReview
-                  setStep={mockSetStep}
-                  goalData={MOCK_GOAL_RESPONSE_DATA}
-                  isDraft
-                />
-              </SidebarProvider>
-            </GoalProvider>
-          </RouteLoadingProvider>
-        </ToastProvider>
-      </ThemeProvider>,
-    );
-
-    const saveButton = screen.getByRole("button", { name: /save/i });
-    await user.click(saveButton);
-
-    expect(goalService.save).toHaveBeenCalledWith(MOCK_GOAL_RESPONSE_DATA);
-    await waitFor(
-      () => {
-        expect(
-          screen.getByText("Your goal is successfully saved"),
-        ).toBeInTheDocument();
-      },
-      { timeout: 1000 },
-    );
+    expect(screen.queryByText("Back")).not.toBeInTheDocument();
   });
 
   it("should update task count when update task status", async () => {
@@ -182,7 +111,6 @@ describe("GoalReview", () => {
             <GoalProvider>
               <SidebarProvider>
                 <GoalReview
-                  setStep={mockSetStep}
                   goalData={MOCK_GOAL_RESPONSE_DATA}
                 />
               </SidebarProvider>
@@ -214,7 +142,6 @@ describe("GoalReview", () => {
             <GoalProvider>
               <SidebarProvider>
               <GoalReview
-                setStep={mockSetStep}
                 goalData={MOCK_GOAL_RESPONSE_DATA}
               />
               </SidebarProvider>

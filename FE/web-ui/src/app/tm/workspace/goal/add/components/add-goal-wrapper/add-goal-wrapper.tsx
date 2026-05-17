@@ -86,7 +86,7 @@ export function AddGoalWrapper() {
           gridColumnStart="1"
           gridRow="1"
         >
-          <CustomButton buttonType={ButtonType.Secondary} onClick={handleBack}>
+          <CustomButton buttonType={ButtonType.Secondary} onClick={handleBack} data-testid="back-button">
             <ArrowLeft size={15} />
             <Text size="2">Back</Text>
           </CustomButton>
