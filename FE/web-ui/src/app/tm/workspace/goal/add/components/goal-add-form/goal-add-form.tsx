@@ -26,7 +26,7 @@ export function GoalAddForm() {
         isFileInput
         errors={errors.description as FieldError}
       />
-      <Flex width="100%" gap="4">
+      <Flex direction={{ initial: "column", md: "row" }} width="100%" gap="4">
         <InputField
           name="tag"
           type=""

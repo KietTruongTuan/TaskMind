@@ -1,25 +1,37 @@
 "use client";
-import { AddStep } from "@/app/enum/step.enum";
+import { AddStep, GoalAddReviewDetailView } from "@/app/enum/step.enum";
 import { GoalAdd } from "../goal-add/goal-add";
 import { GoalReview } from "../../../components/goal-review/goal-review";
 import { useState, useEffect } from "react";
 import { useGoalContext } from "@/app/contexts/goal-context/goal-context";
-import { Box, Flex, Grid, ScrollArea, Text } from "@radix-ui/themes";
+import {
+  Box,
+  DropdownMenu,
+  Flex,
+  Grid,
+  ScrollArea,
+  Text,
+} from "@radix-ui/themes";
 import { LoadingText } from "@/app/components/loading-text/loading-text";
 import { ThreeDotLoading } from "@/app/components/three-dot-loading/three-dot-loading";
 import { GoalChat } from "../goal-chat/goal-chat";
 import { CustomButton } from "@/app/components/custom-button/custom-button";
 import { ButtonType } from "@/app/enum/button-type.enum";
-import { ArrowLeft, Save } from "lucide-react";
+import { ArrowLeft, BotMessageSquare, Eye, Save, Table2 } from "lucide-react";
 import styles from "./add-goal-wrapper.module.scss";
 import { useToast } from "@/app/contexts/toast-context/toast-context";
 import { useRouteLoadingContext } from "@/app/contexts/route-loading-context/route-loading-context";
 import { goalService, SaveGoalRequestBody, ApiError } from "@/app/constants";
 import { WebUrl } from "@/app/enum/web-url.enum";
 import { buildUrl } from "@/app/tm/utils";
+import useMediaQuery from "@mui/material/useMediaQuery";
 
 export function AddGoalWrapper() {
-  const [step, setStep] = useState<AddStep>(AddStep.FillInformation);
+  const isMd = useMediaQuery("(min-width:1024px)");
+  const [step, setStep] = useState<AddStep>(AddStep.ReviewDetail);
+  const [activeView, setActiveView] = useState<GoalAddReviewDetailView>(
+    isMd ? GoalAddReviewDetailView.Both : GoalAddReviewDetailView.ReviewDetail,
+  );
   const { draftGoal, clearDraftGoal } = useGoalContext();
   const [draftCreateGoal, setDraftCreateGoal] = useState(
     draftGoal
@@ -86,23 +98,79 @@ export function AddGoalWrapper() {
           gridColumnStart="1"
           gridRow="1"
         >
-          <CustomButton buttonType={ButtonType.Secondary} onClick={handleBack} data-testid="back-button">
+          <CustomButton
+            buttonType={ButtonType.Secondary}
+            onClick={handleBack}
+            data-testid="back-button"
+          >
             <ArrowLeft size={15} />
             <Text size="2">Back</Text>
           </CustomButton>
-          <CustomButton
-            buttonType={ButtonType.Primary}
-            onClick={handleSave}
-            disabled={!draftCreateGoal}
-          >
-            <Save size={15} />
-            <Text size="2">Save</Text>
-          </CustomButton>
+          <Flex gap="1">
+            <DropdownMenu.Root modal={false}>
+              <DropdownMenu.Trigger>
+                <CustomButton
+                  buttonType={ButtonType.Secondary}
+                  data-testid="view-trigger"
+                >
+                  {activeView === GoalAddReviewDetailView.Both && (
+                    <Table2 size={15} />
+                  )}
+                  {activeView === GoalAddReviewDetailView.Chat && (
+                    <BotMessageSquare size={15} />
+                  )}
+                  {activeView === GoalAddReviewDetailView.ReviewDetail && (
+                    <Eye size={15} />
+                  )}
+                </CustomButton>
+              </DropdownMenu.Trigger>
+              <DropdownMenu.Content variant="soft" color="gray">
+                {isMd && (
+                  <DropdownMenu.Item
+                    onClick={() => setActiveView(GoalAddReviewDetailView.Both)}
+                  >
+                    <Table2 size={15} />
+                    Both
+                  </DropdownMenu.Item>
+                )}
+                <DropdownMenu.Item
+                  onClick={() => setActiveView(GoalAddReviewDetailView.Chat)}
+                >
+                  <BotMessageSquare size={15} />
+                  Chat
+                </DropdownMenu.Item>
+                <DropdownMenu.Item
+                  onClick={() =>
+                    setActiveView(GoalAddReviewDetailView.ReviewDetail)
+                  }
+                >
+                  <Eye size={15}/>
+                  Review
+                </DropdownMenu.Item>
+              </DropdownMenu.Content>
+            </DropdownMenu.Root>
+            <CustomButton
+              buttonType={ButtonType.Primary}
+              onClick={handleSave}
+              disabled={!draftCreateGoal}
+            >
+              <Save size={15} />
+              <Text size="2">Save</Text>
+            </CustomButton>
+          </Flex>
         </Flex>
-        <GoalChat />
+        <GoalChat view={activeView} />
         <ScrollArea
           scrollbars="vertical"
-          style={{ maxHeight: "87vh", gridRow: "2", gridColumn: "2" }}
+          style={{
+            maxHeight: "87vh",
+            gridRow: "2",
+            gridColumnStart:
+              activeView === GoalAddReviewDetailView.ReviewDetail ? "1" : "2",
+            gridColumnEnd: "3",
+            display:
+              activeView === GoalAddReviewDetailView.Chat ? "none" : "flex",
+          }}
         >
           <Flex direction="column" height="100%">
             {draftCreateGoal ? (

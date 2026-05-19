@@ -118,7 +118,7 @@ export function GoalReview({
     },
   ];
   return (
-    <Flex width="100%" justify="center" align="center" height="100%" px={isDraft ? "7" : ""}>
+    <Flex width="100%" justify="center" align="center" height="100%" px={isDraft ? "7" : ""} maxWidth= { { initial: "150vw", xs: "100%"}}>
       <Flex width="100%" direction="column" py="5" gap="5" height="100%">
         {!isDraft && (
           <Flex justify="start">

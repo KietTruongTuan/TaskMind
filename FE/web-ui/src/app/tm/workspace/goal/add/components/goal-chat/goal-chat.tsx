@@ -17,12 +17,13 @@ import {
 import { useGoalContext } from "@/app/contexts/goal-context/goal-context";
 import { ChatRole } from "@/app/enum/chat-role.enum";
 import { ApiError } from "@/app/constants";
+import { GoalAddReviewDetailView } from "@/app/enum/step.enum";
 
 interface UIChatMessage extends ChatMessage {
   options?: string[];
 }
 
-export function GoalChat() {
+export function GoalChat({ view }: { view: GoalAddReviewDetailView }) {
   const {
     draftGoal,
     createRequest,
@@ -137,8 +138,10 @@ export function GoalChat() {
       p="3"
       gap="2"
       gridRow="2"
-      gridColumn="1"
+      gridColumnStart="1"
+      gridColumnEnd={view === GoalAddReviewDetailView.Chat ? "3" : ""}
       className={styles.chatContainer}
+      display={view === GoalAddReviewDetailView.ReviewDetail ? "none" : "flex"}
     >
       <ScrollArea
         scrollbars="vertical"

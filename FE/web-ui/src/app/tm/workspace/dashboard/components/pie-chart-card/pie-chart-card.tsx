@@ -3,7 +3,7 @@
 import { PieChart } from "@mui/x-charts";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { CardNoPadding } from "@/app/components/card-no-padding/card-no-padding";
-import { Flex, Text } from "@radix-ui/themes";
+import { Flex, Text, Box } from "@radix-ui/themes";
 import { Header } from "@/app/components/header/header";
 import { PieChart as PieChartIcon } from "lucide-react";
 import styles from "./pie-chart-card.module.scss";
@@ -15,6 +15,7 @@ export interface PieChartData {
   label: string;
   color: string;
 }
+
 
 export function PieChartCard({
   data,
@@ -60,6 +61,8 @@ export function PieChartCard({
             <ThemeProvider theme={muiTheme}>
               <PieChart
                 className={styles.pieChart}
+                width={200}
+                height={200}
                 series={[
                   {
                     data: chartData,
