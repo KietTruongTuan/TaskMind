@@ -26,7 +26,7 @@ BeforeAll({ timeout: 30000 }, async function () {
     await page.getByLabel('Username').fill('TestUser');
     await page.getByLabel('Email').fill('example@gmail.com');
     await page.getByLabel('Password', { exact: true }).fill('ExamplePassword123');
-    await page.getByLabel('ConfirmPassword').fill('ExamplePassword123');
+    await page.getByLabel('Confirm Password').fill('ExamplePassword123');
     await page.getByRole('button', { name: 'Sign Up', exact: true }).click();
     
     await page.waitForFunction(() => {

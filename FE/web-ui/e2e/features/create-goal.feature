@@ -23,7 +23,7 @@ Feature: User creates Goal
             | Deadline                  |
             | Estimated time remaining  |
         And I should see the "Save" button
-        And I should see the "Cancel" button
+        And I should see the "Back" button
 
     Scenario: Edit the generated goal and save
         Given I am on the "New Goal" page

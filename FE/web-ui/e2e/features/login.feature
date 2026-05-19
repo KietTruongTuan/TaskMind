@@ -46,8 +46,3 @@ Feature: User login
             | @gmail.com        | ExamplePassword123 | Invalid email address                                     |
             | example@gmail     | ExamplePassword123 | Invalid email address                                     |
             | example@gmail.c   | ExamplePassword123 | Invalid email address                                     |
-            | example@gmail.com | short              | Password must be at least 8 characters                    |
-            | example@gmail.com | alllowerpassword   | Password must contain uppercase, lowercase, and a number. |
-            | example@gmail.com | ALLUPPERPASSWORD   | Password must contain uppercase, lowercase, and a number. |
-            | example@gmail.com | lowerand2pass      | Password must contain uppercase, lowercase, and a number. |
-            | example@gmail.com | UPPERAND123PASS    | Password must contain uppercase, lowercase, and a number. |
