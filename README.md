@@ -107,6 +107,23 @@ From the root (`package.json`):
 
 ---
 
+## ⏱️ Performance Benchmarking
+
+To test the backend performance for goal generation (sequential and concurrent load), make sure your backend is running (e.g. via Docker) and run the benchmarking script.
+
+**macOS / Linux:**
+```bash
+python3 BE/benchmark_goals.py --email 'benchmark@example.com' --password 'BenchmarkPassword123!'
+```
+
+**Windows (PowerShell / CMD):**
+```powershell
+python BE\benchmark_goals.py --email "benchmark@example.com" --password "BenchmarkPassword123!"
+```
+*(Note: Windows uses double quotes `"` instead of single quotes `'` for command line arguments).*
+
+---
+
 ## 📦 Tech Stack
 
 - **Frontend:** Next.js 15, React 19, TypeScript, Sass, Radix UI, Framer Motion
