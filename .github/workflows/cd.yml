@@ -45,8 +45,26 @@
             docker push ${{ secrets.DOCKERHUB_USERNAME }}/capstone-frontend-dev:latest
             docker push ${{ secrets.DOCKERHUB_USERNAME }}/capstone-frontend:${{ steps.vars.outputs.SHA_TAG }}
 
-        - name: Trigger backend deploy on Render
-          run: curl --request POST --fail --silent "${{ secrets.BACKEND_DEPLOY_HOOK }}"
+        # - name: Trigger backend deploy on Render
+        #   run: curl --request POST --fail --silent "${{ secrets.BACKEND_DEPLOY_HOOK }}"
         
-        - name: Trigger frontend deploy on Render
-          run: curl --request POST --fail --silent "${{ secrets.FRONTEND_DEPLOY_HOOK }}"
+        # - name: Trigger frontend deploy on Render
+        #   run: curl --request POST --fail --silent "${{ secrets.FRONTEND_DEPLOY_HOOK }}"
+
+        - name: Deploy to AWS
+          uses: appleboy/ssh-action@v1.0.3
+          with:
+            host: ${{ secrets.AWS_HOST }}
+            username: ${{ secrets.AWS_USERNAME }}
+            key: ${{ secrets.AWS_SSH_KEY }}
+            script: |
+              cd ~/app
+              
+              # Pull the newest images from Docker Hub
+              sudo docker compose pull
+              
+              # Recreate and restart containers with the new images
+              sudo docker compose up -d
+              
+              # Clean up old dangling images to prevent disk space issues
+              sudo docker image prune -f
