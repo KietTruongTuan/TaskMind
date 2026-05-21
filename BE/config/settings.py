@@ -283,7 +283,7 @@ ALLOWED_EXTENSIONS = [".pdf", ".docx", ".jpg", ".jpeg", ".png", ".webp"]
 # Django Q2 Configuration
 Q_CLUSTER = {
     'name': 'rag_pipeline_cluster',
-    'workers': 6,              # Number of background processes running simultaneously
+    'workers': 1,              # Number of background processes running simultaneously
     'recycle': 500,            # Restarts workers after 500 tasks to prevent memory leaks
     'timeout': 120,            # Max seconds a task can run before it's killed (2 mins)
     'retry': 180,              # How long to wait before trying a failed task again
