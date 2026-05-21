@@ -9,7 +9,7 @@ from django.contrib.auth import get_user_model
 from django.utils import timezone
 from datetime import timedelta
 
-from apps.goals.models import Goal, Task
+from apps.goals.models import Goal, Task, Tag
 
 User = get_user_model()
 
@@ -74,12 +74,12 @@ class TestGoalModel:
     def test_meta_db_table(self):
         assert Goal._meta.db_table == "goal"
 
-    def test_tag_defaults_to_empty_list(self, goal):
-        # tag field has default=list
+    def test_tag_defaults_to_empty(self, goal):
+        # tag field defaults to empty M2M relation
         new_goal = Goal.objects.create(
             user=goal.user, name="No Tag Goal", deadline=goal.deadline
         )
-        assert new_goal.tag == []
+        assert new_goal.tag.count() == 0
 
     def test_cascade_delete_removes_tasks(self, goal, future_date):
         """Deleting a goal must CASCADE-delete all its tasks."""
@@ -88,6 +88,30 @@ class TestGoalModel:
         goal_id = goal.id
         goal.delete()
         assert Task.objects.filter(goal_id=goal_id).count() == 0
+
+
+# ===========================================================================
+# Tag Model
+# ===========================================================================
+
+
+@pytest.mark.django_db
+class TestTagModel:
+
+    def test_str_returns_name(self):
+        tag = Tag.objects.create(name="Urgent")
+        assert str(tag) == "Urgent"
+
+    def test_uuid_primary_key(self):
+        import uuid
+        tag = Tag.objects.create(name="T")
+        assert isinstance(tag.id, uuid.UUID)
+
+    def test_meta_ordering_is_name(self):
+        assert Tag._meta.ordering == ["name"]
+
+    def test_meta_db_table(self):
+        assert Tag._meta.db_table == "tag"
 
 
 # ===========================================================================

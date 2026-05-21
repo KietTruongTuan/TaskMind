@@ -3,6 +3,19 @@ from django.conf import settings
 import uuid
 
 
+class Tag(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=100, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["name"]
+        db_table = "tag"
+
+    def __str__(self):
+        return self.name
+
+
 class Goal(models.Model):
     STATUS_CHOICES = [
         ("ToDo", "ToDo"),
@@ -22,7 +35,7 @@ class Goal(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="ToDo")
     deadline = models.DateField()
     complete_date = models.DateField(null=True, blank=True)
-    tag = models.JSONField(default=list, blank=True)
+    tag = models.ManyToManyField(Tag, related_name="goals", blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     update_at = models.DateTimeField(auto_now=True)
 

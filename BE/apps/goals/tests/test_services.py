@@ -343,13 +343,19 @@ class TestGoalServiceResponseBuilder:
 class TestGoalServiceTags:
 
     def test_get_unique_tags_deduplicates_and_sorts(self, user, future_date):
-        Goal.objects.create(user=user, name="G1", deadline=future_date, tag=["b", "a"])
-        Goal.objects.create(user=user, name="G2", deadline=future_date, tag=["a", "c"])
+        from apps.goals.models import Tag
+        g1 = Goal.objects.create(user=user, name="G1", deadline=future_date)
+        t_a = Tag.objects.create(name="a")
+        t_b = Tag.objects.create(name="b")
+        t_c = Tag.objects.create(name="c")
+        g1.tag.set([t_b, t_a])
+        g2 = Goal.objects.create(user=user, name="G2", deadline=future_date)
+        g2.tag.set([t_a, t_c])
         result = GoalService.get_unique_tags(user)
         assert result == ["a", "b", "c"]
 
     def test_get_unique_tags_handles_empty_tags(self, user, future_date):
-        Goal.objects.create(user=user, name="G1", deadline=future_date, tag=[])
+        Goal.objects.create(user=user, name="G1", deadline=future_date)
         result = GoalService.get_unique_tags(user)
         assert result == []
 

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Goal, Task
+from .models import Goal, Tag, Task
 from django.utils import timezone
 
 # ========== Goal Generation Serializers (for Swagger documentation) ==========
@@ -70,6 +70,15 @@ class MessageResponseSerializer(serializers.Serializer):
 # ========== Model Serializers ==========
 
 
+class TagSerializer(serializers.ModelSerializer):
+    """Serializer for Tag model"""
+
+    class Meta:
+        model = Tag
+        fields = ["id", "name", "created_at"]
+        read_only_fields = ["id", "created_at"]
+
+
 class TaskSerializer(serializers.ModelSerializer):
     """
     Serializer for Task model
@@ -121,6 +130,7 @@ class GoalListSerializer(serializers.ModelSerializer):
     """
 
     id = serializers.UUIDField(required=False, read_only=True)
+    tag = serializers.SerializerMethodField()
     completed_count = serializers.IntegerField(read_only=True)
     task_count = serializers.IntegerField(read_only=True)
 
@@ -139,11 +149,16 @@ class GoalListSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ["complete_date", "completed_count", "task_count"]
 
+    def get_tag(self, obj):
+        """Return tags as a list of name strings for API compatibility."""
+        return list(obj.tag.values_list("name", flat=True))
+
 
 class GoalDetailSerializer(serializers.ModelSerializer):
     """Serializer for goal details (with tasks)"""
 
     id = serializers.UUIDField(required=False, read_only=True)
+    tag = serializers.SerializerMethodField()
     tasks = TaskSerializer(many=True, required=False)  # Allow editing tasks
     completed_count = serializers.IntegerField(read_only=True)
     task_count = serializers.IntegerField(read_only=True)
@@ -164,6 +179,10 @@ class GoalDetailSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ["complete_date", "completed_count", "task_count"]
 
+    def get_tag(self, obj):
+        """Return tags as a list of name strings for API compatibility."""
+        return list(obj.tag.values_list("name", flat=True))
+
     def validate_deadline(self, value):
         """
         Prevent setting a new past deadline, but allow keeping an existing past
@@ -178,9 +197,20 @@ class GoalDetailSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Deadline cannot be in the past")
         return value
 
+    @staticmethod
+    def _sync_tags(goal, tag_names):
+        """Resolve tag name strings to Tag objects via get_or_create, then set M2M."""
+        tag_objects = [Tag.objects.get_or_create(name=name)[0] for name in tag_names]
+        goal.tag.set(tag_objects)
+
     def create(self, validated_data):
         tasks_data = validated_data.pop("tasks", [])
         goal = Goal.objects.create(**validated_data)
+
+        # Handle M2M tags from raw request data
+        tag_names = self.initial_data.get("tag", [])
+        if tag_names:
+            self._sync_tags(goal, tag_names)
 
         for task_data in tasks_data:
             Task.objects.create(goal=goal, **task_data)  # dictionary unpacking
@@ -194,6 +224,11 @@ class GoalDetailSerializer(serializers.ModelSerializer):
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
+
+        # Handle M2M tags from raw request data if provided
+        if "tag" in self.initial_data:
+            tag_names = self.initial_data.get("tag", [])
+            self._sync_tags(instance, tag_names)
 
         # Update tasks if provided
         if tasks_data is not None:
@@ -227,6 +262,7 @@ class GoalDetailSerializer(serializers.ModelSerializer):
 class GoalCreateSerializer(serializers.ModelSerializer):
     """Serializer for creating a goal with tasks from AI response"""
 
+    tag = serializers.SerializerMethodField()
     tasks = TaskSerializer(many=True, required=False)
     completed_count = serializers.IntegerField(read_only=True)
     task_count = serializers.IntegerField(read_only=True)
@@ -247,6 +283,10 @@ class GoalCreateSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ["complete_date", "completed_count", "task_count"]
 
+    def get_tag(self, obj):
+        """Return tags as a list of name strings for API compatibility."""
+        return list(obj.tag.values_list("name", flat=True))
+
     def validate_deadline(self, value):
         if value < timezone.now().date():
             raise serializers.ValidationError("Deadline cannot be in the past")
@@ -255,6 +295,12 @@ class GoalCreateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         tasks_data = validated_data.pop("tasks", [])
         goal = Goal.objects.create(**validated_data)
+
+        # Handle M2M tags from raw request data
+        tag_names = self.initial_data.get("tag", [])
+        if tag_names:
+            tag_objects = [Tag.objects.get_or_create(name=name)[0] for name in tag_names]
+            goal.tag.set(tag_objects)
 
         for task_data in tasks_data:
             Task.objects.create(goal=goal, **task_data)

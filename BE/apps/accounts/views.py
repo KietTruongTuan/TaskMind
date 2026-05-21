@@ -1,6 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 from .serializers import (
     RegisterSerializer, 
     LoginSerializer, 
@@ -13,6 +14,7 @@ from .serializers import (
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from .models import User
 from drf_spectacular.utils import extend_schema
 import logging
@@ -163,9 +165,9 @@ class RefreshTokenView(APIView):
             # Fetch the user from database
             try:
                 user = User.objects.get(id=user_id)
-            except User.DoesNotExist:
+            except (User.DoesNotExist, ValueError, ValidationError):
                 return Response(
-                    {'error': 'User not found'}, 
+                    {'error': 'User not found or invalid ID'}, 
                     status=status.HTTP_401_UNAUTHORIZED
                 )
             
@@ -274,5 +276,46 @@ class LogoutView(APIView):
             path='/',
             samesite='Lax',
         )
-
         return response
+
+
+@extend_schema(
+    tags=['Accounts'],
+    request=None,
+    responses={
+        200: MessageResponseSerializer,
+    },
+    summary="Toggle local knowledge base",
+    description="Turn on/off the local knowledge base feature for the authenticated user.",
+)
+class ToggleLocalKBView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request):
+        user = request.user
+        # Toggle
+        user.enable_local_kb = not user.enable_local_kb
+        user.save(update_fields=['enable_local_kb'])
+        status_text = "enabled" if user.enable_local_kb else "disabled"
+        return Response({'message': f'Local knowledge base has been {status_text}.', 'enable_local_kb': user.enable_local_kb}, status=status.HTTP_200_OK)
+
+
+@extend_schema(
+    tags=['Accounts'],
+    request=None,
+    responses={
+        200: MessageResponseSerializer,
+    },
+    summary="Toggle global knowledge base",
+    description="Turn on/off the global/system knowledge base feature for the authenticated user.",
+)
+class ToggleGlobalKBView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request):
+        user = request.user
+        # Toggle
+        user.enable_global_kb = not user.enable_global_kb
+        user.save(update_fields=['enable_global_kb'])
+        status_text = "enabled" if user.enable_global_kb else "disabled"
+        return Response({'message': f'Global knowledge base has been {status_text}.', 'enable_global_kb': user.enable_global_kb}, status=status.HTTP_200_OK)
