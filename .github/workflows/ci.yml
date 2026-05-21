@@ -9,6 +9,10 @@ jobs:
   backend-tests:
     runs-on: ubuntu-latest
 
+    env:
+      WORKER_DB: 1
+      DEBUG: false
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
