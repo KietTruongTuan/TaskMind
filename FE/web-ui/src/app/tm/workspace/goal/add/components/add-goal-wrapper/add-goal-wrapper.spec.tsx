@@ -9,9 +9,15 @@ import {
 import userEvent from "@testing-library/user-event";
 import { RouteLoadingProvider } from "@/app/contexts/route-loading-context/route-loading-context";
 import { ToastProvider } from "@/app/contexts/toast-context/toast-context";
+import { ThemeProvider } from "@/app/contexts/theme-context/theme-context";
 
 jest.mock("@/app/contexts/goal-context/goal-context", () => ({
   useGoalContext: jest.fn(),
+}));
+
+jest.mock("@mui/material/useMediaQuery", () => ({
+  __esModule: true,
+  default: jest.fn(),
 }));
 
 jest.mock("../goal-add/goal-add", () => ({
@@ -35,19 +41,25 @@ jest.mock("../../../components/goal-review/goal-review", () => ({
 }));
 
 describe("AddGoalWrapper", () => {
+  const mockUseMediaQuery = jest.requireMock("@mui/material/useMediaQuery")
+    .default as jest.Mock;
+
   beforeEach(() => {
     jest.clearAllMocks();
+    mockUseMediaQuery.mockReturnValue(false);
   });
 
   it("should render GoalAdd by default", () => {
     (useGoalContext as jest.Mock).mockReturnValue({ draftGoal: null });
 
     render(
-      <ToastProvider>
-        <RouteLoadingProvider>
-          <AddGoalWrapper />
-        </RouteLoadingProvider>
-      </ToastProvider>,
+      <ThemeProvider>
+        <ToastProvider>
+          <RouteLoadingProvider>
+            <AddGoalWrapper />
+          </RouteLoadingProvider>
+        </ToastProvider>
+      </ThemeProvider>,
     );
 
     expect(screen.getByTestId("goal-add")).toBeInTheDocument();
@@ -61,11 +73,13 @@ describe("AddGoalWrapper", () => {
     });
 
     render(
-      <ToastProvider>
-        <RouteLoadingProvider>
-          <AddGoalWrapper />
-        </RouteLoadingProvider>
-      </ToastProvider>,
+      <ThemeProvider>
+        <ToastProvider>
+          <RouteLoadingProvider>
+            <AddGoalWrapper />
+          </RouteLoadingProvider>
+        </ToastProvider>
+      </ThemeProvider>,
     );
 
     const nextButton = screen.getByTestId("go-to-review-btn");
@@ -83,11 +97,13 @@ describe("AddGoalWrapper", () => {
     });
 
     render(
-      <ToastProvider>
-        <RouteLoadingProvider>
-          <AddGoalWrapper />
-        </RouteLoadingProvider>
-      </ToastProvider>,
+      <ThemeProvider>
+        <ToastProvider>
+          <RouteLoadingProvider>
+            <AddGoalWrapper />
+          </RouteLoadingProvider>
+        </ToastProvider>
+      </ThemeProvider>,
     );
 
     const nextButton = screen.getByTestId("go-to-review-btn");
@@ -100,15 +116,69 @@ describe("AddGoalWrapper", () => {
     ).toBeInTheDocument();
   });
 
+  it("should display the Both menu item on desktop and switch to Both view", async () => {
+    mockUseMediaQuery.mockReturnValue(true);
+    (useGoalContext as jest.Mock).mockReturnValue({
+      draftGoal: MOCK_GOAL_RESPONSE_DATA,
+      clearDraftGoal: jest.fn(),
+    });
+
+    render(
+      <ThemeProvider>
+        <ToastProvider>
+          <RouteLoadingProvider>
+            <AddGoalWrapper />
+          </RouteLoadingProvider>
+        </ToastProvider>
+      </ThemeProvider>,
+    );
+
+    await userEvent.click(screen.getByTestId("go-to-review-btn"));
+    await userEvent.click(screen.getByTestId("view-trigger"));
+
+    expect(await screen.findByText("Both")).toBeInTheDocument();
+    await userEvent.click(screen.getByText("Both"));
+
+    expect(screen.getByTestId("goal-review")).toBeInTheDocument();
+    expect(screen.getByTestId("goal-chat-message-container")).toBeVisible();
+  });
+
+  it("should switch to Chat view when Chat menu item is selected", async () => {
+    mockUseMediaQuery.mockReturnValue(true);
+    (useGoalContext as jest.Mock).mockReturnValue({
+      draftGoal: MOCK_GOAL_RESPONSE_DATA,
+      clearDraftGoal: jest.fn(),
+    });
+
+    render(
+      <ThemeProvider>
+        <ToastProvider>
+          <RouteLoadingProvider>
+            <AddGoalWrapper />
+          </RouteLoadingProvider>
+        </ToastProvider>
+      </ThemeProvider>,
+    );
+
+    await userEvent.click(screen.getByTestId("go-to-review-btn"));
+    await userEvent.click(screen.getByTestId("view-trigger"));
+    await userEvent.click(screen.getByText("Chat"));
+
+    expect(screen.getByTestId("goal-chat-message-container")).toBeVisible();
+    expect(screen.getByTestId("goal-review")).not.toBeVisible();
+  });
+
   it("should render chat generating view if step is ReviewDetail but draftGoal is null", async () => {
     (useGoalContext as jest.Mock).mockReturnValue({ draftGoal: null });
 
     render(
-      <ToastProvider>
-        <RouteLoadingProvider>
-          <AddGoalWrapper />
-        </RouteLoadingProvider>
-      </ToastProvider>,
+      <ThemeProvider>
+        <ToastProvider>
+          <RouteLoadingProvider>
+            <AddGoalWrapper />
+          </RouteLoadingProvider>
+        </ToastProvider>
+      </ThemeProvider>,
     );
 
     const nextButton = screen.getByTestId("go-to-review-btn");

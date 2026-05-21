@@ -24,11 +24,10 @@ import { useRouteLoadingContext } from "@/app/contexts/route-loading-context/rou
 import { goalService, SaveGoalRequestBody, ApiError } from "@/app/constants";
 import { WebUrl } from "@/app/enum/web-url.enum";
 import { buildUrl } from "@/app/tm/utils";
-import useMediaQuery from "@mui/material/useMediaQuery";
 
 export function AddGoalWrapper() {
-  const isMd = useMediaQuery("(min-width:1024px)");
-  const [step, setStep] = useState<AddStep>(AddStep.ReviewDetail);
+  const [isMd, setIsMd] = useState(window.innerWidth >= 1024);
+  const [step, setStep] = useState<AddStep>(AddStep.FillInformation);
   const [activeView, setActiveView] = useState<GoalAddReviewDetailView>(
     isMd ? GoalAddReviewDetailView.Both : GoalAddReviewDetailView.ReviewDetail,
   );
@@ -53,6 +52,17 @@ export function AddGoalWrapper() {
         : null,
     );
   }, [draftGoal]);
+
+  useEffect(() => {
+    const updateMedia = () => setIsMd(window.innerWidth >= 1024);
+    updateMedia();
+    window.addEventListener("resize", updateMedia);
+    return () => window.removeEventListener("resize", updateMedia);
+  }, []);
+
+  useEffect(() => {
+    setActiveView(isMd ? GoalAddReviewDetailView.Both : GoalAddReviewDetailView.ReviewDetail);
+  }, [isMd]);
 
   const handleBack = () => {
     clearDraftGoal();
@@ -144,7 +154,7 @@ export function AddGoalWrapper() {
                     setActiveView(GoalAddReviewDetailView.ReviewDetail)
                   }
                 >
-                  <Eye size={15}/>
+                  <Eye size={15} />
                   Review
                 </DropdownMenu.Item>
               </DropdownMenu.Content>
