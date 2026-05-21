@@ -10,6 +10,8 @@ const GoalContext = createContext<{
   clearDraftGoal: () => void;
   setCreateRequest: (request: CreateGoalRequestBody) => void;
   clearCreateRequest: () => void;
+  abortController: AbortController | null;
+  setAbortController: (controller: AbortController | null) => void;
 } | null>(null);
 
 export function GoalProvider({ children }: { children: ReactNode }) {
@@ -19,6 +21,7 @@ export function GoalProvider({ children }: { children: ReactNode }) {
   const [isDraftGoalFromChat, setIsDraftGoalFromChat] = useState(false);
   const [createRequest, setCreateRequest] =
     useState<CreateGoalRequestBody | null>(null);
+  const [abortController, setAbortController] = useState<AbortController | null>(null);
 
   const handleSetDraftGoal = (
     goal: CreateGoalResponseBody | null,
@@ -50,6 +53,8 @@ export function GoalProvider({ children }: { children: ReactNode }) {
         clearDraftGoal: handleClearDraftGoal,
         setCreateRequest: handleSetCreateRequest,
         clearCreateRequest: handleClearCreateRequest,
+        abortController,
+        setAbortController,
       }}
     >
       {children}

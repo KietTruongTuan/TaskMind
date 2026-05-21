@@ -196,6 +196,19 @@ describe("HttpService", () => {
         message: "Unknown Error.",
       });
     });
+
+    it("should reject with the original error if it is an Axios cancel object", async () => {
+      const useMock = mockAxiosInstance.interceptors.response.use as jest.Mock;
+      const responseErrorInterceptor = useMock.mock.calls[0][1];
+      const cancelError = {
+        isAxiosError: true,
+        message: "canceled",
+      };
+
+      mockedAxios.isCancel.mockReturnValueOnce(true);
+
+      await expect(responseErrorInterceptor(cancelError)).rejects.toBe(cancelError);
+    });
   });
 });
 

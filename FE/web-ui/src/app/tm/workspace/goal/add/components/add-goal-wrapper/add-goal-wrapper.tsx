@@ -33,7 +33,7 @@ export function AddGoalWrapper() {
   const [activeView, setActiveView] = useState<GoalAddReviewDetailView>(
     isMd ? GoalAddReviewDetailView.Both : GoalAddReviewDetailView.ReviewDetail,
   );
-  const { draftGoal, clearDraftGoal } = useGoalContext();
+  const { draftGoal, clearDraftGoal, abortController, setAbortController } = useGoalContext();
   const [draftCreateGoal, setDraftCreateGoal] = useState(
     draftGoal
       ? {
@@ -71,6 +71,8 @@ export function AddGoalWrapper() {
   }, [isMd]);
 
   const handleBack = () => {
+    abortController?.abort();
+    setAbortController(null);
     clearDraftGoal();
     setStep(AddStep.FillInformation);
   };

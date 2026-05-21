@@ -50,7 +50,7 @@ describe("AddGoalWrapper", () => {
   });
 
   it("should render GoalAdd by default", () => {
-    (useGoalContext as jest.Mock).mockReturnValue({ draftGoal: null });
+    (useGoalContext as jest.Mock).mockReturnValue({ draftGoal: null, setAbortController: jest.fn() });
 
     render(
       <ThemeProvider>
@@ -70,6 +70,7 @@ describe("AddGoalWrapper", () => {
     (useGoalContext as jest.Mock).mockReturnValue({
       draftGoal: MOCK_GOAL_RESPONSE_DATA,
       clearDraftGoal: jest.fn(),
+      setAbortController: jest.fn(),
     });
 
     render(
@@ -94,6 +95,7 @@ describe("AddGoalWrapper", () => {
   it("should transition to GoalReview when step changes AND draftGoal exists", async () => {
     (useGoalContext as jest.Mock).mockReturnValue({
       draftGoal: MOCK_GOAL_RESPONSE_DATA,
+      setAbortController: jest.fn(),
     });
 
     render(
@@ -121,6 +123,7 @@ describe("AddGoalWrapper", () => {
     (useGoalContext as jest.Mock).mockReturnValue({
       draftGoal: MOCK_GOAL_RESPONSE_DATA,
       clearDraftGoal: jest.fn(),
+      setAbortController: jest.fn(),
     });
 
     render(
@@ -148,6 +151,7 @@ describe("AddGoalWrapper", () => {
     (useGoalContext as jest.Mock).mockReturnValue({
       draftGoal: MOCK_GOAL_RESPONSE_DATA,
       clearDraftGoal: jest.fn(),
+      setAbortController: jest.fn(),
     });
 
     render(
@@ -169,7 +173,7 @@ describe("AddGoalWrapper", () => {
   });
 
   it("should render chat generating view if step is ReviewDetail but draftGoal is null", async () => {
-    (useGoalContext as jest.Mock).mockReturnValue({ draftGoal: null });
+    (useGoalContext as jest.Mock).mockReturnValue({ draftGoal: null, setAbortController: jest.fn() });
 
     render(
       <ThemeProvider>
