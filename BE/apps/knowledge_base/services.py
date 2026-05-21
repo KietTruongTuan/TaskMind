@@ -197,8 +197,9 @@ class RAGContextService:
             logger.info(f"Calling user instance: {user}")
             
             # only get context from user's document or built-in ones
-            security_filter = Q()
             if user:
+                security_filter = Q(pk__in=[]) # Start with "match nothing"
+                
                 if getattr(user, 'enable_local_kb', True):
                     security_filter |= Q(source_document__user=user.id)
                 if getattr(user, 'enable_global_kb', True):
