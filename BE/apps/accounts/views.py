@@ -13,6 +13,7 @@ from .serializers import (
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from .models import User
 from drf_spectacular.utils import extend_schema
 import logging
@@ -163,9 +164,9 @@ class RefreshTokenView(APIView):
             # Fetch the user from database
             try:
                 user = User.objects.get(id=user_id)
-            except User.DoesNotExist:
+            except (User.DoesNotExist, ValueError, ValidationError):
                 return Response(
-                    {'error': 'User not found'}, 
+                    {'error': 'User not found or invalid ID'}, 
                     status=status.HTTP_401_UNAUTHORIZED
                 )
             
