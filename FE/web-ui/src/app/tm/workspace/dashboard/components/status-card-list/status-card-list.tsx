@@ -42,7 +42,7 @@ export function StatusCardList({
   ];
   return (
     <Grid
-      columns={{ initial: "1", xs: "2", lg: "4" }}
+      columns={{ initial: "2", lg: "4" }}
       gap="5"
       width="100%"
       data-testid="status-card-list"

@@ -8,7 +8,7 @@ report.generate({
   reportPath: "./reports",
   reportName: "Automation Test Report",
   pageTitle: "TaskMind test report",
-  displayDuration: false,
+  displayDuration: true,
   metadata: {
     browser: {
       name: "chrome",

@@ -114,19 +114,6 @@ export function AuthenticationForm() {
               >
                 <Flex direction="column" gap="4">
                   {formContents[activeForm].formComponents}
-                  {activeForm === AuthenticationModule.Login && (
-                    <Flex justify="between">
-                      <Text as="label">
-                        <Flex gap="2" align="center">
-                          <Checkbox />
-                          Remember me
-                        </Flex>
-                      </Text>
-                      <Text className={styles.textButton}>
-                        Forgot password?
-                      </Text>
-                    </Flex>
-                  )}
                   <Flex direction="column">
                     <CustomButton
                       type="submit"

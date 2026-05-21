@@ -10,39 +10,40 @@ export function SideBar() {
   const { isOpen, setIsOpen } = useSidebarContext();
 
   return (
-    <motion.div
-      animate={{ width: isOpen ? "14vw" : "4vw" }}
-      style={{ minWidth: isOpen ? "14vw" : "4vw" }}
-      transition={{
-        type: "spring",
-        stiffness: 300,
-        damping: 30,
-      }}
-      className={styles.sideBarMotion}
-    >
-      <Flex
-        direction="column"
-        height="100%"
-        align="center"
-        width="100%"
-        p="4"
-        className={styles.sideBar}
+    <Flex width="auto">
+      <motion.div
+        style={{ width: "100%" }}
+        transition={{
+          type: "spring",
+          stiffness: 300,
+          damping: 30,
+        }}
+        className={styles.sideBarMotion}
       >
         <Flex
           direction="column"
-          align="start"
-          justify="center"
-          gap="8"
+          height="100%"
+          align="center"
           width="100%"
+          p="4"
+          className={styles.sideBar}
         >
-          <Menu
-            cursor="pointer"
-            onClick={() => setIsOpen(!isOpen)}
-            data-testid="side-bar-open-button"
-          />
-          <BarItems isOpen={isOpen} />
+          <Flex
+            direction="column"
+            align="start"
+            justify="center"
+            gap="8"
+            width="100%"
+          >
+            <Menu
+              cursor="pointer"
+              onClick={() => setIsOpen(!isOpen)}
+              data-testid="side-bar-open-button"
+            />
+            <BarItems isOpen={isOpen} />
+          </Flex>
         </Flex>
-      </Flex>
-    </motion.div>
+      </motion.div>
+    </Flex>
   );
 }

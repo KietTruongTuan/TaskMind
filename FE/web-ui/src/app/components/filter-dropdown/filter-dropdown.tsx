@@ -15,6 +15,8 @@ import { buildUrl } from "@/app/tm/utils";
 import React from "react";
 import { CustomButton } from "../custom-button/custom-button";
 import { ButtonType } from "@/app/enum/button-type.enum";
+import { StatusDisplay } from "@/app/constants";
+import { Status } from "@/app/enum/status.enum";
 
 const RCTCheckboxGroupRoot = CheckboxGroup.Root as React.FC<
   React.ComponentProps<typeof CheckboxGroup.Root> & {
@@ -110,7 +112,9 @@ export function FilterDropDown({
                 <Grid columns="2" gapX="4" gapY="3" width="100%">
                   {filterOption.options.map((option) => (
                     <CheckboxGroup.Item key={option} value={option}>
-                      {option}
+                      {filterOption.searchParamKey === SearchParams.Status
+                        ? StatusDisplay[option as Status]?.title || option
+                        : option}
                     </CheckboxGroup.Item>
                   ))}
                 </Grid>

@@ -29,7 +29,7 @@ export default async function AllTaskPage({
           />
         </Box>
 
-        <Flex width="50%" gap="2">
+        <Flex width={{ initial: "80%", md: "50%" }} gap="2">
           <SearchBar value={(params[SearchParams.Search] as string) || ""} />
         </Flex>
 

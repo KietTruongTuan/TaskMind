@@ -109,18 +109,24 @@ export default async function DashboardPage() {
             />
             <Grid columns={{ initial: "1", md: "2fr 1fr" }} gap="5">
               <Grid
-                rows={{ initial: "1", md: "1fr auto" }}
+                rows={{ initial: "auto", md: "1fr auto" }}
                 columns={{ initial: "1", md: "1fr 1fr" }}
                 gap="5"
               >
-                <Box gridRow="1" gridColumn="1">
+                <Box
+                  gridRow={{ initial: "1", md: "1" }}
+                  gridColumn={{ initial: "1", md: "1" }}
+                >
                   <PieChartCard
                     data={chartData}
                     header="Task Statistics"
                     subHeader="Overview of your tasks"
                   />
                 </Box>
-                <Box gridRow="1" gridColumn="2">
+                <Box
+                  gridRow={{ initial: "4", md: "1" }}
+                  gridColumn={{ initial: "1", md: "2" }}
+                >
                   <RecentGoalList
                     header="Due soon"
                     subHeader="Tasks Nearing Deadline"
@@ -130,7 +136,11 @@ export default async function DashboardPage() {
                     cardTypeComponent={KanbanItem}
                   />
                 </Box>
-                <Box gridRow="2" gridColumnStart="1" gridColumnEnd="3">
+                <Box
+                  gridRow={{ initial: "auto", md: "2" }}
+                  gridColumnStart={{ initial: "1", md: "1" }}
+                  gridColumnEnd={{ initial: "2", md: "3" }}
+                >
                   <ContributionGraph
                     header="Productivity"
                     subHeader="Your activity over time"

@@ -54,7 +54,7 @@ export function BarItems({
   ];
 
   return (
-    <Flex direction="column" gap="4" width="100%" align="center">
+    <Flex direction="column" gap="4" width="100%" align="center" px="1">
       {navBarItems.map((value, index) => {
         const isActive = currentUrl === value.url;
         const Icon = value.icon;

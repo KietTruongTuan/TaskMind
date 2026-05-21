@@ -53,7 +53,7 @@ export function RegistrationForm() {
         errors={errors.password as FieldError}
       />
       <InputField
-        name="confirmPassword"
+        name="confirm Password"
         type="password"
         placeholder="Confirm your password"
         rules={{
@@ -63,7 +63,7 @@ export function RegistrationForm() {
             return matches || "Passwords do not match";
           },
         }}
-        errors={errors.confirmPassword as FieldError}
+        errors={errors["confirm Password"] as FieldError}
       />
     </Flex>
   );

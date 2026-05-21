@@ -29,9 +29,7 @@ export default async function MyGoalPage({
     {
       label: "Status",
       searchParamKey: SearchParams.Status,
-      options: Object.values(Status).map(
-        (status) => StatusDisplay[status].title,
-      ),
+      options: Object.values(Status),
     },
     {
       label: "Tag",
@@ -63,14 +61,14 @@ export default async function MyGoalPage({
             subTextSize="2"
           />
         </Box>
-        <Flex width="50%" gap="2">
+        <Flex width={{ initial: "80%", xs: "100%", md: "80%", lg: "50%" }} gap="2">
           <SearchBar value={(params[SearchParams.Search] as string) || ""} />
           <FilterDropDown filterOptions={filterOptions} value={filterParams} />
         </Flex>
 
         <ScrollArea type="auto" scrollbars="vertical">
           {goals.length > 0 ? (
-            <Flex gap="3" wrap="wrap">
+            <Flex gap="3" wrap="wrap" maxWidth= {{ initial: "90vw", xs: "100%"}}>
               {goals.map((goal) => (
                 <Box
                   key={goal.id}

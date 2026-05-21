@@ -96,6 +96,10 @@ export class HttpService {
           }
         }
 
+        if (axios.isCancel(error)) {
+          return Promise.reject(error);
+        }
+
         return Promise.reject(this.handleError(error));
       },
     );

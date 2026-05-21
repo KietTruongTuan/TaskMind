@@ -1,7 +1,7 @@
 "use client";
 import { CardNoPadding } from "../card-no-padding/card-no-padding";
 import { Fragment, useRef, useState } from "react";
-import { Flex, Progress, Text } from "@radix-ui/themes";
+import { Flex, Grid, Progress, Text } from "@radix-ui/themes";
 
 import { Calendar, CheckCircle, Clock, Trash2, TrendingUp } from "lucide-react";
 import { GoalCardPropsData } from "@/app/tm/workspace/dashboard/components/recent-goal-list/recent-goal-list";
@@ -355,14 +355,14 @@ export function GoalCard({
                 data-testid="delete-goal-button"
               />
             </AlertDialogPopUp>
-          )}
+          )}  
         </Flex>
         {isDetailCard && (
-          <Flex align="stretch" gap="3">
+          <Grid columns={{ initial: "1", sm: "2", md: "4" }} gap="3">
             {cardContent.map((value, index) => (
               <StatusCard key={index} {...value} />
             ))}
-          </Flex>
+          </Grid>
         )}
       </Flex>
     </CardNoPadding>

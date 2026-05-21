@@ -52,7 +52,7 @@ describe("AIService", () => {
     expect(spy).toHaveBeenCalledWith(
       ApiUrl.GoalGenerate,
       MOCK_GOAL_REQUEST_DATA,
-      { "headers": undefined }
+      { "headers": {} }
     );
     expect(result).toEqual(MOCK_GOAL_RESPONSE_DATA);
   });

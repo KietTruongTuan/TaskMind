@@ -9,11 +9,8 @@ import {
 } from "@/app/components/tab-container/tab-container";
 import { TaskList } from "@/app/components/task-list/task-list";
 import {
-  ApiError,
   CreateGoalResponseBody,
   GoalDetailResponseBody,
-  goalService,
-  SaveGoalRequestBody,
   Task,
 } from "@/app/constants";
 import { useGoalContext } from "@/app/contexts/goal-context/goal-context";
@@ -21,19 +18,15 @@ import { useRouteLoadingContext } from "@/app/contexts/route-loading-context/rou
 import { useToast } from "@/app/contexts/toast-context/toast-context";
 import { ButtonType } from "@/app/enum/button-type.enum";
 import { Status } from "@/app/enum/status.enum";
-import { AddStep } from "@/app/enum/step.enum";
-import { WebUrl } from "@/app/enum/web-url.enum";
-import { buildUrl } from "@/app/tm/utils";
-import { Flex } from "@radix-ui/themes";
-import { Kanban, ListChecks } from "lucide-react";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Flex, Text } from "@radix-ui/themes";
+import { ArrowLeft, Kanban, ListChecks } from "lucide-react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export function GoalReview({
-  setStep,
   goalData,
   isDraft = false,
 }: {
-  setStep?: Dispatch<SetStateAction<AddStep>>;
   goalData: CreateGoalResponseBody | GoalDetailResponseBody;
   isDraft?: boolean;
 }) {
@@ -48,9 +41,7 @@ export function GoalReview({
     tag,
     deadline,
   } = goalData;
-  const { route, setIsRouteLoading } = useRouteLoadingContext();
-  const { showToast, setIsSuccess } = useToast();
-  const { clearDraftGoal } = useGoalContext();
+  const router = useRouter();
 
   const [localCompletedCount, setLocalCompletedCount] =
     useState(completedCount);
@@ -79,27 +70,6 @@ export function GoalReview({
 
   const handleTaskCountChange = (isDelete?: boolean) => {
     setLocalTaskCount((prev) => (isDelete ? Math.max(0, prev - 1) : prev + 1));
-  };
-
-  const handleCancel = () => {
-    clearDraftGoal();
-    setStep && setStep(AddStep.FillInformation);
-  };
-
-  const handleSave = async () => {
-    try {
-      setIsRouteLoading(true);
-      const data = await goalService.save(goalData as SaveGoalRequestBody);
-      route(buildUrl(WebUrl.GoalDetail, data.id));
-      setIsSuccess(true);
-      showToast("Your goal is successfully saved");
-    } catch (err) {
-      setIsSuccess(false);
-      const error = err as ApiError;
-      showToast(error.message);
-    } finally {
-      setIsRouteLoading(false);
-    }
   };
 
   const tabList: TabListProps[] = [
@@ -148,18 +118,16 @@ export function GoalReview({
     },
   ];
   return (
-    <Flex width="100%" justify="center" align="center" height="100%" px="7">
+    <Flex width="100%" justify="center" align="center" height="100%" px={isDraft ? "7" : ""} maxWidth= { { initial: "150vw", xs: "100%"}}>
       <Flex width="100%" direction="column" py="5" gap="5" height="100%">
-        {isDraft && (
-          <Flex width="100%" justify="end" gap="1">
+        {!isDraft && (
+          <Flex justify="start">
             <CustomButton
               buttonType={ButtonType.Secondary}
-              onClick={handleCancel}
+              onClick={() => router.back()}
             >
-              Cancel
-            </CustomButton>
-            <CustomButton buttonType={ButtonType.Primary} onClick={handleSave}>
-              Save
+              <ArrowLeft size={15} />
+              <Text size="2">Back</Text>
             </CustomButton>
           </Flex>
         )}

@@ -12,11 +12,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <LoadingOverlay isGlobal />
         <Flex height="100vh" width="100%" overflow="hidden">
           <SideBar />
-          <Flex direction="column" height="100%" flexGrow="1" minHeight="0">
+          <Flex direction="column" height="100%" flexGrow="1" minHeight="0" minWidth="0">
             <NavigationBar />
-            <Box flexGrow="1" minHeight="0" height="100%">
-              <ScrollArea scrollbars="vertical" style={{ height: "100%" }}>
-                <Box px="7" pb="4" height="100%">
+            <Box flexGrow="1" minHeight="0" height="100%" minWidth="0">
+              <ScrollArea scrollbars="both" style={{ height: "100%" }}>
+                <Box px="7" pb="4" height="100%" minWidth={{ initial: "max-content", xs: "100%" }}>
                   {children}
                 </Box>
               </ScrollArea>

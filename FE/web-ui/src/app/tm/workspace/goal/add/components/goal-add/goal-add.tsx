@@ -1,4 +1,5 @@
 "use client";
+import axios from "axios";
 import { FormProvider, useForm } from "react-hook-form";
 import * as Form from "@radix-ui/react-form";
 import { Flex, Text } from "@radix-ui/themes";
@@ -35,7 +36,7 @@ export function GoalAdd({
     formState: { isValid },
     getValues,
   } = methods;
-  const { setDraftGoal, setCreateRequest } = useGoalContext();
+  const { setDraftGoal, setCreateRequest, setAbortController } = useGoalContext();
   const { showToast, setIsSuccess } = useToast();
 
   const onSubmit = async () => {
@@ -61,8 +62,11 @@ export function GoalAdd({
         });
         requestData = formData;
       }
+      const controller = new AbortController();
+      setAbortController(controller);
       const draftGoalData: CreateGoalResponseBody =
-        await aiService.createGoal(data);
+        await aiService.createGoal(requestData, { signal: controller.signal });
+        
       setCreateRequest(data);
 
       setDraftGoal({
@@ -73,10 +77,15 @@ export function GoalAdd({
         })),
       });
     } catch (err) {
-      setStep(AddStep.FillInformation);
-      setIsSuccess(false);
-      const error = err as ApiError;
-      showToast(error.message);
+      if (axios.isCancel(err)) {
+        setIsSuccess(false);
+        showToast("Request canceled");
+      } else {
+        setStep(AddStep.FillInformation);
+        setIsSuccess(false);
+        const error = err as ApiError;
+        showToast(error.message);
+      }
     }
   };
 
