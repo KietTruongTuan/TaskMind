@@ -17,7 +17,7 @@ from docx import Document
 from openai import OpenAI
 from pypdf import PdfReader
 
-from .models import Goal, Task
+from .models import Goal, Task, Tag
 from apps.accounts.models import User
 from apps.knowledge_base.services import RAGContextService
 from django.conf import settings
@@ -586,8 +586,10 @@ class GoalService:
     @staticmethod
     def _apply_tag_filter(goals, tag_filter):
         if tag_filter:
-            tag_list = [t.strip() for t in tag_filter.split(",")]
-            goals = goals.filter(tag__contains=tag_list)
+            tags = [t.strip() for t in tag_filter.split(',')]
+            for t in tags:
+                goals = goals.filter(tag__name=t)
+            goals = goals.distinct()
         return goals
 
     @staticmethod
@@ -648,15 +650,11 @@ class GoalService:
 
     @staticmethod
     def _fetch_user_tags(user):
-        return Goal.objects.filter(user=user).values_list("tag", flat=True)
+        return Tag.objects.filter(goals__user=user).distinct().values_list("name", flat=True).order_by("name")
 
     @staticmethod
     def _extract_and_deduplicate_tags(raw_tags_lists):
-        unique_tags = set()
-        for tags in raw_tags_lists:
-            if isinstance(tags, list):
-                unique_tags.update(tags)
-        return sorted(list(unique_tags))
+        return list(raw_tags_lists)
 
 
 class TaskService:

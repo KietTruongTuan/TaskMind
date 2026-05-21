@@ -91,15 +91,17 @@ def sample_goal_data(future_deadline):
 
 @pytest.fixture
 def created_goal(db, user, future_deadline):
+    from apps.goals.models import Tag
     """Create a goal in the database for testing - uses same user as auth_client"""
     goal = Goal.objects.create(
         user=user,
         name="Test Goal",
         description="Test description",
         status="ToDo",
-        deadline=future_deadline,
-        tag=["Test"]
+        deadline=future_deadline
     )
+    t, _ = Tag.objects.get_or_create(name="Test")
+    goal.tag.set([t])
     Task.objects.create(
         goal=goal,
         name="Task 1",
@@ -333,9 +335,18 @@ class TestGoalList:
 
     def test_list_goals_filter_by_multiple_tags(self, auth_client, user, future_deadline):
         """Test filtering goals by multiple tags"""
-        Goal.objects.create(user=user, name="Goal 1", status="ToDo", deadline=future_deadline, tag=["work", "urgent"])
-        Goal.objects.create(user=user, name="Goal 2", status="ToDo", deadline=future_deadline, tag=["work", "low-priority"])
-        Goal.objects.create(user=user, name="Goal 3", status="ToDo", deadline=future_deadline, tag=["personal"])
+        from apps.goals.models import Tag
+        t_work, _ = Tag.objects.get_or_create(name="work")
+        t_urgent, _ = Tag.objects.get_or_create(name="urgent")
+        t_low, _ = Tag.objects.get_or_create(name="low-priority")
+        t_personal, _ = Tag.objects.get_or_create(name="personal")
+
+        g1 = Goal.objects.create(user=user, name="Goal 1", status="ToDo", deadline=future_deadline)
+        g1.tag.set([t_work, t_urgent])
+        g2 = Goal.objects.create(user=user, name="Goal 2", status="ToDo", deadline=future_deadline)
+        g2.tag.set([t_work, t_low])
+        g3 = Goal.objects.create(user=user, name="Goal 3", status="ToDo", deadline=future_deadline)
+        g3.tag.set([t_personal])
 
         response = auth_client.get('/v1/goals?tag=work,urgent')
 
@@ -689,9 +700,16 @@ class TestGoalTagList:
 
     def test_list_tags_success(self, auth_client, user, future_deadline):
         """Test getting unique tags across multiple goals"""
-        Goal.objects.create(user=user, name="Goal 1", status="ToDo", deadline=future_deadline, tag=["work", "urgent"])
-        Goal.objects.create(user=user, name="Goal 2", status="ToDo", deadline=future_deadline, tag=["personal", "urgent"])
-        Goal.objects.create(user=user, name="Goal 3", status="ToDo", deadline=future_deadline, tag=[])
+        from apps.goals.models import Tag
+        t_work, _ = Tag.objects.get_or_create(name="work")
+        t_urgent, _ = Tag.objects.get_or_create(name="urgent")
+        t_personal, _ = Tag.objects.get_or_create(name="personal")
+        
+        g1 = Goal.objects.create(user=user, name="Goal 1", status="ToDo", deadline=future_deadline)
+        g1.tag.set([t_work, t_urgent])
+        g2 = Goal.objects.create(user=user, name="Goal 2", status="ToDo", deadline=future_deadline)
+        g2.tag.set([t_personal, t_urgent])
+        Goal.objects.create(user=user, name="Goal 3", status="ToDo", deadline=future_deadline)
 
         response = auth_client.get('/v1/goals/tags')
 
@@ -703,7 +721,7 @@ class TestGoalTagList:
 
     def test_list_tags_empty(self, auth_client, user, future_deadline):
         """Test getting tags when there are none"""
-        Goal.objects.create(user=user, name="Goal 1", status="ToDo", deadline=future_deadline, tag=[])
+        Goal.objects.create(user=user, name="Goal 1", status="ToDo", deadline=future_deadline)
 
         response = auth_client.get('/v1/goals/tags')
 
@@ -712,8 +730,13 @@ class TestGoalTagList:
 
     def test_list_tags_user_isolation(self, auth_client, user, other_user, future_deadline):
         """Test getting tags respects user isolation"""
-        Goal.objects.create(user=user, name="My Goal", status="ToDo", deadline=future_deadline, tag=["my-tag"])
-        Goal.objects.create(user=other_user, name="Other Goal", status="ToDo", deadline=future_deadline, tag=["other-tag"])
+        from apps.goals.models import Tag
+        t_my, _ = Tag.objects.get_or_create(name="my-tag")
+        t_other, _ = Tag.objects.get_or_create(name="other-tag")
+        g1 = Goal.objects.create(user=user, name="My Goal", status="ToDo", deadline=future_deadline)
+        g1.tag.set([t_my])
+        g2 = Goal.objects.create(user=other_user, name="Other Goal", status="ToDo", deadline=future_deadline)
+        g2.tag.set([t_other])
 
         response = auth_client.get('/v1/goals/tags')
 
