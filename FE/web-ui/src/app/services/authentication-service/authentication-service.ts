@@ -4,6 +4,7 @@ import {
   RefreshTokenResponseBody,
   RegistrationRequestBody,
   RegistrationResponseBody,
+  UserProfile,
 } from "@/app/constants";
 import { HttpService } from "../http-service/http-service";
 import { ApiUrl } from "@/app/enum/api-url.enum";
@@ -38,8 +39,20 @@ export class AuthenticationService extends HttpService {
     return res;
   }
 
+  async getProfile() {
+    return this.get<UserProfile>(ApiUrl.Me);
+  }
+
   async logout() {
     this.clearAccessToken();
     return this.post(ApiUrl.LogOut);
+  }
+
+  async toggleLocalKnowledgeBase() {
+    return this.post(ApiUrl.ToggleLocalKnowledgeBase);
+  }
+
+  async toggleGlobalKnowledgeBase() {
+    return this.post(ApiUrl.ToggleGlobalKnowledgeBase);
   }
 }

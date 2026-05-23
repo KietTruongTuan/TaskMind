@@ -12,6 +12,11 @@ import { MOCK_GOAL_RESPONSE_DATA } from "@/app/constants";
 import { RouteLoadingProvider } from "@/app/contexts/route-loading-context/route-loading-context";
 import { ThemeProvider } from "@/app/contexts/theme-context/theme-context";
 import AddGoalPage from "../tm/workspace/goal/add/page";
+import { useServerSideService } from "../hooks/useServerSideService/useServerSideService";
+
+jest.mock("@/app/hooks/useServerSideService/useServerSideService", () => ({
+  useServerSideService: jest.fn(),
+}));
 
 jest.mock("@/app/constants", () => {
   const actual = jest.requireActual("@/app/constants");
@@ -29,6 +34,17 @@ jest.mock("@/app/constants", () => {
 describe("Goal Creation Integration Test", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    (useServerSideService as jest.Mock).mockResolvedValue({
+      authenticationService: {
+        getProfile: jest.fn().mockResolvedValue({
+          id: "123",
+          name: "Test User",
+          email: "test@example.com",
+          enableLocalKb: true,
+          enableGlobalKb: true,
+        }),
+      },
+    });
   });
 
   it("should successfully go to review step with goal chat and generated goal plan", async () => {

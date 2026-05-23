@@ -28,6 +28,7 @@ export async function useServerSideService() {
     aiService.setAccessToken(accessToken);
     taskService.setAccessToken(accessToken);
     knowledgeBaseService.setAccessToken(accessToken);
+    authenticationService.setAccessToken(accessToken);
   }
 
   return {
@@ -36,5 +37,6 @@ export async function useServerSideService() {
     taskService,
     knowledgeBaseService,
     accessToken,
+    authenticationService,
   };
 }

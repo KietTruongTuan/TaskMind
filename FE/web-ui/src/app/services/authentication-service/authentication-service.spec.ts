@@ -22,10 +22,7 @@ describe("AuthenticationService", () => {
       .mockResolvedValue(MOCK_LOGIN_RESPONSE_DATA);
 
     const result = await authenticationService.login(MOCK_LOGIN_REQUEST_DATA);
-    expect(spy).toHaveBeenCalledWith(
-      ApiUrl.Login,
-      MOCK_LOGIN_REQUEST_DATA,
-    );
+    expect(spy).toHaveBeenCalledWith(ApiUrl.Login, MOCK_LOGIN_REQUEST_DATA);
 
     expect(result).toEqual(MOCK_LOGIN_RESPONSE_DATA);
   });
@@ -52,5 +49,20 @@ describe("AuthenticationService", () => {
     expect(spy).toHaveBeenCalledWith(ApiUrl.RefreshToken);
 
     expect(result).toEqual(MOCK_ACCESS_TOKEN);
+  });
+
+  it("should call toggleLocalKnowledgeBase with the correct URL and data", async () => {
+    const spy = jest.spyOn(AuthenticationService.prototype, "post").mockResolvedValue(undefined);
+
+    const result = await authenticationService.toggleLocalKnowledgeBase();
+    expect(spy).toHaveBeenCalled();
+    expect(result).toEqual(undefined);
+  });
+
+  it("should call toggleGlobalKnowledgeBase with the correct URL and data", async () => {
+    const spy = jest.spyOn(AuthenticationService.prototype, "post").mockResolvedValue(undefined);
+    const result = await authenticationService.toggleGlobalKnowledgeBase();
+    expect(spy).toHaveBeenCalled();
+    expect(result).toEqual(undefined);
   });
 });

@@ -21,19 +21,25 @@ import { ArrowLeft, BotMessageSquare, Eye, Save, Table2 } from "lucide-react";
 import styles from "./add-goal-wrapper.module.scss";
 import { useToast } from "@/app/contexts/toast-context/toast-context";
 import { useRouteLoadingContext } from "@/app/contexts/route-loading-context/route-loading-context";
-import { goalService, SaveGoalRequestBody, ApiError } from "@/app/constants";
+import {
+  goalService,
+  SaveGoalRequestBody,
+  ApiError,
+  UserProfile,
+} from "@/app/constants";
 import { WebUrl } from "@/app/enum/web-url.enum";
 import { buildUrl } from "@/app/tm/utils";
 import useMediaQuery from "@mui/material/useMediaQuery";
 
-export function AddGoalWrapper() {
+export function AddGoalWrapper({ userProfile }: { userProfile: UserProfile }) {
   const checkIsMd = useMediaQuery("(min-width:1024px)");
   const [isMd, setIsMd] = useState(checkIsMd);
   const [step, setStep] = useState<AddStep>(AddStep.FillInformation);
   const [activeView, setActiveView] = useState<GoalAddReviewDetailView>(
     isMd ? GoalAddReviewDetailView.Both : GoalAddReviewDetailView.ReviewDetail,
   );
-  const { draftGoal, clearDraftGoal, abortController, setAbortController } = useGoalContext();
+  const { draftGoal, clearDraftGoal, abortController, setAbortController } =
+    useGoalContext();
   const [draftCreateGoal, setDraftCreateGoal] = useState(
     draftGoal
       ? {
@@ -95,7 +101,13 @@ export function AddGoalWrapper() {
     }
   };
   const stepComponents = {
-    [AddStep.FillInformation]: <GoalAdd setStep={setStep} />,
+    [AddStep.FillInformation]: (
+      <GoalAdd
+        setStep={setStep}
+        enableGlobalKb={userProfile.enableGlobalKb}
+        enableLocalKb={userProfile.enableLocalKb}
+      />
+    ),
     [AddStep.ReviewDetail]: (
       <Grid
         columns="1fr 2fr"

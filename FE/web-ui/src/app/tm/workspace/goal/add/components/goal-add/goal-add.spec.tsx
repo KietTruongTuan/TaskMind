@@ -10,6 +10,7 @@ import { AddStep } from "@/app/enum/step.enum";
 import { RouteLoadingProvider } from "@/app/contexts/route-loading-context/route-loading-context";
 import { GoalProvider } from "@/app/contexts/goal-context/goal-context";
 import { ToastProvider } from "@/app/contexts/toast-context/toast-context";
+import { ThemeProvider } from "@/app/contexts/theme-context/theme-context";
 
 jest.mock("@/app/constants", () => ({
   ...jest.requireActual("@/app/constants"),
@@ -36,15 +37,24 @@ describe("AddForm", () => {
       MOCK_GOAL_RESPONSE_DATA,
     );
     render(
-      <GoalProvider>
-        <RouteLoadingProvider>
-          <ToastProvider>
-            <GoalAdd setStep={mockSetStep} />
-          </ToastProvider>
-        </RouteLoadingProvider>
-      </GoalProvider>,
+      <ThemeProvider>
+        <GoalProvider>
+          <RouteLoadingProvider>
+            <ToastProvider>
+              <GoalAdd
+                setStep={mockSetStep}
+                enableLocalKb={true}
+                enableGlobalKb={true}
+              />
+            </ToastProvider>
+          </RouteLoadingProvider>
+        </GoalProvider>
+      </ThemeProvider>,
     );
     const user = userEvent.setup();
+    await user.click(await screen.findByTestId("settings-button"));
+    await user.click(await screen.findByTestId("toggle-local-kb"));
+    await user.click(await screen.findByTestId("toggle-global-kb"));
     await user.click(await screen.findByTestId("dialog-trigger"));
     const file = [
       new File(["test content"], "test-file-0.pdf", {
@@ -89,13 +99,19 @@ describe("AddForm", () => {
 
   it("should show error message when deadline is in the past", async () => {
     render(
-      <GoalProvider>
-        <RouteLoadingProvider>
-          <ToastProvider>
-            <GoalAdd setStep={mockSetStep} />
-          </ToastProvider>
-        </RouteLoadingProvider>
-      </GoalProvider>,
+      <ThemeProvider>
+        <GoalProvider>
+          <RouteLoadingProvider>
+            <ToastProvider>
+              <GoalAdd
+                setStep={mockSetStep}
+                enableLocalKb={true}
+                enableGlobalKb={true}
+              />
+            </ToastProvider>
+          </RouteLoadingProvider>
+        </GoalProvider>
+      </ThemeProvider>,
     );
     const user = userEvent.setup();
 

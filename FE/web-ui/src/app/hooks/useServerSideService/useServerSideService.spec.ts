@@ -27,6 +27,7 @@ jest.mock("../../constants", () => ({
   },
   authenticationService: {
     refresh: jest.fn(),
+    setAccessToken: jest.fn(),
     refreshInstance: {
       defaults: {
         headers: {
@@ -74,6 +75,12 @@ describe("useServerSideService", () => {
     expect(aiService.setAccessToken).toHaveBeenCalledWith(
       "new_mock_access_token",
     );
+    expect(knowledgeBaseService.setAccessToken).toHaveBeenCalledWith(
+      "new_mock_access_token",
+    );
+    expect(authenticationService.setAccessToken).toHaveBeenCalledWith(
+      "new_mock_access_token",
+    );
     expect(taskService.setAccessToken).toHaveBeenCalledWith(
       "new_mock_access_token",
     );
@@ -83,6 +90,7 @@ describe("useServerSideService", () => {
       aiService,
       taskService,
       knowledgeBaseService,
+      authenticationService,
       accessToken: "new_mock_access_token",
     });
   });
@@ -110,6 +118,7 @@ describe("useServerSideService", () => {
     expect(aiService.setAccessToken).not.toHaveBeenCalled();
     expect(taskService.setAccessToken).not.toHaveBeenCalled();
     expect(knowledgeBaseService.setAccessToken).not.toHaveBeenCalled();
+    expect(authenticationService.setAccessToken).not.toHaveBeenCalled();
     expect(result.accessToken).toBeUndefined();
   });
 });

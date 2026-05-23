@@ -6,6 +6,7 @@ import {
   RefreshTokenResponseBody,
   RegistrationRequestBody,
   RegistrationResponseBody,
+  UserProfile,
 } from "./authentication.constants";
 import {
   CreateGoalRequestBody,
@@ -27,6 +28,15 @@ const getFutureDate = () => {
   date.setFullYear(date.getFullYear() + 1);
   return date;
 };
+
+export const MOCK_USER: UserProfile = {
+  id: "1",
+  username: "testuser",
+  email: "testuser@example.com",
+  enableLocalKb: true,
+  enableGlobalKb: false,
+};
+
 export const MOCK_ACCESS_TOKEN: RefreshTokenResponseBody = {
   access: "mocked_access_token",
 };
@@ -216,43 +226,45 @@ export const MOCK_REGISTER_RESPONSE_DATA: RegistrationResponseBody = {
   message: "Register successfully",
 };
 
-export const MOCK_KNOWLEDGE_BASE_UPLOAD_RESPONSE_DATA: KnowledgeBaseResponseBody = {
-  id: "1",
-  name: "File1.pdf",
-  fileType: FileType.Pdf,
-  size: "1 MB",
-  uploadDate: getFutureDate(),
-  status: FileStatus.Pending,
-  message: "File uploaded successfully",
-};
+export const MOCK_KNOWLEDGE_BASE_UPLOAD_RESPONSE_DATA: KnowledgeBaseResponseBody =
+  {
+    id: "1",
+    name: "File1.pdf",
+    fileType: FileType.Pdf,
+    size: "1 MB",
+    uploadDate: getFutureDate(),
+    status: FileStatus.Pending,
+    message: "File uploaded successfully",
+  };
 
-export const MOCK_KNOWLEDGE_BASE_LIST_RESPONSE_DATA: KnowledgeBaseResponseBody[] = [
-  MOCK_KNOWLEDGE_BASE_UPLOAD_RESPONSE_DATA,
-  {
-    id: "2",
-    name: "File2.pdf",
-    fileType: FileType.Pdf,
-    size: "2 MB",
-    uploadDate: getFutureDate(),
-    status: FileStatus.Processing,
-    message: "File uploaded successfully",
-  },
-  {
-    id: "3",
-    name: "File3.pdf",
-    fileType: FileType.Pdf,
-    size: "3 MB",
-    uploadDate: getFutureDate(),
-    status: FileStatus.Success,
-    message: "File uploaded successfully",
-  },
-  {
-    id: "4",
-    name: "File4.pdf",
-    fileType: FileType.Pdf,
-    size: "4 MB",
-    uploadDate: getFutureDate(),
-    status: FileStatus.Failed,
-    message: "File uploaded successfully",
-  },
-];
+export const MOCK_KNOWLEDGE_BASE_LIST_RESPONSE_DATA: KnowledgeBaseResponseBody[] =
+  [
+    MOCK_KNOWLEDGE_BASE_UPLOAD_RESPONSE_DATA,
+    {
+      id: "2",
+      name: "File2.pdf",
+      fileType: FileType.Pdf,
+      size: "2 MB",
+      uploadDate: getFutureDate(),
+      status: FileStatus.Processing,
+      message: "File uploaded successfully",
+    },
+    {
+      id: "3",
+      name: "File3.pdf",
+      fileType: FileType.Pdf,
+      size: "3 MB",
+      uploadDate: getFutureDate(),
+      status: FileStatus.Success,
+      message: "File uploaded successfully",
+    },
+    {
+      id: "4",
+      name: "File4.pdf",
+      fileType: FileType.Pdf,
+      size: "4 MB",
+      uploadDate: getFutureDate(),
+      status: FileStatus.Failed,
+      message: "File uploaded successfully",
+    },
+  ];
