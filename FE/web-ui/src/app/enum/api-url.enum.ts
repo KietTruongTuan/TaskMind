@@ -4,6 +4,9 @@ export enum ApiUrl {
   Register = "/v1/accounts/register",
   RefreshToken = "/v1/accounts/token/refresh",
   LogOut = "/v1/accounts/logout",
+  Me = "/v1/accounts/me",
+  ToggleLocalKnowledgeBase = "/v1/accounts/toggle-local-kb",
+  ToggleGlobalKnowledgeBase = "/v1/accounts/toggle-global-kb",
 
   // Goals
   Goal = "/v1/goals",

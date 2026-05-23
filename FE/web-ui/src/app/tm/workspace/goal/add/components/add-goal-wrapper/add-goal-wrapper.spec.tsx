@@ -5,6 +5,7 @@ import { AddStep } from "@/app/enum/step.enum";
 import {
   GoalDetailResponseBody,
   MOCK_GOAL_RESPONSE_DATA,
+  MOCK_USER,
 } from "@/app/constants";
 import userEvent from "@testing-library/user-event";
 import { RouteLoadingProvider } from "@/app/contexts/route-loading-context/route-loading-context";
@@ -50,13 +51,16 @@ describe("AddGoalWrapper", () => {
   });
 
   it("should render GoalAdd by default", () => {
-    (useGoalContext as jest.Mock).mockReturnValue({ draftGoal: null, setAbortController: jest.fn() });
+    (useGoalContext as jest.Mock).mockReturnValue({
+      draftGoal: null,
+      setAbortController: jest.fn(),
+    });
 
     render(
       <ThemeProvider>
         <ToastProvider>
           <RouteLoadingProvider>
-            <AddGoalWrapper />
+            <AddGoalWrapper userProfile={MOCK_USER} />
           </RouteLoadingProvider>
         </ToastProvider>
       </ThemeProvider>,
@@ -77,7 +81,7 @@ describe("AddGoalWrapper", () => {
       <ThemeProvider>
         <ToastProvider>
           <RouteLoadingProvider>
-            <AddGoalWrapper />
+            <AddGoalWrapper userProfile={MOCK_USER} />
           </RouteLoadingProvider>
         </ToastProvider>
       </ThemeProvider>,
@@ -102,7 +106,7 @@ describe("AddGoalWrapper", () => {
       <ThemeProvider>
         <ToastProvider>
           <RouteLoadingProvider>
-            <AddGoalWrapper />
+            <AddGoalWrapper userProfile={MOCK_USER} />
           </RouteLoadingProvider>
         </ToastProvider>
       </ThemeProvider>,
@@ -130,7 +134,7 @@ describe("AddGoalWrapper", () => {
       <ThemeProvider>
         <ToastProvider>
           <RouteLoadingProvider>
-            <AddGoalWrapper />
+            <AddGoalWrapper userProfile={MOCK_USER} />
           </RouteLoadingProvider>
         </ToastProvider>
       </ThemeProvider>,
@@ -158,7 +162,7 @@ describe("AddGoalWrapper", () => {
       <ThemeProvider>
         <ToastProvider>
           <RouteLoadingProvider>
-            <AddGoalWrapper />
+            <AddGoalWrapper userProfile={MOCK_USER} />
           </RouteLoadingProvider>
         </ToastProvider>
       </ThemeProvider>,
@@ -173,13 +177,16 @@ describe("AddGoalWrapper", () => {
   });
 
   it("should render chat generating view if step is ReviewDetail but draftGoal is null", async () => {
-    (useGoalContext as jest.Mock).mockReturnValue({ draftGoal: null, setAbortController: jest.fn() });
+    (useGoalContext as jest.Mock).mockReturnValue({
+      draftGoal: null,
+      setAbortController: jest.fn(),
+    });
 
     render(
       <ThemeProvider>
         <ToastProvider>
           <RouteLoadingProvider>
-            <AddGoalWrapper />
+            <AddGoalWrapper userProfile={MOCK_USER} />
           </RouteLoadingProvider>
         </ToastProvider>
       </ThemeProvider>,

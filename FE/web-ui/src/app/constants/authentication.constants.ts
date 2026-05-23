@@ -27,3 +27,11 @@ export interface UserPayload {
   username: string;
   email: string;
 }
+
+export interface UserProfile {
+  id: string;
+  username: string;
+  email: string;
+  enableLocalKb: boolean;
+  enableGlobalKb: boolean;
+}
