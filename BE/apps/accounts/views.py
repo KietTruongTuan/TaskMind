@@ -16,7 +16,8 @@ from rest_framework_simplejwt.exceptions import TokenError
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from .models import User
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema, inline_serializer
+from rest_framework import serializers
 import logging
 from datetime import timedelta, datetime, timezone as dt_timezone
 from django.utils import timezone
@@ -319,3 +320,34 @@ class ToggleGlobalKBView(APIView):
         user.save(update_fields=['enable_global_kb'])
         status_text = "enabled" if user.enable_global_kb else "disabled"
         return Response({'message': f'Global knowledge base has been {status_text}.', 'enable_global_kb': user.enable_global_kb}, status=status.HTTP_200_OK)
+
+
+@extend_schema(
+    tags=['Accounts'],
+    responses={
+        200: inline_serializer(
+            name='MeResponse',
+            fields={
+                'id': serializers.UUIDField(),
+                'username': serializers.CharField(),
+                'email': serializers.EmailField(),
+                'enable_local_kb': serializers.BooleanField(),
+                'enable_global_kb': serializers.BooleanField(),
+            }
+        ),
+    },
+    summary="Get current user profile",
+    description="Fetch the authenticated user's details including knowledge base settings.",
+)
+class MeView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        user = request.user
+        return Response({
+            'id': user.id,
+            'username': user.username,
+            'email': user.email,
+            'enable_local_kb': user.enable_local_kb,
+            'enable_global_kb': user.enable_global_kb,
+        }, status=status.HTTP_200_OK)
