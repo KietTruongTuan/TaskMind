@@ -273,7 +273,7 @@ CHUNK_OVERLAP = 1       # (paragraphs)
 
 TOP_K_CONTEXT = 10  # the maximum number of contexts to get from knowledge base to supply for plan generation 
 
-CONTEXT_DISTANCE_THRESHOLD = 0.5 # the maximum distance between user query and the context queried from knowledge base
+CONTEXT_DISTANCE_THRESHOLD = 2.0 # the maximum distance between user query and the context queried from knowledge base
 
 # File upload limits
 MAX_FILES = 5
