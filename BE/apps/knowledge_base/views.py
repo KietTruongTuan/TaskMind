@@ -28,7 +28,9 @@ from .serializers import DocumentSerializer, DocumentUploadProcessSerializer, Do
         tags=["Knowledge base"],
         summary="Upload document",
         description="Upload pdf, docx document for RAG processing",
-        request=DocumentUploadProcessSerializer,
+        request={
+            "multipart/form-data": DocumentUploadProcessSerializer
+        },
         responses={202: DocumentUploadProcessSerializer},
     ),
     delete=extend_schema(
@@ -66,13 +68,13 @@ class DocumentUploadProcessView(APIView):
 
     def post(self, request: Request):
         # get uploaded files from request + validate uploaded file
-        data = {"file": request.FILES.getlist("files")}
+        data = {"files": request.FILES.getlist("files")}
         upload_serializer = DocumentUploadProcessSerializer(data=data)
         if not upload_serializer.is_valid():
             return Response(
                 upload_serializer.errors, status=status.HTTP_400_BAD_REQUEST
             )
-        uploaded_files: List[UploadedFile] = upload_serializer.validated_data["file"]
+        uploaded_files: List[UploadedFile] = upload_serializer.validated_data["files"]
         processed_files: List[Document] = []
 
         for uploaded_file in uploaded_files:

@@ -2,6 +2,13 @@ from django.conf import settings
 from rest_framework import serializers
 from .models import Document
 
+def file_size(size_byte: int) -> str:
+    if size_byte < 1024:
+        return f"{size_byte} B"
+    elif size_byte < 1048_576: # 1024 * 1024
+        return f"{size_byte / 1024:.1f} KB"
+    else:
+        return f"{size_byte / 1048576:.2f} MB"
 
 class DocumentSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField()
@@ -20,17 +27,11 @@ class DocumentSerializer(serializers.ModelSerializer):
         return obj.filename.split('.')[-1]
         
     def get_size(self, obj: Document):
-        size = obj.size_byte
-        if size < 1024:
-            return f"{size} B"
-        elif size < 1048_576: # 1024 * 1024
-            return f"{size / 1024:.1f} KB"
-        else:
-            return f"{size / 1048576:.2f} MB"
+        return file_size(obj.size_byte)
         
         
 class DocumentUploadProcessSerializer(serializers.Serializer):
-    file = serializers.ListField(
+    files = serializers.ListField(
         child=serializers.FileField(),
         allow_empty=False,
         error_messages={"empty": "No files was uploaded"}
@@ -41,8 +42,8 @@ class DocumentUploadProcessSerializer(serializers.Serializer):
             if not any([file.name.endswith(ext) for ext in settings.RAG_ALLOWED_EXTENSIONS]):
                 raise serializers.ValidationError(f"Invalid file type for {file.name}. Allowed types are {settings.RAG_ALLOWED_EXTENSIONS}")
             if file.size > settings.MAX_FILE_SIZE:
-                raise serializers.ValidationError(f"File size limit exceeded for {file.name}. Max allowed is {settings.MAX_FILE_SIZE}")
-        return file
+                raise serializers.ValidationError(f"File size limit exceeded for {file.name}. Max allowed is {file_size(settings.MAX_FILE_SIZE)}")
+        return files
     
 class DocumentBulkDeleteSerializer(serializers.Serializer):
     document_ids = serializers.ListField(
