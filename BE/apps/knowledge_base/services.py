@@ -150,15 +150,29 @@ class RAGFileProcessService:
         return phase1_chunks
     
     @staticmethod
-    def phase2_llm_semantic_chunking(llm_client: OpenAI, llm_model: str, phase1_chunk: str):
+    def phase2_llm_semantic_chunking(llm_client: OpenAI, llm_model: str, phase1_chunk: str, document_context: str | None = None):
+        # Build an optional document-level context preamble so each chunk
+        # can be grounded in the overall meaning of the source document.
+        context_section = ""
+        if document_context and document_context != "":
+            context_section = f"""Summarized Document Context (use this to ground your understanding): {document_context}"""
+        else:
+            context_section = "Summarized context from document is not available."
+
         prompt = f"""You are an expert data processor building a knowledge base.
-Analyze the following text block. Break it down into smaller, standalone, 
-semantically complete chunks. Each chunk should contain a complete thought or concept.
+
+{context_section}
+
+Analyze the following text block extracted from the document. \
+Break it down into smaller, standalone, semantically complete chunks. \
+Each chunk should contain a complete thought or concept and must be fully \
+understandable on its own — without requiring any external context.
 
 Rules:
 1. Resolve pronouns (e.g., replace "it" with the actual noun it refers to).
-2. Do not change the underlying meaning.
-3. Return ONLY a valid JSON array of strings. No markdown, no introductory text.
+2. If available, enrich each chunk with key entities or concepts from the summarized document context so that it remains self-contained and semantically rich.
+3. Do not change the underlying meaning of the text block.
+4. Return ONLY a valid JSON array of strings. No markdown, no introductory text.
 
 Text block:
 {phase1_chunk}"""
