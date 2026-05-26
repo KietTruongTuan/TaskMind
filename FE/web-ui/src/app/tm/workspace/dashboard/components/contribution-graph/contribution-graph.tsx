@@ -13,10 +13,16 @@ export function ContributionGraph({
   header,
   subHeader,
   data,
+  activeDate,
+  activeColor,
+  onDateClick,
 }: {
   header: string;
   subHeader?: string;
   data: TaskProductivityResponseBody[];
+  activeDate?: string;
+  activeColor?: string;
+  onDateClick?: (date: string) => void;
 }) {
   const explicitTheme = {
     light: [
@@ -69,6 +75,20 @@ export function ContributionGraph({
                   day: "2-digit",
                   year: "numeric",
                 })}`,
+                onClick: () => {
+                  if (onDateClick) {
+                    onDateClick(activity.date);
+                  }
+                },
+                stroke:
+                  activeDate === activity.date
+                    ? activeColor || "#000000"
+                    : undefined,
+                strokeWidth: activeDate === activity.date ? 3 : undefined,
+                style: {
+                  cursor: onDateClick ? "pointer" : "default",
+                  outline: "none",
+                },
               });
             }}
             showWeekdayLabels

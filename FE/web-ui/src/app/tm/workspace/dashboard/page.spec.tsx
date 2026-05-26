@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import { Status } from "@/app/enum/status.enum";
 import DashboardPage from "./page";
 import { TokenRefresherProvider } from "@/app/contexts/token-refresher-context/token-refresher-context";
 import { ToastProvider } from "@/app/contexts/toast-context/toast-context";
@@ -9,8 +10,24 @@ import {
   MOCK_GOAL_LIST_RESPONSE_DATA_WITH_STATS,
   MOCK_TASK_LIST_RESPONSE_DATA_WITH_STATS,
 } from "@/app/constants";
+import { userEvent } from "@testing-library/user-event";
 
 jest.mock("@/app/hooks/useServerSideService/useServerSideService");
+
+jest.mock("@mui/x-charts", () => ({
+  PieChart: ({ onItemClick, series }: any) => {
+    return (
+      <div
+        data-testid="mock-pie-chart"
+        onClick={(e) => {
+          if (onItemClick && series?.[0]?.data) {
+            onItemClick(e, { dataIndex: 0 });
+          }
+        }}
+      />
+    );
+  },
+}));
 
 jest.mock("react-activity-calendar", () => {
   return {
@@ -101,5 +118,93 @@ describe("DashboardPage", () => {
     expect(
       screen.getByText("Today is a wonderful day to achieve your goals."),
     ).toBeInTheDocument();
+  });
+
+  it("should filter by status when pie chart is clicked", async () => {
+    const ResolvedDashboardPage = await DashboardPage();
+    render(
+      <ThemeProvider>
+        <RouteLoadingProvider>
+          <ToastProvider>
+            <TokenRefresherProvider>
+              {ResolvedDashboardPage}
+            </TokenRefresherProvider>
+          </ToastProvider>
+        </RouteLoadingProvider>
+      </ThemeProvider>,
+    );
+
+    expect(await screen.findByText("Task 1")).toBeInTheDocument();
+    expect(screen.getByText("Task 2")).toBeInTheDocument();
+
+    const mockPieChart = await screen.findByTestId("mock-pie-chart");
+    await userEvent.click(mockPieChart);
+
+    expect(screen.getByText("Task 1")).toBeInTheDocument();
+    expect(screen.queryByText("Task 2")).not.toBeInTheDocument();
+
+    await userEvent.click(mockPieChart);
+    expect(screen.getByText("Task 2")).toBeInTheDocument();
+  });
+
+  it("should filter by date when contribution graph is clicked", async () => {
+    const ResolvedDashboardPage = await DashboardPage();
+    render(
+      <ThemeProvider>
+        <RouteLoadingProvider>
+          <ToastProvider>
+            <TokenRefresherProvider>
+              {ResolvedDashboardPage}
+            </TokenRefresherProvider>
+          </ToastProvider>
+        </RouteLoadingProvider>
+      </ThemeProvider>,
+    );
+
+    expect(await screen.findByText("Task 1")).toBeInTheDocument();
+
+    const mockBlock = await screen.findByTestId("mock-block");
+    await userEvent.click(mockBlock);
+
+    expect(screen.getByText("No due soon tasks available")).toBeInTheDocument();
+    expect(screen.getByText("No recent goals available")).toBeInTheDocument();
+
+    await userEvent.click(mockBlock);
+    expect(screen.getByText("Task 1")).toBeInTheDocument();
+  });
+
+  it("should sort completed goals properly when some completedDate are missing", async () => {
+    (useServerSideService as jest.Mock).mockResolvedValue({
+      goalService: {
+        getAll: jest.fn().mockResolvedValue({
+          ...MOCK_GOAL_LIST_RESPONSE_DATA_WITH_STATS,
+          goals: [
+            { id: "1", name: "Goal A", status: Status.Completed, completedDate: new Date("2026-01-01"), deadline: new Date() },
+            { id: "2", name: "Goal B", status: Status.Completed, deadline: new Date() }, 
+            { id: "3", name: "Goal C", status: Status.Completed, completedDate: new Date("2026-05-01"), deadline: new Date() },
+            { id: "4", name: "Goal D", status: Status.Completed, deadline: new Date() }, 
+          ],
+        }),
+      },
+      taskService: {
+        getAll: jest.fn().mockResolvedValue(MOCK_TASK_LIST_RESPONSE_DATA_WITH_STATS),
+        getProductivity: jest.fn().mockResolvedValue([]),
+      },
+    });
+
+    const ResolvedDashboardPage = await DashboardPage();
+    render(
+      <ThemeProvider>
+        <RouteLoadingProvider>
+          <ToastProvider>
+            <TokenRefresherProvider>
+              {ResolvedDashboardPage}
+            </TokenRefresherProvider>
+          </ToastProvider>
+        </RouteLoadingProvider>
+      </ThemeProvider>,
+    );
+
+    expect(await screen.findByText("Recent Achievements")).toBeInTheDocument();
   });
 });

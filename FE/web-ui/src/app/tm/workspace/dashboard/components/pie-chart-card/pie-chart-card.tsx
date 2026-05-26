@@ -8,23 +8,25 @@ import { Header } from "@/app/components/header/header";
 import { PieChart as PieChartIcon } from "lucide-react";
 import styles from "./pie-chart-card.module.scss";
 import { useThemeContext } from "@/app/contexts/theme-context/theme-context";
+import { Status } from "@/app/enum/status.enum";
 
 export interface PieChartData {
-  id: number;
+  id: Status;
   value: number;
   label: string;
   color: string;
 }
 
-
 export function PieChartCard({
   data,
   header,
   subHeader,
+  onStatusClick,
 }: {
   data: PieChartData[];
   header: string;
   subHeader?: string;
+  onStatusClick?: (status: Status) => void;
 }) {
   const chartData = data.filter((item) => item.value > 0);
   const { theme } = useThemeContext();
@@ -75,9 +77,14 @@ export function PieChartCard({
                     innerRadius: 20,
                     paddingAngle: 5,
                     cornerRadius: 4,
-                    valueFormatter: (v) => `${v.value}`,
-                  },
+                    valueFormatter: (v) => `${v.value}`,  
+                  },  
                 ]}
+                onItemClick={(e, item) => {
+                  if (onStatusClick) {
+                    onStatusClick(chartData[item.dataIndex].id);
+                  }
+                }}
               />
             </ThemeProvider>
           )}
