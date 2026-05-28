@@ -268,7 +268,7 @@ RAG_ALLOWED_EXTENSIONS = [".pdf", ".docx"]
 # ? Note: chunk size trade-off
 # ? - larger chunk -> less number of chunk -> less api call + wider context
 # ? - smaller chunk -> more number of chunk -> greater data granularity of data -> deeper + more detailed semantic
-CHUNK_MAX_SIZE = 4_000 # (characters)
+CHUNK_MAX_SIZE = 10_000 # (characters)
 CHUNK_OVERLAP = 1       # (paragraphs)
 
 TOP_K_CONTEXT = 10  # the maximum number of contexts to get from knowledge base to supply for plan generation 

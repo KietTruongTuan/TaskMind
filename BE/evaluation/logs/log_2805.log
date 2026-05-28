@@ -1,0 +1,564 @@
+acer@LeeTrungKenie MINGW64 ~/Downloads/Documents/kitchen/capstone/BE (feat/improve-rag)
+$ docker compose exec backend pytest evaluation/deepeval/test_deepeval.py -v -k "CO2013" --html=evaluation/rag_test_report.html --self-contained-html
+==================================================== test session starts =====================================================
+platform linux -- Python 3.12.13, pytest-8.4.2, pluggy-1.6.0 -- /usr/local/bin/python3.12
+cachedir: .pytest_cache
+metadata: {'Python': '3.12.13', 'Platform': 'Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.41', 'Packages': {'pytest': '8.4.2', 'pluggy': '1.6.0'}, 'Plugins': {'metadata': '3.1.1', 'anyio': '4.11.0', 'rerunfailures': '16.3', 'xdist': '3.8.0', 'cov': '6.2.1', 'asyncio': '1.4.0', 'repeat': '0.9.4', 'deepeval': '4.0.4', 'html': '4.2.0', 'django': '4.11.1'}}
+django: version: 5.2.6, settings: config.settings (from ini)
+rootdir: /app
+configfile: pytest.ini
+plugins: metadata-3.1.1, anyio-4.11.0, rerunfailures-16.3, xdist-3.8.0, cov-6.2.1, asyncio-1.4.0, repeat-0.9.4, deepeval-4.0.4, html-4.2.0, django-4.11.1
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 15 items / 12 deselected / 3 selected                                                                              
+
+evaluation/deepeval/test_deepeval.py::test_rag_pipeline[CO2013__Prepare for Database Systems Final Exam] FAILED        [ 33%]
+evaluation/deepeval/test_deepeval.py::test_rag_pipeline[CO2013__Complete Database Lab Assignment] PASSED               [ 66%]
+evaluation/deepeval/test_deepeval.py::test_rag_pipeline[CO2013__Master Database Normalization] FAILED                  [100%]Running teardown with pytest sessionfinish...
+
+
+========================================================== FAILURES ==========================================================
+_____________________________ test_rag_pipeline[CO2013__Prepare for Database Systems Final Exam] _____________________________
+
+fut = <coroutine object _a_execute_llm_test_cases at 0x7739a91d9430>, timeout = 180
+
+    async def wait_for(fut, timeout):
+        """Wait for the single Future or coroutine to complete, with timeout.
+
+        Coroutine will be wrapped in Task.
+
+        Returns result of the Future or coroutine.  When a timeout occurs,
+        it cancels the task and raises TimeoutError.  To avoid the task
+        cancellation, wrap it in shield().
+
+        If the wait is cancelled, the task is also cancelled.
+
+        If the task suppresses the cancellation and returns a value instead,
+        that value is returned.
+
+        This function is a coroutine.
+        """
+        # The special case for timeout <= 0 is for the following case:
+        #
+        # async def test_waitfor():
+        #     func_started = False
+        #
+        #     async def func():
+        #         nonlocal func_started
+        #         func_started = True
+        #
+        #     try:
+        #         await asyncio.wait_for(func(), 0)
+        #     except asyncio.TimeoutError:
+        #         assert not func_started
+        #     else:
+        #         assert False
+        #
+        # asyncio.run(test_waitfor())
+
+
+        if timeout is not None and timeout <= 0:
+            fut = ensure_future(fut)
+
+            if fut.done():
+                return fut.result()
+
+            await _cancel_and_wait(fut)
+            try:
+                return fut.result()
+            except exceptions.CancelledError as exc:
+                raise TimeoutError from exc
+
+        async with timeouts.timeout(timeout):
+>           return await fut
+                   ^^^^^^^^^
+
+/usr/local/lib/python3.12/asyncio/tasks.py:520:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/site-packages/deepeval/evaluate/execute/e2e.py:578: in _a_execute_llm_test_cases
+    await measure_metrics_with_indicator(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+metrics = [<deepeval.metrics.faithfulness.faithfulness.FaithfulnessMetric object at 0x773a404be0c0>, <deepeval.metrics.answer_re...cda0>, <deepeval.metrics.contextual_relevancy.contextual_relevancy.ContextualRelevancyMetric object at 0x7739a8f37c80>]  
+test_case = LLMTestCase(input='Prepare for Database Systems Final Exam. Review all topics: ER model, relational model, SQL, normal...servers=None, mcp_tools_called=None, mcp_resources_called=None, mcp_prompts_called=None, custom_column_key_values=None)
+cached_test_case = None, ignore_errors = False, skip_on_missing_params = False, show_indicator = False
+progress = <rich.progress.Progress object at 0x7739a90fd5b0>, pbar_eval_id = 1, _in_component = False
+
+    async def measure_metrics_with_indicator(
+        metrics: List[Union[BaseMetric, BaseConversationalMetric]],
+        test_case: Union[LLMTestCase, LLMTestCase, ConversationalTestCase],
+        cached_test_case: Union[CachedTestCase, None],
+        ignore_errors: bool,
+        skip_on_missing_params: bool,
+        show_indicator: bool,
+        progress: Optional[Progress] = None,
+        pbar_eval_id: Optional[int] = None,
+        _in_component: bool = False,
+    ):
+        if show_indicator:
+            with Progress(
+                SpinnerColumn(style="rgb(106,0,255)"),
+                BarColumn(bar_width=60),
+                TextColumn("[progress.description]{task.description}"),
+                transient=False,
+            ) as progress:
+                tasks = []
+                for metric in metrics:
+                    task_id = progress.add_task(
+                        description=format_metric_description(
+                            metric, async_mode=True
+                        ),
+                        total=100,
+                    )
+                    tasks.append(
+                        measure_metric_task(
+                            task_id,
+                            progress,
+                            metric,
+                            test_case,
+                            cached_test_case,
+                            ignore_errors,
+                            skip_on_missing_params,
+                            _in_component=_in_component,
+                        )
+                    )
+                await asyncio.gather(*tasks)
+        else:
+            tasks = []
+            for metric in metrics:
+                metric_data = None
+                # cached test case will always be None for conversationals
+                if cached_test_case is not None:
+                    cached_metric_data = Cache.get_metric_data(
+                        metric, cached_test_case
+                    )
+                    if (
+                        cached_metric_data
+                        and cached_metric_data.metric_data.score is not None
+                    ):
+                        metric_data = cached_metric_data.metric_data
+
+                if metric_data:
+                    ## Here we're setting the metric state from metrics metadata cache,
+                    ## and later using the metric state to create a new metrics metadata cache
+                    ## WARNING: Potential for bugs, what will happen if a metric changes state in between
+                    ## test cases?
+                    metric.score = metric_data.score
+                    metric.threshold = metric_data.threshold
+                    metric.success = metric_data.success
+                    metric.reason = metric_data.reason
+                    metric.strict_mode = metric_data.strict_mode
+                    metric.evaluation_model = metric_data.evaluation_model
+                    metric.evaluation_cost = metric_data.evaluation_cost
+                    metric.verbose_logs = metric_data.verbose_logs
+                    update_pbar(progress, pbar_eval_id)
+                else:
+                    tasks.append(
+                        safe_a_measure(
+                            metric,
+                            test_case,
+                            ignore_errors,
+                            skip_on_missing_params,
+                            progress=progress,
+                            pbar_eval_id=pbar_eval_id,
+                            _in_component=_in_component,
+                        )
+                    )
+
+>           await asyncio.gather(*tasks)
+E           asyncio.exceptions.CancelledError
+
+/usr/local/lib/python3.12/site-packages/deepeval/metrics/indicator.py:238: CancelledError
+
+The above exception was the direct cause of the following exception:
+
+sample = {'_comment': '=== CO2013 — Database Systems ===', 'course': 'CO2013', 'goal_description': 'Review all topics: ER model...al exam is 90 minutes MCQ + written, worth 50% of grade.', 'goal_name': 'Prepare for Database Systems Final Exam', ...}   
+
+    @pytest.mark.django_db          # ← grants ORM access for the whole test body
+    @pytest.mark.parametrize(
+        "sample",
+        _DATASET,
+        ids=[f"{s.get('course', 'unknown')}__{s['goal_name']}" for s in _DATASET],
+    )
+    def test_rag_pipeline(sample: dict):
+        """
+        Run all five RAGAS metrics for one sample from the evaluation dataset.
+
+        The DB access mark is required because ``TaskMindRAGAdapter.retrieve()``
+        calls ``RAGContextService`` which queries the ``DocumentChunk`` ORM table.
+
+        The test fails if *any* metric falls below its threshold (0.5).
+        DeepEval's ``assert_test`` raises ``AssertionError`` and prints a detailed
+        breakdown of which metrics failed and why (reason included).
+
+        Note on empty retrieval context
+        --------------------------------
+        ``Contextual Precision``, ``Contextual Recall``, and ``Contextual Relevancy``
+        will score 0.0 if no documents have been ingested into the global knowledge
+        base.  Upload course-relevant documents via the admin panel first for
+        meaningful scores on those three metrics.
+        """
+        goal_name: str = sample["goal_name"]
+        goal_description: str = sample["goal_description"]
+        ground_truth: str = sample["ground_truth"]
+
+        # ---------------------------------------------------------------------------
+        # Run the RAG pipeline — DB access happens here, inside the django_db scope
+        # ---------------------------------------------------------------------------
+        result = _ADAPTER.generate(goal_name, goal_description)
+        actual_output: str = result["answer"]
+        retrieval_context: list[str] = result["contexts"]
+
+        # The "input" for DeepEval is the combined goal name + description,
+        # mirroring how RAGContextService builds the embedding query internally.
+        query = f"{goal_name}. {goal_description}"
+
+        test_case = LLMTestCase(
+            input=query,
+            actual_output=actual_output,
+            retrieval_context=retrieval_context,
+            expected_output=ground_truth,
+        )
+
+>       assert_test(
+            test_case,
+            metrics=[
+                faithfulness_metric,
+                answer_relevancy_metric,
+                # contextual_precision_metric,
+                # contextual_recall_metric,
+                contextual_relevancy_metric,
+            ],
+        )
+
+evaluation/deepeval/test_deepeval.py:142:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/site-packages/deepeval/evaluate/evaluate.py:107: in assert_test
+    test_result = loop.run_until_complete(
+/usr/local/lib/python3.12/asyncio/base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/site-packages/deepeval/evaluate/execute/e2e.py:449: in a_execute_test_cases
+    await asyncio.wait_for(
+/usr/local/lib/python3.12/asyncio/tasks.py:520: in wait_for
+    return await fut
+           ^^^^^^^^^
+/usr/local/lib/python3.12/site-packages/deepeval/evaluate/execute/e2e.py:352: in execute_with_semaphore
+    return await _await_with_outer_deadline(
+/usr/local/lib/python3.12/site-packages/deepeval/evaluate/execute/_common.py:238: in _await_with_outer_deadline
+    return await asyncio.wait_for(coro, timeout=timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/tasks.py:519: in wait_for
+    async with timeouts.timeout(timeout):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Timeout [expired]>, exc_type = <class 'asyncio.exceptions.CancelledError'>, exc_val = CancelledError()
+exc_tb = <traceback object at 0x7739f0179a80>
+
+    async def __aexit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ) -> Optional[bool]:
+        assert self._state in (_State.ENTERED, _State.EXPIRING)
+
+        if self._timeout_handler is not None:
+            self._timeout_handler.cancel()
+            self._timeout_handler = None
+
+        if self._state is _State.EXPIRING:
+            self._state = _State.EXPIRED
+
+            if self._task.uncancel() <= self._cancelling and exc_type is exceptions.CancelledError:
+                # Since there are no new cancel requests, we're
+                # handling this.
+>               raise TimeoutError from exc_val
+E               TimeoutError
+
+/usr/local/lib/python3.12/asyncio/timeouts.py:115: TimeoutError
+---------------------------------------------------- Captured stderr call ----------------------------------------------------
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-05-28 23:07:37 [WARNING] huggingface_hub.utils._http: Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights: 100%|██████████| 103/103 [00:00<00:00, 2628.49it/s]
+BertModel LOAD REPORT from: sentence-transformers/all-MiniLM-L6-v2
+Key                     | Status     |  |
+------------------------+------------+--+-
+embeddings.position_ids | UNEXPECTED |  |
+
+Notes:
+- UNEXPECTED:   can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+2026-05-28 23:07:42 [INFO] apps.knowledge_base.services: Calling user instance: kien1
+2026-05-28 23:07:42 [INFO] apps.knowledge_base.services: Calling user instance: None
+2026-05-28 23:07:42 [INFO] apps.goals.services: AI request started | correlation_id=b1b99728 model=gemini-flash-latest prompt_length=4472 max_retries=3
+2026-05-28 23:07:55 [INFO] apps.goals.services: AI request succeeded | correlation_id=b1b99728 attempt=1 response_length=2140 latency_ms=12699.0 raw_response=```json
+{
+    "message": "Your plan is done! Please let me know if you would like any further edits. If you are satisfied with the current version, kindly click the Save button in the top right corner.",
+    "options": [],
+    "description": "Successfully prepare for the Database Systems Final Exam by systematically reviewing core topics including ER modeling, relational algebra, SQL, normalization, storage, and security. The final preparation culminates in practicing 90-minute mock exams (MCQ and written) to maximize performance on this high-stakes assessment worth 50% of the overall grade.", 
+    "tasks": [
+        {
+            "name": "Review ER Model concepts and practice drawing Entity-Relationship Diagrams",
+            "status": "ToDo",
+            "deadline": "2026-06-02"
+        },
+        {
+            "name": "Study Relational Model, mapping ERDs to relations, and Relational Algebra",
+            "status": "ToDo",
+            "deadline": "2026-06-07"
+        },
+        {
+            "name": "Practice SQL queries including DDL, DML, complex Joins, and Subqueries",
+            "status": "ToDo",
+            "deadline": "2026-06-12"
+        },
+        {
+            "name": "Master Normalization techniques, functional dependencies, and normal forms (1NF to BCNF)",
+            "status": "ToDo",
+            "deadline": "2026-06-17"
+        },
+        {
+            "name": "Study Storage, file organization, indexing structures (B-Trees), and transaction management",
+            "status": "ToDo",
+            "deadline": "2026-06-22"
+        },
+        {
+            "name": "Review Database Security, access control, and SQL injection prevention techniques",
+            "status": "ToDo",
+            "deadline": "2026-06-25"
+        },
+        {
+            "name": "Simulate 90-minute exam conditions with practice MCQ and written questions",
+            "status": "ToDo",
+            "deadline": "2026-06-29"
+        },
+        {
+            "name": "Conduct a final comprehensive review of all topics and cheat sheets",
+            "status": "ToDo",
+            "deadline": "2026-06-30"
+        }
+    ]
+}
+```
+2026-05-28 23:07:55 [INFO] deepeval.evaluate.execute.e2e: in _a_execute_llm_test_cases
+2026-05-28 23:11:00 [WARNING] deepeval.evaluate.execute.e2e: gather TIMEOUT after 207.0s. Some metrics may be marked as timed out. To give tasks more time, consider increasing DEEPEVAL_PER_TASK_TIMEOUT_SECONDS_OVERRIDE or DEEPEVAL_TASK_GATHER_BUFFER_SECONDS_OVERRIDE.
+----------------------------------------------------- Captured log call ------------------------------------------------------
+WARNING  huggingface_hub.utils._http:_http.py:916 Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+INFO     deepeval.evaluate.execute.e2e:e2e.py:550 in _a_execute_llm_test_cases
+WARNING  deepeval.evaluate.execute.e2e:_common.py:96 gather TIMEOUT after 207.0s. Some metrics may be marked as timed out. To give tasks more time, consider increasing DEEPEVAL_PER_TASK_TIMEOUT_SECONDS_OVERRIDE or DEEPEVAL_TASK_GATHER_BUFFER_SECONDS_OVERRIDE.
+__________________________________ test_rag_pipeline[CO2013__Master Database Normalization] __________________________________
+
+sample = {'course': 'CO2013', 'goal_description': 'Deeply understand functional dependencies, keys, and normal forms (1NF, 2NF,... 7th edition, Chapter on Functional Dependencies).\nTask 9: Review normalization questions from previous final exams.'}   
+
+    @pytest.mark.django_db          # ← grants ORM access for the whole test body
+    @pytest.mark.parametrize(
+        "sample",
+        _DATASET,
+        ids=[f"{s.get('course', 'unknown')}__{s['goal_name']}" for s in _DATASET],
+    )
+    def test_rag_pipeline(sample: dict):
+        """
+        Run all five RAGAS metrics for one sample from the evaluation dataset.
+
+        The DB access mark is required because ``TaskMindRAGAdapter.retrieve()``
+        calls ``RAGContextService`` which queries the ``DocumentChunk`` ORM table.
+
+        The test fails if *any* metric falls below its threshold (0.5).
+        DeepEval's ``assert_test`` raises ``AssertionError`` and prints a detailed
+        breakdown of which metrics failed and why (reason included).
+
+        Note on empty retrieval context
+        --------------------------------
+        ``Contextual Precision``, ``Contextual Recall``, and ``Contextual Relevancy``
+        will score 0.0 if no documents have been ingested into the global knowledge
+        base.  Upload course-relevant documents via the admin panel first for
+        meaningful scores on those three metrics.
+        """
+        goal_name: str = sample["goal_name"]
+        goal_description: str = sample["goal_description"]
+        ground_truth: str = sample["ground_truth"]
+
+        # ---------------------------------------------------------------------------
+        # Run the RAG pipeline — DB access happens here, inside the django_db scope
+        # ---------------------------------------------------------------------------
+        result = _ADAPTER.generate(goal_name, goal_description)
+        actual_output: str = result["answer"]
+        retrieval_context: list[str] = result["contexts"]
+
+        # The "input" for DeepEval is the combined goal name + description,
+        # mirroring how RAGContextService builds the embedding query internally.
+        query = f"{goal_name}. {goal_description}"
+
+        test_case = LLMTestCase(
+            input=query,
+            actual_output=actual_output,
+            retrieval_context=retrieval_context,
+            expected_output=ground_truth,
+        )
+
+>       assert_test(
+            test_case,
+            metrics=[
+                faithfulness_metric,
+                answer_relevancy_metric,
+                # contextual_precision_metric,
+                # contextual_recall_metric,
+                contextual_relevancy_metric,
+            ],
+        )
+
+evaluation/deepeval/test_deepeval.py:142:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+test_case = LLMTestCase(input='Master Database Normalization. Deeply understand functional dependencies, keys, and normal forms (1...servers=None, mcp_tools_called=None, mcp_resources_called=None, mcp_prompts_called=None, custom_column_key_values=None)
+metrics = [<deepeval.metrics.faithfulness.faithfulness.FaithfulnessMetric object at 0x773a4d876ea0>, <deepeval.metrics.answer_re...0050>, <deepeval.metrics.contextual_relevancy.contextual_relevancy.ContextualRelevancyMetric object at 0x773a4b7819d0>]  
+golden = None, run_async = True
+
+    def assert_test(
+        test_case: Optional[Union[LLMTestCase, ConversationalTestCase]] = None,
+        metrics: Optional[
+            Union[
+                List[BaseMetric],
+                List[BaseConversationalMetric],
+            ]
+        ] = None,
+        golden: Optional[Golden] = None,
+        run_async: bool = True,
+    ):
+        validate_assert_test_inputs(
+            golden=golden,
+            test_case=test_case,
+            metrics=metrics,
+        )
+
+        async_config = AsyncConfig(throttle_value=0, max_concurrent=100)
+        display_config = DisplayConfig(
+            verbose_mode=should_verbose_print(), show_indicator=True
+        )
+        error_config = ErrorConfig(
+            ignore_errors=should_ignore_errors(),
+            skip_on_missing_params=should_skip_on_missing_params(),
+        )
+        cache_config = CacheConfig(
+            write_cache=get_is_running_deepeval(), use_cache=should_use_cache()
+        )
+
+        if golden and not test_case:
+            # Trace-scoped assert_test: read the active trace set by the plugin.
+            test_result = _assert_test_from_current_trace(
+                golden=golden,
+                metrics=metrics,
+                error_config=error_config,
+                display_config=display_config,
+            )
+
+        elif test_case and metrics:
+            if run_async:
+                loop = get_or_create_event_loop()
+                test_result = loop.run_until_complete(
+                    a_execute_test_cases(
+                        [test_case],
+                        metrics,
+                        error_config=error_config,
+                        display_config=display_config,
+                        async_config=async_config,
+                        cache_config=cache_config,
+                        identifier=get_identifier(),
+                        _use_bar_indicator=True,
+                        _is_assert_test=True,
+                    )
+                )[0]
+            else:
+                test_result = execute_test_cases(
+                    [test_case],
+                    metrics,
+                    error_config=error_config,
+                    display_config=display_config,
+                    cache_config=cache_config,
+                    identifier=get_identifier(),
+                    _use_bar_indicator=False,
+                    _is_assert_test=True,
+                )[0]
+
+        if not test_result.success:
+            failed_metrics_data: List[MetricData] = []
+            # even for conversations, test_result right now is just the
+            # result for the last message
+            for metric_data in test_result.metrics_data:
+                if metric_data.error is not None:
+                    failed_metrics_data.append(metric_data)
+                else:
+                    # This try block is for user defined custom metrics,
+                    # which might not handle the score == undefined case elegantly
+                    try:
+                        if not metric_data.success:
+                            failed_metrics_data.append(metric_data)
+                    except Exception:
+                        failed_metrics_data.append(metric_data)
+
+            failed_metrics_str = ", ".join(
+                [
+                    f"{metrics_data.name} (score: {metrics_data.score}, threshold: {metrics_data.threshold}, strict: {metrics_data.strict_mode}, error: {metrics_data.error}, reason: {metrics_data.reason})"
+                    for metrics_data in failed_metrics_data
+                ]
+            )
+>           raise AssertionError(f"Metrics: {failed_metrics_str} failed.")
+E           AssertionError: Metrics: Contextual Relevancy (score: 0.25806451612903225, threshold: 0.5, strict: False, error: None, reason: The score is 0.26 because while the context contains some highly relevant statements like "Learning Outcome L.O.2.4 requires students to determine a normal form (1NF, 2NF, 3NF, BCNF)" and "The Database Systems course covers functional dependencies and data normalization", a large portion of the context is irrelevant, discussing unrelated topics such as "Session 4 of the Data Structures and Algorithms (CO2003) course... '5. Binary Tree' (Cây nhị phân)" and "database storage, management, and security issues".) failed.
+
+/usr/local/lib/python3.12/site-packages/deepeval/evaluate/evaluate.py:154: AssertionError
+---------------------------------------------------- Captured stderr call ----------------------------------------------------
+2026-05-28 23:13:58 [INFO] apps.knowledge_base.services: Calling user instance: kien1
+2026-05-28 23:13:58 [INFO] apps.knowledge_base.services: Calling user instance: None
+2026-05-28 23:13:58 [INFO] apps.goals.services: AI request started | correlation_id=3b328360 model=gemini-flash-latest prompt_length=4463 max_retries=3
+2026-05-28 23:14:05 [INFO] apps.goals.services: AI request succeeded | correlation_id=3b328360 attempt=1 response_length=1738 latency_ms=7475.2 raw_response={
+    "message": "Your plan is done! Please let me know if you would like any further edits. If you are satisfied with the current version, kindly click the Save button in the top right corner.",
+    "options": [],
+    "description": "Achieve complete mastery of relational database design by understanding functional dependencies, identifying keys, and applying normalization techniques (1NF, 2NF, 3NF, BCNF). By the end of this plan, you will be able to analyze any database schema, perform lossless and dependency-preserving decompositions, and design highly efficient, redundancy-free database structures.",
+    "tasks": [
+        {
+            "name": "Study Functional Dependencies (FDs) and Attribute Closure",
+            "status": "ToDo",
+            "deadline": "2026-06-15"
+        },
+        {
+            "name": "Master methods for finding Candidate Keys and Super Keys",
+            "status": "ToDo",
+            "deadline": "2026-06-30"
+        },
+        {
+            "name": "Learn and apply First Normal Form (1NF) and Second Normal Form (2NF)",
+            "status": "ToDo",
+            "deadline": "2026-07-15"
+        },
+        {
+            "name": "Learn and apply Third Normal Form (3NF) and Boyce-Codd Normal Form (BCNF)",
+            "status": "ToDo",
+            "deadline": "2026-07-31"
+        },
+        {
+            "name": "Practice Normalization Decomposition Algorithms (Lossless-Join and Dependency-Preserving)",
+            "status": "ToDo",
+            "deadline": "2026-08-15"
+        },
+        {
+            "name": "Complete comprehensive normalization exercises and real-world database design case studies",
+            "status": "ToDo",
+            "deadline": "2026-08-31"
+        }
+    ]
+    ]
+}
+2026-05-28 23:14:05 [INFO] deepeval.evaluate.execute.e2e: in _a_execute_llm_test_cases
+----------------------------------------------------- Captured log call ------------------------------------------------------
+INFO     deepeval.evaluate.execute.e2e:e2e.py:550 in _a_execute_llm_test_cases
+====================================================== warnings summary ======================================================
+evaluation/deepeval/test_deepeval.py::test_rag_pipeline[CO2013__Prepare for Database Systems Final Exam]
+  /usr/local/lib/python3.12/site-packages/deepeval/utils.py:194: DeprecationWarning: There is no current event loop
+    loop = asyncio.get_event_loop()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+----------------------------- Generated html report: file:///app/evaluation/rag_test_report.html -----------------------------
+================================================== short test summary info ===================================================
+FAILED evaluation/deepeval/test_deepeval.py::test_rag_pipeline[CO2013__Prepare for Database Systems Final Exam] - TimeoutError
+FAILED evaluation/deepeval/test_deepeval.py::test_rag_pipeline[CO2013__Master Database Normalization] - AssertionError: Metrics: Contextual Relevancy (score: 0.25806451612903225, threshold: 0.5, strict: False, error: None, re...
+============================= 2 failed, 1 passed, 12 deselected, 1 warning in 541.51s (0:09:01) ==============================

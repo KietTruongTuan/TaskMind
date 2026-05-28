@@ -1,0 +1,101 @@
+[
+  {
+    "_comment": "=== CO2013 — Database Systems ===",
+    "course": "CO2013",
+    "goal_name": "Prepare for Database Systems Final Exam",
+    "goal_description": "Review all topics: ER model, relational model, SQL, normalization, storage, and security. Final exam is 90 minutes MCQ + written, worth 50% of grade.",
+    "ground_truth": "Task 1: Review the ER model and its extended versions — practice designing conceptual schemas that satisfy data requirements of given applications.\nTask 2: Study the relational data model — practice converting ER diagrams into relational schemas.\nTask 3: Practice writing SQL statements: DDL (CREATE, ALTER, DROP), DML (SELECT, INSERT, UPDATE, DELETE), stored procedures, functions, and triggers.\nTask 4: Practice identifying functional dependencies and keys for given relations.\nTask 5: Determine normal forms (1NF, 2NF, 3NF, BCNF) for relations given their primary key and functional dependencies.\nTask 6: Review database storage concepts: physical data storage, indexing techniques, and approaches for managing large-scale data.\nTask 7: Study database security: DAC and MAC access control, information flow control, and user management in MySQL/Oracle/MS SQL Server.\nTask 8: Complete two past MCQ + written practice exams under 90-minute time conditions."
+  },
+  {
+    "course": "CO2013",
+    "goal_name": "Complete Database Lab Assignment",
+    "goal_description": "Implement and manage a database application on MySQL covering schema creation, SQL queries, stored procedures, triggers, and basic user authorization. Lab component is 30% of total grade.",
+    "ground_truth": "Task 1: Install and configure MySQL locally and verify the connection.\nTask 2: Translate the provided ER diagram into a relational schema and create all tables with appropriate constraints (PRIMARY KEY, FOREIGN KEY, NOT NULL).\nTask 3: Write DDL statements to define the full database schema.\nTask 4: Write DML queries covering all required operations: multi-table SELECT with JOINs, subqueries, GROUP BY, HAVING, INSERT, UPDATE, and DELETE.\nTask 5: Implement the required stored procedures and functions in SQL.\nTask 6: Write and test triggers for the specified business rules.\nTask 7: Implement basic authorization: create users, grant and revoke privileges using DCL statements.\nTask 8: Prepare the lab report documenting schema design decisions and testing evidence.\nTask 9: Submit the lab report at the end of the lab session as required."
+  },
+  {
+    "course": "CO2013",
+    "goal_name": "Master Database Normalization",
+    "goal_description": "Deeply understand functional dependencies, keys, and normal forms (1NF, 2NF, 3NF, BCNF) and be able to apply normalization algorithms to any relation.",
+    "ground_truth": "Task 1: Study the definition and rules for identifying functional dependencies in a relation.\nTask 2: Practice finding the key(s) of a relation given a set of functional dependencies — including candidate keys and primary keys.\nTask 3: Learn the definition of 1NF and identify violations (repeating groups, non-atomic attributes).\nTask 4: Learn 2NF — identify and resolve partial dependencies on the primary key.\nTask 5: Learn 3NF — identify and resolve transitive dependencies.\nTask 6: Learn BCNF — identify relations where a non-trivial dependency's left side is not a superkey and decompose accordingly.\nTask 7: Practice the decomposition algorithms: lossless-join decomposition and dependency-preserving decomposition.\nTask 8: Solve at least 10 normalization exercises from the textbook (Elmasri & Navathe, 7th edition, Chapter on Functional Dependencies).\nTask 9: Review normalization questions from previous final exams."
+  },
+
+  {
+    "_comment": "=== CO2003 — Data Structures and Algorithms ===",
+    "course": "CO2003",
+    "goal_name": "Prepare for DSA Midterm Exam",
+    "goal_description": "Review Big-O notation, linked lists, stacks, queues, and binary trees. Midterm is 60 minutes MCQ worth 10% of grade, tested directly in the lab session.",
+    "ground_truth": "Task 1: Review Big-O notation — be able to give the formal definition and identify the complexity class (O(1), O(log n), O(n), O(n log n), O(n²)) of a given algorithm with nested loops.\nTask 2: Study the list data structure — implementation using arrays and singly linked lists, and compare their trade-offs.\nTask 3: Practice stack and queue operations — push, pop, enqueue, dequeue — and their implementations using both linked lists and arrays.\nTask 4: Review applications of stacks (e.g., expression trees) and queues.\nTask 5: Study binary tree concepts: basic definitions, storage structures, traversal methods (in-order, pre-order, post-order), binary search trees, and expression trees.\nTask 6: Practice tracing the step-by-step execution of BST insert, delete, and search.\nTask 7: Complete all in-class exercise sets from sessions 1–4.\nTask 8: Take one full 60-minute MCQ practice test covering the above topics."
+  },
+  {
+    "course": "CO2003",
+    "goal_name": "Implement DSA Large Assignment",
+    "goal_description": "Complete the large programming assignment (BTL) requiring implementation of data structures and algorithms in C++. Assignment is 30% of the total grade and is auto-graded by the system.",
+    "ground_truth": "Task 1: Read the full assignment specification carefully and list all required data structures and algorithms.\nTask 2: Review C++ fundamentals needed: pointers, arrays, structs, templates, OOP, and exception handling.\nTask 3: Implement the required linked list class with all specified methods.\nTask 4: Implement the required tree structure (BST or AVL as specified) with insert, delete, search, and traversal.\nTask 5: Implement any required sorting algorithm(s) — trace through step-by-step to verify correctness before coding.\nTask 6: Implement any required searching or hashing algorithm with the specified collision resolution strategy.\nTask 7: Test each component with edge cases: empty structure, single element, duplicate keys, and large inputs.\nTask 8: Analyze the Big-O complexity of each implemented method and document it in the report.\nTask 9: Submit via the auto-grading system before the deadline and verify all test cases pass."
+  },
+  {
+    "course": "CO2003",
+    "goal_name": "Study Advanced Tree Structures",
+    "goal_description": "Understand and be able to implement AVL trees, multi-way trees, and B-Trees as covered in sessions 4–5 of the course.",
+    "ground_truth": "Task 1: Review basic binary search tree operations and their worst-case complexities before moving to balanced trees.\nTask 2: Study AVL tree rotations: single right rotation, single left rotation, right-left rotation, and left-right rotation — trace through 5 examples of each.\nTask 3: Practice AVL insert and delete with rebalancing from scratch on paper.\nTask 4: Study multi-way trees: definition, properties, and how search and insertion differ from binary trees.\nTask 5: Study B-Tree structure: order, minimum/maximum keys per node, split on insert, merge on delete.\nTask 6: Practice B-Tree insertion and deletion step-by-step on examples of order 3 and order 4 trees.\nTask 7: Compare AVL trees and B-Trees: when to use each, and how their performance characteristics differ.\nTask 8: Solve all exercises from the session 4–5 exercise sets."
+  },
+
+  {
+    "_comment": "=== CO3005 — Principles of Programming Languages ===",
+    "course": "CO3005",
+    "goal_name": "Prepare for PPL Midterm Exam",
+    "goal_description": "Review lexical specification with regular expressions, context-free grammar with BNF, parse trees, and abstract syntax trees. Midterm is 60 minutes MCQ worth 20% of grade.",
+    "ground_truth": "Task 1: Study regular expression syntax and semantics — practice writing regex for common token types: identifiers, integer literals, float literals, string literals, and operators.\nTask 2: Study automata and token identification — understand how a lexer uses a DFA to match tokens.\nTask 3: Study context-free grammar and BNF notation — be able to write a grammar for a simple language.\nTask 4: Practice constructing parse trees for given strings and grammars.\nTask 5: Study ambiguity in grammars — be able to identify ambiguous grammars and resolve them using precedence and associativity rules.\nTask 6: Practice writing abstract syntax trees (AST) from parse trees.\nTask 7: Complete Large Assignment 1 topics: write lexical and grammar specifications for the assigned simple language.\nTask 8: Review all in-class exercises from sessions 2 and 3.\nTask 9: Take a 60-minute MCQ practice test under timed conditions."
+  },
+  {
+    "course": "CO3005",
+    "goal_name": "Implement a Simple Compiler Component",
+    "goal_description": "Complete Large Assignment 2 and/or 4 requiring implementation of intermediate code generation or JVM Jasmin code generation for the assigned language. Assignment contributes to the 30% project grade.",
+    "ground_truth": "Task 1: Review the AST structure produced in Assignment 1 — understand each node type and what code it should generate.\nTask 2: Study JVM architecture: the operand stack, local variable array, and the instruction set covered in Chapter 10 (Jasmin code).\nTask 3: Learn Jasmin assembly syntax: class structure, method descriptors, and the key instructions (iload, istore, iadd, if_icmpeq, invokevirtual, etc.).\nTask 4: Implement code generation for arithmetic expressions and assignment statements first.\nTask 5: Implement code generation for conditional statements (if-else).\nTask 6: Implement code generation for loop constructs.\nTask 7: Implement code generation for function/method calls including parameter passing.\nTask 8: Run and test generated Jasmin code by assembling and executing it on the JVM.\nTask 9: Submit before the deadline — the course requires at least 50% of assignments submitted to avoid being barred from the final exam."
+  },
+  {
+    "course": "CO3005",
+    "goal_name": "Understand Data Types and Control Structures in Programming Languages",
+    "goal_description": "Master Chapter 8 (Data Types) and Chapter 9 (Control Structures) — key topics for both the midterm and final exam, covering scope, type systems, parameter passing mechanisms.",
+    "ground_truth": "Task 1: Study scope rules and reference environments — understand static (lexical) scope vs. dynamic scope with code examples.\nTask 2: Study data type concepts: type information, basic types, type constructors (arrays, records, pointers), type equivalence (structural vs. name equivalence), and type checking.\nTask 3: Study type conversion: implicit coercion vs. explicit casting.\nTask 4: Study data abstraction: abstract data types and their relationship to OOP.\nTask 5: Study control structures: expression evaluation order, short-circuit evaluation, conditional statements, and loop constructs.\nTask 6: Study parameter passing mechanisms in depth: pass-by-value, pass-by-reference, pass-by-value-result, and pass-by-name — trace examples in C, C++, and Python.\nTask 7: Complete Large Assignment 3 (covers mechanisms of scope, reference environment, and data types) before its deadline.\nTask 8: Review all in-class exercises from sessions 7, 8, and 9."
+  },
+
+  {
+    "_comment": "=== CO2007 — Computer Architecture ===",
+    "course": "CO2007",
+    "goal_name": "Prepare for Computer Architecture Midterm",
+    "goal_description": "Review performance metrics, MIPS instruction set architecture, and computer arithmetic. Midterm is 60 minutes MCQ worth 20% of the total grade.",
+    "ground_truth": "Task 1: Study performance metrics: understand CPU execution time, CPI, clock cycle time, and instruction count (IC) — be able to calculate machine performance given these parameters.\nTask 2: Learn to distinguish CPI, Clock Cycles, and IC and understand how each contributes to overall performance.\nTask 3: Study benchmark types used to evaluate performance (SPEC benchmarks).\nTask 4: Study MIPS instruction set architecture: instruction formats (R-type, I-type, J-type), addressing modes, and the register set.\nTask 5: Practice interpreting arithmetic, logic, branching, and data transfer instructions in MIPS assembly.\nTask 6: Practice translating MIPS assembly instructions into 32-bit machine code (binary and hex).\nTask 7: Practice writing simple MIPS subroutines that interact with the user using syscalls.\nTask 8: Study binary arithmetic: signed/unsigned number representation, binary addition/subtraction, overflow detection, logic operations, and the ALU design.\nTask 9: Take a 60-minute MCQ practice test covering sessions 1–8."
+  },
+  {
+    "course": "CO2007",
+    "goal_name": "Master MIPS Pipeline and Hazard Detection",
+    "goal_description": "Deeply understand the pipelined data path (sessions 9–12): the 5-stage pipeline, data hazards, control hazards, and structural hazards, as these are heavily tested in the final exam.",
+    "ground_truth": "Task 1: Review the single-cycle data path and control signals before studying the pipeline — understand what each stage (IF, ID, EX, MEM, WB) does.\nTask 2: Study the pipelined data path: pipeline registers (IF/ID, ID/EX, EX/MEM, MEM/WB) and how data flows through them.\nTask 3: Study data hazards: identify RAW (Read After Write) hazards in a given code sequence and determine the number of stall cycles needed.\nTask 4: Study forwarding/bypassing: understand when forwarding resolves a RAW hazard and when a stall is still required (load-use hazard).\nTask 5: Study control hazards: understand branch delay and branch prediction strategies (predict-not-taken, predict-taken).\nTask 6: Practice on 5+ assembly code sequences: draw the pipeline diagram, identify all hazards, apply forwarding, and count total cycles.\nTask 7: Study structural hazards and how they are typically eliminated in MIPS (e.g., separate instruction and data memory).\nTask 8: Solve all exercises from the textbook (Patterson & Hennessy, 5th edition) Chapter 4 on pipeline hazards."
+  },
+  {
+    "course": "CO2007",
+    "goal_name": "Study Memory Hierarchy and Cache Organization",
+    "goal_description": "Understand cache memory organization (direct-mapped, set-associative, fully-associative), cache sizing calculations, and virtual memory concepts from sessions 13–14 for the final exam.",
+    "ground_truth": "Task 1: Study the principle of locality (temporal and spatial) and why it justifies the memory hierarchy.\nTask 2: Study direct-mapped cache: understand index bits, tag bits, offset bits, and how to determine which cache block a memory address maps to.\nTask 3: Study set-associative cache: understand the difference from direct-mapped, how the set index and tag are computed, and replacement policies (LRU).\nTask 4: Study fully-associative cache: compare with the above two methods in terms of hit rate and complexity.\nTask 5: Practice calculating cache size: given block size, number of sets, associativity, and address width, calculate total cache capacity and the number of tag/index/offset bits.\nTask 6: Study write policies: write-through vs. write-back with write-allocate.\nTask 7: Study the relationship between cache memory, main memory (DRAM), and secondary memory — understand miss penalty and average memory access time (AMAT).\nTask 8: Study virtual memory: page tables, TLB (Translation Lookaside Buffer), and page fault handling.\nTask 9: Solve 10+ cache calculation exercises from the textbook and past exams."
+  },
+
+  {
+    "_comment": "=== GE1013 — Earth Science ===",
+    "course": "GE1013",
+    "goal_name": "Prepare for Earth Science Final Exam",
+    "goal_description": "Review all four spheres (geosphere, hydrosphere, atmosphere, biosphere/human activities) and their interactions. Final exam is 80 minutes MCQ worth 60% of the grade.",
+    "ground_truth": "Task 1: Review geosphere topics — mineral physical properties and classification, rock cycle (igneous, sedimentary, metamorphic rocks and their identification), plate tectonics theory, earthquake types and seismic waves, Earth's interior structure, and geological time scale principles.\nTask 2: Review atmosphere topics — atmospheric structure and composition, humidity and precipitation processes, atmospheric circulation (Hadley, Ferrel, Polar cells, Walker cell), climate types, storm formation, and deserts.\nTask 3: Review hydrosphere topics — surface water, groundwater (porosity vs. permeability), ocean composition and circulation (gyres, thermocline), tides and waves.\nTask 4: Review sphere interactions — climate change mechanisms (greenhouse gases, energy balance, global warming evidence), weathering processes, mass wasting (landslide mechanisms), and the geological time scale.\nTask 5: Review Earth resources — mineral, water, and fuel resources (fossil fuels, renewable energy, geothermal).\nTask 6: Review topographic maps: coordinate systems, map scale, how to read contour lines, and drawing topographic cross-sections.\nTask 7: Complete all e-learning exercises for chapters 1–13 before the exam.\nTask 8: Take a full 80-minute MCQ mock exam covering all topics."
+  },
+  {
+    "course": "GE1013",
+    "goal_name": "Complete Earth Science Lab Report",
+    "goal_description": "Submit lab reports for all 5 practice sessions (minerals, igneous rocks, sedimentary/metamorphic rocks, topographic maps, compass use). Lab work counts for 20% of the total grade.",
+    "ground_truth": "Task 1: Practice 1 (Minerals) — identify the physical properties of provided mineral samples (color, luster, hardness, cleavage/fracture, streak) and name each mineral. Write the lab report.\nTask 2: Practice 2 (Igneous rocks) — identify the texture and structure of igneous rock samples, classify them as felsic, intermediate, or mafic. Write the lab report.\nTask 3: Practice 3 (Sedimentary and metamorphic rocks) — identify texture and structure, classify each rock type. Write the lab report.\nTask 4: Practice 4 (Topographic maps) — identify map features (drainage, transportation, vegetation, contour lines), read coordinate systems and map scale, and draw a topographic cross-section for the given profile. Write the lab report.\nTask 5: Practice 5 (Compass use and navigation) — locate positions on a topographic map, measure azimuth and dip of fractures/faults/rock layers using the compass. Write the lab report.\nTask 6: Submit each lab report at the end of the respective lab session as required by the instructor.\nTask 7: Review reports before submission — ensure all identification tables are complete and observations are explained."
+  },
+  {
+    "course": "GE1013",
+    "goal_name": "Write Earth Science Group Report on Climate Change and Earth Resources",
+    "goal_description": "Complete the group project report (BTL) on the roles of Earth resources or renewable/non-renewable energy in sustainable economic development. Report contributes 20% to the final grade.",
+    "ground_truth": "Task 1: Form a group of 5 students and assign roles: team leader, researcher for each sub-topic (atmosphere/climate, resources/energy, impact on society, and conclusion/recommendations).\nTask 2: Review course content on climate change: solar radiation balance, greenhouse gases and their effects, global warming evidence, and climate modelling concepts (Chapter 3).\nTask 3: Review Earth resources (Chapter 12): mineral resources, water resources, fossil fuels (oil, gas, coal), nuclear energy, and renewable energy sources (solar, wind, tidal, geothermal).\nTask 4: Search for at least 3–5 peer-reviewed or reputable sources on the group's chosen topic; summarize each source as part of the basic literature review (L.O.7).\nTask 5: Draft the report structure: Introduction → Literature Review → Main Discussion → Conclusion and Recommendations.\nTask 6: Write the discussion section connecting climate change evidence to the viability of renewable vs. non-renewable energy in sustainable development.\nTask 7: Create the mind-map showing the relationships between Earth Science disciplines relevant to the topic (required deliverable from Week 1, due Week 7).\nTask 8: Review and finalize the report — ensure all members' contributions are documented for individual evaluation (L.O.6). Submit before the deadline."
+  }
+]

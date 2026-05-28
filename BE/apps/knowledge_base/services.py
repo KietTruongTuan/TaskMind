@@ -159,23 +159,32 @@ class RAGFileProcessService:
         else:
             context_section = "Summarized context from document is not available."
 
-        prompt = f"""You are an expert data processor building a knowledge base.
+        prompt: str = f"""You are an expert data processor building a knowledge base.
 
 {context_section}
 
-Analyze the following text block extracted from the document. \
-Break it down into smaller, standalone, semantically complete chunks. \
-Each chunk should contain a complete thought or concept and must be fully \
-understandable on its own — without requiring any external context.
+Analyze the following text block extracted from the document. Break it down into smaller, standalone, semantically complete chunks.
 
 Rules:
-1. Resolve pronouns (e.g., replace "it" with the actual noun it refers to).
-2. If available, enrich each chunk with key entities or concepts from the summarized document context so that it remains self-contained and semantically rich.
-3. Do not change the underlying meaning of the text block.
-4. Return ONLY a valid JSON array of strings. No markdown, no introductory text.
+1. Contextual Resolution: Resolve pronouns and ambiguous references (e.g., replace "it" or "the course" with the actual subject like "Database Systems").
+2. ANTI-DILUTION GUARDRAIL: Do NOT inject repetitive administrative metadata (e.g., University names, course codes) into every chunk. 
+3. Do not change the underlying factual meaning of the text block.
+4. Return ONLY a valid JSON array of strings.
+
+=== EXAMPLE INPUT ===
+Text block:
+"The Midterm exam for the Database Systems course (CO2013) at Ho Chi Minh City University of Technology will cover Chapter 3. It accounts for 30% of the final grade."
+
+=== EXAMPLE OUTPUT ===
+[
+  "The Database Systems Midterm exam covers Chapter 3.",
+  "The Database Systems Midterm exam accounts for 30% of the final grade."
+]
+=====================
 
 Text block:
-{phase1_chunk}"""
+{phase1_chunk}
+"""
         
         response: str = llm_client.chat.completions.create(
             model=llm_model,
