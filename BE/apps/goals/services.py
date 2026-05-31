@@ -424,21 +424,28 @@ class AIGoalGeneratorService:
             name, description, settings.TOP_K_CONTEXT, user
         )
 
+        if relevant_context and str(relevant_context).strip():
+            context_section = f"Here are some context, prioritize using these context for your response:\n            {relevant_context}"
+        else:
+            context_section = "There is currently no supported document from your uploads or in the system, so use your general knowledge to support the user. IMPORTANT: If this is your first response to the user, you must briefly mention in the 'message' that no relevant documents were found and you are using your general knowledge."
+
         return f"""You are an excellent project management assistant.
             Please help me break down goals into specific, actionable steps from {timezone.now().date().isoformat()} to "{deadline}".
             Each step should be a clear, achievable task within deadline.
             Also, rewrite the goal description into a summary that explains the expected outcomes.
 
             IMPORTANT CLARIFICATION RULES:
-            If you need more context or want to clarify any details with the user to create a better plan, ask questions to clarify in the "message" field.
-            If NO further clarification is needed from your side, you MUST make the "message" field EXACTLY this: "Your plan is done! Please let me know if you would like any further edits. If you are satisfied with the current version, kindly click the Save button in the top right corner.".
+            1. If you need more context or want to clarify details with the user to create a better plan, ask questions in the "message" field.
+            2. If NO further clarification is needed, the "message" field MUST summarize your plan. If you are updating a previous plan based on the user's clarification, briefly explain what you changed. If this is the first plan you are generating, briefly explain the approach you took. Always end your message EXACTLY with: "Please let me know if you would like any further edits. If you are satisfied with the current version, kindly click the Save button in the top right corner."
+            3. MESSAGE STYLING: The "message" MUST be friendly, short, and concise. Use line breaks (\\n\\n) to separate different thoughts into easily readable paragraphs. Use bullet points if helpful.
+            4. DO NOT mention or list the suggested options inside the "message" text (e.g., avoid saying "For example, do you want A, B, or C?"). The options will be displayed separately in the UI.
             
-            Here are some context, prioritize using these context for your response, if it is empty, then you can ignore it:
-            {relevant_context}
+            {context_section}
             
             Must return the result strictly as a valid JSON object with the following structure:
             {{
                 "message": "<your clarification question or the completion message>",
+                "is_general_knowledge": <boolean>,
                 "options": [
                     "<suggested answer 1>", 
                     "<suggested answer 2>", 
@@ -454,7 +461,9 @@ class AIGoalGeneratorService:
                 ]
             }}
 
-            IMPORTANT: If you ask a clarification question in the "message", you MUST provide 2 to 4 highly relevant, distinct options in the "options" array for the user to choose from. When asking a question, ALWAYS append a friendly sentence to the end of your "message" stating: "If you have another preference or answer, feel free to type it in the chatbox!". If NO further clarification is needed, return an empty array `[]` for "options".
+            IMPORTANT: If you ask a clarification question in the "message", you MUST provide 2 to 4 highly relevant, distinct options in the "options" array for the user to choose from. When asking a question, ALWAYS append a friendly sentence to the end of your "message" (as its own paragraph) stating: "If you have another preference or answer, feel free to type it in the chatbox!". If NO further clarification is needed, return an empty array `[]` for "options".
+            
+            ALSO IMPORTANT: You must set "is_general_knowledge" to true if you are relying on your general knowledge if there is currently no supported of relevant context. Otherwise, set it to false.
             
             The return language should match the user's input language.
             
@@ -463,6 +472,7 @@ class AIGoalGeneratorService:
             
             {{
                 "message": "Do you need any specific technologies integrated for the Fanpage Management (like React, Django, etc.)?",
+                "is_general_knowledge": true,
                 "description": "Develop a comprehensive fanpage management system. The project covers database design, backend API development, and a management web interface, culminating with testing and final presentation.",
                 "tasks": [
                     {{
