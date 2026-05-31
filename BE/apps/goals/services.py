@@ -164,7 +164,7 @@ class AIGoalGeneratorService:
         model: str,
         correlation_id: str = "",
         attempt: int = 0,
-    ) -> list[dict[str, Any]]:
+    ) -> dict[str, Any]:
         """
         Executes a single generation attempt with the AI provider.
 
@@ -320,7 +320,7 @@ class AIGoalGeneratorService:
                 )
         else:
             raise ValueError(
-                f"Could not find a JSON array in AI response. Content: {text}"
+                f"Could not find a Dict in AI response. Content: {text}"
             )
 
     @staticmethod
@@ -417,24 +417,15 @@ class AIGoalGeneratorService:
             return None
 
     @staticmethod
-    def build_prompt_for_task(
-        name, description, deadline, user: User | None = None, message: str = ""
+    def build_system_prompt_for_task(
+        name, description, deadline, user: User | None = None
     ):
         relevant_context = RAGContextService.context_query_wrapper(
             name, description, settings.TOP_K_CONTEXT, user
         )
 
-        user_message_part = (
-            f"User's clarification/message: '{message}'\n" if message else ""
-        )
-
         return f"""You are an excellent project management assistant.
-            Here is a new goal:
-            Name: '{name}'
-            Description: '{description}'
-            Deadline: '{deadline}'
-            {user_message_part}
-            Please help me break down this goal name and description into specific, actionable steps from {timezone.now().date().isoformat()} to "{deadline}".
+            Please help me break down goals into specific, actionable steps from {timezone.now().date().isoformat()} to "{deadline}".
             Each step should be a clear, achievable task within deadline.
             Also, rewrite the goal description into a summary that explains the expected outcomes.
 
@@ -465,7 +456,7 @@ class AIGoalGeneratorService:
 
             IMPORTANT: If you ask a clarification question in the "message", you MUST provide 2 to 4 highly relevant, distinct options in the "options" array for the user to choose from. When asking a question, ALWAYS append a friendly sentence to the end of your "message" stating: "If you have another preference or answer, feel free to type it in the chatbox!". If NO further clarification is needed, return an empty array `[]` for "options".
             
-            The return language should match the name and description language.
+            The return language should match the user's input language.
             
             Example:
             If the name is "Complete a graduation project on Fanpage Management" and description is "A project to manage a fanpage for a product" and deadline is "2023-12-31" and start date is "2023-09-29", return the result in the following format:
@@ -507,6 +498,18 @@ class AIGoalGeneratorService:
                 ]
             }}
             """
+
+    @staticmethod
+    def build_user_prompt_for_task(
+        name, description, deadline, message: str = ""
+    ):
+        if message:
+            return f"User's clarification/message: '{message}'"
+            
+        return f"""Here is a new goal:
+            Name: '{name}'
+            Description: '{description}'
+            Deadline: '{deadline}'"""
 
     @staticmethod
     def build_prompt_for_description(name, description, deadline):
@@ -880,14 +883,16 @@ class GoalBreakDownService:
         text_model,
         user: User | None = None,
     ):
-        latest_user_prompt = AIGoalGeneratorService.build_prompt_for_task(
-            name, description, deadline, user, message
+        system_prompt = AIGoalGeneratorService.build_system_prompt_for_task(
+            name, description, deadline, user
         )
 
-        system_prompt = "You are a helpful project management assistant."
+        latest_user_prompt = AIGoalGeneratorService.build_user_prompt_for_task(
+            name, description, deadline, message
+        )
 
         logger.info(
-            f"Calling to AI for generating task with prompt: {latest_user_prompt}"
+            f"Calling to AI for generating task with user prompt: {latest_user_prompt}"
         )
         return AIGoalGeneratorService.get_ai_response(
             system_prompt, history, latest_user_prompt, api_key, base_url, text_model
@@ -901,7 +906,12 @@ class GoalBreakDownService:
             name, description, deadline
         )
         raw_response = AIGoalGeneratorService.get_ai_response(
-            description_prompt, api_key, base_url, text_model
+            system_prompt="You are a helpful project management assistant.",
+            history=[],
+            latest_user_prompt=description_prompt,
+            api_key=api_key,
+            base_url=base_url,
+            model=text_model
         )
         return GoalBreakDownService._parse_description_response(raw_response)
 

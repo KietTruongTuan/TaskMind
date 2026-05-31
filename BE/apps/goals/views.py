@@ -83,8 +83,6 @@ class GoalBreakdownView(APIView):
         )
 
 
-# The rest of the AI logic was moved to services.py
-
 
 @extend_schema_view(
     get=extend_schema(
