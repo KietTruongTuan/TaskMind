@@ -427,7 +427,7 @@ class AIGoalGeneratorService:
         if relevant_context and str(relevant_context).strip():
             context_section = f"Here are some context, prioritize using these context for your response:\n            {relevant_context}"
         else:
-            context_section = "There is currently no supported document from your uploads or in the system, so use your general knowledge to support the user. IMPORTANT: If this is your first response to the user, you must briefly mention in the 'message' that no relevant documents were found and you are using your general knowledge."
+            context_section = "There is currently no supported document from your uploads or in the system, so use your general knowledge to support the user."
 
         return f"""You are an excellent project management assistant.
             Please help me break down goals into specific, actionable steps from {timezone.now().date().isoformat()} to "{deadline}".
@@ -463,7 +463,7 @@ class AIGoalGeneratorService:
 
             IMPORTANT: If you ask a clarification question in the "message", you MUST provide 2 to 4 highly relevant, distinct options in the "options" array for the user to choose from. When asking a question, ALWAYS append a friendly sentence to the end of your "message" (as its own paragraph) stating: "If you have another preference or answer, feel free to type it in the chatbox!". If NO further clarification is needed, return an empty array `[]` for "options".
             
-            ALSO IMPORTANT: You must set "is_general_knowledge" to true if you are relying on your general knowledge if there is currently no supported of relevant context. Otherwise, set it to false.
+            ALSO IMPORTANT: You must set "is_general_knowledge" to true if you are relying on your general knowledge when there is currently no supported of relevant context (IMPORTANT: If this is your first response to the user, you must briefly mention in the 'message' that no relevant documents were found and you are using your general knowledge). Otherwise, set it to false.
             
             The return language should match the user's input language.
             
