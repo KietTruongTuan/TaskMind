@@ -39,6 +39,7 @@ import { useToast } from "@/app/contexts/toast-context/toast-context";
 import { useThemeContext } from "@/app/contexts/theme-context/theme-context";
 import { useRouter } from "next/navigation";
 import { useSidebarContext } from "@/app/contexts/sidebar-context/sidebar-context";
+import { ToastType } from "@/app/enum/toast-type.enum";
 
 export function KanbanBoard({
   tasks: initialTasks,
@@ -61,7 +62,7 @@ export function KanbanBoard({
   }, [initialTasks]);
 
   const [key, setKey] = useState(0);
-  const { showToast, setIsSuccess } = useToast();
+  const { showToast, setToastType } = useToast();
   const router = useRouter();
 
   const kanbanItems = tasks
@@ -129,12 +130,12 @@ export function KanbanBoard({
           }
 
           setKey((k) => k + 1);
-          setIsSuccess(false);
+          setToastType(ToastType.Error);
           showToast("Failed to update task status");
         }
       }
     },
-    [tasks, onTaskStatusChange, router, showToast, setTasksLocal, setIsSuccess],
+    [tasks, onTaskStatusChange, router, showToast, setTasksLocal, setToastType],
   );
 
   return (
@@ -164,7 +165,10 @@ export function KanbanBoard({
               {kanbanState.columns.map((columnId) => (
                 <Flex key={columnId} className={styles.columnWrapper}>
                   <CardNoPadding key={columnId} p="2" isPrimary>
-                    <KanbanColumn id={columnId} data-testid={`${columnId}-column`}>
+                    <KanbanColumn
+                      id={columnId}
+                      data-testid={`${columnId}-column`}
+                    >
                       <Flex direction="column" gap="3">
                         <KanbanColumnHeader>
                           <Flex align="center" gap="2">

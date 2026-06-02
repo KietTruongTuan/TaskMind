@@ -21,6 +21,7 @@ import { ButtonType } from "@/app/enum/button-type.enum";
 import { useToast } from "@/app/contexts/toast-context/toast-context";
 import { LoadingOverlay } from "@/app/components/loading-overlay/loading-overlay";
 import { useRouteLoadingContext } from "@/app/contexts/route-loading-context/route-loading-context";
+import { ToastType } from "@/app/enum/toast-type.enum";
 
 interface formContentsProps {
   header: string;
@@ -35,7 +36,7 @@ export function AuthenticationForm() {
     defaultValues: {},
   });
   const { route } = useRouteLoadingContext();
-  const { showToast, setIsSuccess } = useToast();
+  const { showToast, setToastType } = useToast();
   const {
     reset,
     handleSubmit,
@@ -75,11 +76,11 @@ export function AuthenticationForm() {
           data as RegistrationRequestBody,
         );
         SetActiveForm(AuthenticationModule.Login);
-        setIsSuccess(true);
+        setToastType(ToastType.Success);
         showToast(res.message);
       }
     } catch (err) {
-      setIsSuccess(false);
+      setToastType(ToastType.Error);
       const error = err as ApiError;
       showToast(error.message);
     }

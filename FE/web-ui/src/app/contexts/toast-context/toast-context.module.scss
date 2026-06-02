@@ -16,7 +16,16 @@
   overflow: hidden;
 }
 
-.toastViewport {
+.toastWarning {
+  background: var(--message-warning-light);
+  color: var(--message-warning);
+  border-radius: var(--spacing-small);
+  border: 2px solid var(--message-warning);
+  padding: 0;
+  overflow: hidden;
+}
+
+.toastViewportRight {
   position: fixed;
   bottom: 24px;
   right: 24px;
@@ -24,5 +33,17 @@
   flex-direction: column;
   gap: 12px;
   width: 360px;
+  z-index: 1000;  
+}
+
+.toastViewportLeft {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 360px;
   z-index: 1000;
 }
+

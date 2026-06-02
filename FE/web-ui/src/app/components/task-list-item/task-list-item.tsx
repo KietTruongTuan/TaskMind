@@ -17,6 +17,7 @@ import { useGoalContext } from "@/app/contexts/goal-context/goal-context";
 import { useRouter } from "next/navigation";
 import { Dispatch, SetStateAction } from "react";
 import { Task } from "@/app/constants";
+import { ToastType } from "@/app/enum/toast-type.enum";
 
 export function TaskListItem({
   task,
@@ -40,7 +41,7 @@ export function TaskListItem({
   const [detail, setDetail] = useState<DraftTask>(initialDetail);
   const detailRef = useRef<DraftTask>(initialDetail);
   const isCompleted = detail.status === Status.Completed;
-  const { showToast, setIsSuccess } = useToast();
+  const { showToast, setToastType } = useToast();
   const router = useRouter();
 
   const handleUpdate = async (field: keyof DraftTask) => {
@@ -82,7 +83,7 @@ export function TaskListItem({
         } as CreateGoalResponseBody);
       }
     } catch (error) {
-      setIsSuccess(false);
+      setToastType(ToastType.Error);
       showToast(`Failed to update ${field}`);
       setDetail({ ...detail, [field]: originalValue });
       setEditingField(null);

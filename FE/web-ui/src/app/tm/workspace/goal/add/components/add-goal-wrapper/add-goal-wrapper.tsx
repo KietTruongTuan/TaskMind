@@ -10,6 +10,7 @@ import {
   Flex,
   Grid,
   ScrollArea,
+  Strong,
   Text,
 } from "@radix-ui/themes";
 import { LoadingText } from "@/app/components/loading-text/loading-text";
@@ -30,6 +31,8 @@ import {
 import { WebUrl } from "@/app/enum/web-url.enum";
 import { buildUrl } from "@/app/tm/utils";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import { AlertDialogPopUp } from "@/app/components/alert-dialog-pop-up/alert-dialog-pop-up";
+import { ToastType } from "@/app/enum/toast-type.enum";
 
 export function AddGoalWrapper({ userProfile }: { userProfile: UserProfile }) {
   const checkIsMd = useMediaQuery("(min-width:1024px)");
@@ -38,6 +41,7 @@ export function AddGoalWrapper({ userProfile }: { userProfile: UserProfile }) {
   const [activeView, setActiveView] = useState<GoalAddReviewDetailView>(
     isMd ? GoalAddReviewDetailView.Both : GoalAddReviewDetailView.ReviewDetail,
   );
+  const [hasShownWarning, setHasShownWarning] = useState(false);
   const { draftGoal, clearDraftGoal, abortController, setAbortController } =
     useGoalContext();
   const [draftCreateGoal, setDraftCreateGoal] = useState(
@@ -49,8 +53,47 @@ export function AddGoalWrapper({ userProfile }: { userProfile: UserProfile }) {
       : null,
   );
   const { route, setIsRouteLoading } = useRouteLoadingContext();
-  const { showToast, setIsSuccess } = useToast();
+  const { showToast, setToastType, hideToast } = useToast();
   useEffect(() => {
+    if (draftGoal?.isGeneralKnowledge && !hasShownWarning) {
+      setHasShownWarning(true);
+      setToastType(ToastType.Warning);
+      showToast(
+        <Flex direction="column" gap="2">
+          <Flex>
+            <Text size="2" weight="regular">
+              <Strong>Warning:</Strong> This plan was generated using
+              generalized AI knowledge because no relevant information was found
+              in your personal knowledge base or the system knowledge base.
+            </Text>
+          </Flex>
+          <Flex justify="end" gap="2">
+            <CustomButton
+              buttonType={ButtonType.Secondary}
+              size="1"
+              onClick={() => {
+                handleBack();
+                hideToast();
+              }}
+            >
+              Back
+            </CustomButton>
+            <CustomButton
+              buttonType={ButtonType.Primary}
+              size="1"
+              onClick={() => {
+                hideToast();
+              }}
+            >
+              Got it!
+            </CustomButton>
+          </Flex>
+        </Flex>,
+        10000,
+        false,
+      );
+    }
+
     setDraftCreateGoal(
       draftGoal
         ? {
@@ -59,7 +102,7 @@ export function AddGoalWrapper({ userProfile }: { userProfile: UserProfile }) {
           }
         : null,
     );
-  }, [draftGoal]);
+  }, [draftGoal, hasShownWarning]);
 
   useEffect(() => {
     const updateMedia = () => setIsMd(window.innerWidth >= 1024);
@@ -81,6 +124,7 @@ export function AddGoalWrapper({ userProfile }: { userProfile: UserProfile }) {
     setAbortController(null);
     clearDraftGoal();
     setStep(AddStep.FillInformation);
+    setHasShownWarning(false);
   };
 
   const handleSave = async () => {
@@ -90,10 +134,10 @@ export function AddGoalWrapper({ userProfile }: { userProfile: UserProfile }) {
         draftCreateGoal as SaveGoalRequestBody,
       );
       route(buildUrl(WebUrl.GoalDetail, data.id));
-      setIsSuccess(true);
+      setToastType(ToastType.Success);
       showToast("Your goal is successfully saved");
     } catch (err) {
-      setIsSuccess(false);
+      setToastType(ToastType.Error);
       const error = err as ApiError;
       showToast(error.message);
     } finally {
