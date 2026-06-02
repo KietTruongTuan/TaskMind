@@ -1,0 +1,84 @@
+        if not test_result.success:
+            failed_metrics_data: List[MetricData] = []
+            # even for conversations, test_result right now is just the
+            # result for the last message
+            for metric_data in test_result.metrics_data:
+                if metric_data.error is not None:
+                    failed_metrics_data.append(metric_data)
+                else:
+                    # This try block is for user defined custom metrics,
+                    # which might not handle the score == undefined case elegantly
+                    try:
+                        if not metric_data.success:
+                            failed_metrics_data.append(metric_data)
+                    except Exception:
+                        failed_metrics_data.append(metric_data)
+
+            failed_metrics_str = ", ".join(
+                [
+                    f"{metrics_data.name} (score: {metrics_data.score}, threshold: {metrics_data.threshold}, strict: {metrics_data.strict_mode}, error: {metrics_data.error}, reason: {metrics_data.reason})"
+                    for metrics_data in failed_metrics_data
+                ]
+            )
+>           raise AssertionError(f"Metrics: {failed_metrics_str} failed.")
+E           AssertionError: Metrics: Contextual Relevancy (score: 0.3333333333333333, threshold: 0.5, strict: False, error: None, reason: The score is 0.33 because while the context contains highly relevant statements such as 'Learning Outcome 2.4 (L.O.2.4) requires students to determine a normal form (1NF, 2NF, 3NF, BCNF) of a relation based on its given primary key and functional dependencies', it is heavily diluted by irrelevant institutional and administrative details such as 'Ho Chi Minh City University of Technology (HCMUT)', the 'Database Systems (CO2013) course', and evaluation methods like 'the Final Exam (A.O.1) and Lab Assignments (A.O.3)'.) failed.
+
+/usr/local/lib/python3.12/site-packages/deepeval/evaluate/evaluate.py:154: AssertionError
+--------------------------------------------------------- Captured stderr call ---------------------------------------------------------
+2026-05-27 23:20:49 [INFO] apps.knowledge_base.services: Calling user instance: kien1
+2026-05-27 23:20:49 [INFO] apps.knowledge_base.services: Calling user instance: None
+2026-05-27 23:20:49 [INFO] apps.goals.services: AI request started | correlation_id=2429e441 model=gemini-flash-latest prompt_length=4463 max_retries=3
+2026-05-27 23:20:56 [INFO] apps.goals.services: AI request succeeded | correlation_id=2429e441 attempt=1 response_length=1746 latency_ms=7048.3 raw_response=```json
+{
+    "message": "Your plan is done! Please let me know if you would like any further edits. If you are satisfied with the current version, kindly click the Save button in the top right corner.",
+    "options": [],
+    "description": "Gain a comprehensive and practical mastery of relational database design principles. By completing this goal, you will be able to analyze functional dependencies, systematically identify candidate keys, and decompose complex database schemas up to BCNF using lossless-join and dependency-preserving algorithms, ensuring optimal database performance and data integrity.",
+    "tasks": [
+        {
+            "name": "Study Functional Dependencies (FDs) and Attribute Closures",
+            "status": "ToDo",
+            "deadline": "2026-06-15"
+        },
+        {
+            "name": "Learn Candidate Keys and Superkeys Identification Algorithms",
+            "status": "ToDo",
+            "deadline": "2026-06-30"
+        },
+        {
+            "name": "Master First Normal Form (1NF) and Second Normal Form (2NF) with practical examples",
+            "status": "ToDo",
+            "deadline": "2026-07-15"
+        },
+        {
+            "name": "Master Third Normal Form (3NF) and Boyce-Codd Normal Form (BCNF)",
+            "status": "ToDo",
+            "deadline": "2026-07-31"
+        },
+        {
+            "name": "Practice 3NF and BCNF Decomposition Algorithms (Lossless-Join and Dependency-Preserving)",
+            "status": "ToDo",
+            "deadline": "2026-08-15"
+        },
+        {
+            "name": "Solve complex normalization exercises and complete a comprehensive self-assessment",
+            "status": "ToDo",
+            "deadline": "2026-08-31"
+        }
+    ]
+}
+```
+2026-05-27 23:20:56 [INFO] deepeval.evaluate.execute.e2e: in _a_execute_llm_test_cases
+---------------------------------------------------------- Captured log call -----------------------------------------------------------
+INFO     deepeval.evaluate.execute.e2e:e2e.py:550 in _a_execute_llm_test_cases
+=========================================================== warnings summary ===========================================================
+evaluation/deepeval/test_deepeval.py::test_rag_pipeline[CO2013__Prepare for Database Systems Final Exam]
+  /usr/local/lib/python3.12/site-packages/deepeval/utils.py:194: DeprecationWarning: There is no current event loop
+    loop = asyncio.get_event_loop()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================================================= short test summary info ========================================================
+FAILED evaluation/deepeval/test_deepeval.py::test_rag_pipeline[CO2013__Prepare for Database Systems Final Exam] - AssertionError: Metrics: Contextual Recall (score: 0.25, threshold: 0.5, strict: False, error: None, reason: The score is 0.25 beca...
+FAILED evaluation/deepeval/test_deepeval.py::test_rag_pipeline[CO2013__Complete Database Lab Assignment] - AssertionError: Metrics: Contextual Recall (score: 0.3333333333333333, threshold: 0.5, strict: False, error: None, reason: The scor...
+FAILED evaluation/deepeval/test_deepeval.py::test_rag_pipeline[CO2013__Master Database Normalization] - AssertionError: Metrics: Contextual Relevancy (score: 0.3333333333333333, threshold: 0.5, strict: False, error: None, reason: The s...
+======================================= 3 failed, 12 deselected, 1 warning in 479.96s (0:07:59) ========================================
+((venv) ) 

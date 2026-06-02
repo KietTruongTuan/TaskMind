@@ -1,0 +1,157 @@
+acer@LeeTrungKenie MINGW64 ~/Downloads/Documents/kitchen/capstone (feat/improve-rag)
+$ docker compose exec backend pytest evaluation/deepeval/test_deepeval.py -v -k "CO2013" --html=evaluation/outputs/rag_test_report.html --self-contained-html
+=========================================================================================================== test session starts ===========================================================================================================
+platform linux -- Python 3.12.13, pytest-8.4.2, pluggy-1.6.0 -- /usr/local/bin/python3.12
+cachedir: .pytest_cache
+metadata: {'Python': '3.12.13', 'Platform': 'Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.41', 'Packages': {'pytest': '8.4.2', 'pluggy': '1.6.0'}, 'Plugins': {'metadata': '3.1.1', 'anyio': '4.11.0', 'rerunfailures': '16.3', 'xdist': '3.8.0', 'cov': '6.2.1', 'asyncio': '1.4.0', 'repeat': '0.9.4', 'deepeval': '4.0.4', 'html': '4.2.0', 'django': '4.11.1'}}
+django: version: 5.2.6, settings: config.settings (from ini)
+rootdir: /app
+configfile: pytest.ini
+plugins: metadata-3.1.1, anyio-4.11.0, rerunfailures-16.3, xdist-3.8.0, cov-6.2.1, asyncio-1.4.0, repeat-0.9.4, deepeval-4.0.4, html-4.2.0, django-4.11.1
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 15 items / 12 deselected / 3 selected                                                                                                                                                                                           
+
+evaluation/deepeval/test_deepeval.py::test_rag_pipeline[CO2013__Prepare for Database Systems Final Exam] FAILED                                                                                                                     [ 33%]
+evaluation/deepeval/test_deepeval.py::test_rag_pipeline[CO2013__Complete Database Lab Assignment] PASSED                                                                                                                            [ 66%]
+evaluation/deepeval/test_deepeval.py::test_rag_pipeline[CO2013__Master Database Normalization] PASSED                                                                                                                               [100%]Running teardown with pytest sessionfinish...
+
+
+================================================================================================================ FAILURES =================================================================================================================
+___________________________________________________________________________________ test_rag_pipeline[CO2013__Prepare for Database Systems Final Exam] ____________________________________________________________________________________
+
+sample = {'_comment': '=== CO2013 — Database Systems ===', 'course': 'CO2013', 'goal_description': 'Review all topics: ER model...al exam is 90 minutes MCQ + written, worth 50% of grade.', 'goal_name': 'Prepare for Database Systems Final Exam', ...}
+
+    @pytest.mark.django_db          # ← grants ORM access for the whole test body
+    @pytest.mark.parametrize(
+        "sample",
+        _DATASET,
+        ids=[f"{s.get('course', 'unknown')}__{s['goal_name']}" for s in _DATASET],
+    )
+    def test_rag_pipeline(sample: dict):
+        """
+        Measure all three RAGAS metrics for one sample from the evaluation dataset
+        using ``metric.measure()`` / ``metric.score``.
+
+        Each row is appended to the module-level ``_RESULTS`` list.  The
+        ``pytest_terminal_summary`` hook in ``conftest.py`` then prints the full
+        DataFrame (all test cases, passed and failed) once at the very end of the
+        session — bypassing pytest's per-test stdout capture.
+
+        The test fails if *any* metric score is None (error/timeout) or falls
+        below the threshold (0.5).
+
+        Note on empty retrieval context
+        --------------------------------
+        ``Contextual Relevancy`` will score 0.0 if no documents have been ingested
+        into the global knowledge base.  Upload course-relevant documents via the
+        admin panel first for meaningful scores.
+        """
+        row = _measure_sample(sample)
+
+        # Accumulate for the session-level summary table
+        _RESULTS.append(row)
+
+        # Fail the pytest test if status is not Passed
+>       assert row["status"] == "Passed", (
+            f"Metrics below threshold for '{row['test_case']}': "
+            f"faithfulness={row['faithfulness']}, "
+            f"answer_relevancy={row['answer_relevancy']}, "
+            f"contextual_relevancy={row['contextual_relevancy']}"
+        )
+E       AssertionError: Metrics below threshold for 'Prepare for Database Systems Final Exam': faithfulness=1.0, answer_relevancy=1.0, contextual_relevancy=0.4782608695652174
+E       assert 'Failed' == 'Passed'
+E
+E         - Passed
+E         + Failed
+
+evaluation/deepeval/test_deepeval.py:225: AssertionError
+---------------------------------------------------------------------------------------------------------- Captured stderr call -----------------------------------------------------------------------------------------------------------
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-06-02 13:22:13 [WARNING] huggingface_hub.utils._http: Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights: 100%|██████████| 103/103 [00:00<00:00, 1767.82it/s]
+BertModel LOAD REPORT from: sentence-transformers/all-MiniLM-L6-v2
+Key                     | Status     |  |
+------------------------+------------+--+-
+embeddings.position_ids | UNEXPECTED |  |
+
+Notes:
+- UNEXPECTED:   can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+2026-06-02 13:22:19 [INFO] apps.knowledge_base.services: Calling user instance: kien1
+2026-06-02 13:22:20 [INFO] apps.knowledge_base.services: Calling user instance: None
+2026-06-02 13:22:20 [INFO] apps.goals.services: AI request started | correlation_id=61fcd1a8 model=gemini-flash-latest prompt_length=4472 max_retries=3
+2026-06-02 13:22:29 [INFO] apps.goals.services: AI request succeeded | correlation_id=61fcd1a8 attempt=1 response_length=1773 latency_ms=9176.3 raw_response=```json
+{
+    "message": "To help me structure the perfect study schedule, could you clarify your target exam date or how many weeks you would like to dedicate to this preparation? If you have another preference or answer, feel free to type it in the chatbox!",
+    "options": [
+        "Create a structured 4-week study plan starting June 2, 2026",
+        "Create an intensive 2-week review plan",
+        "Spread the topics evenly leading up to a mid-July 2026 exam"
+    ],
+    "description": "Master all core database concepts—including ER modeling, relational design, advanced SQL, normalization, storage, and security—to excel in the 90-minute MCQ and written final exam, securing up to 50% of the course grade.",
+    "tasks": [
+        {
+            "name": "Review ER Model and Relational Model concepts",
+            "status": "ToDo",
+            "deadline": "2026-06-07"
+        },
+        {
+            "name": "Practice SQL queries (DDL, DML, Joins, Subqueries, and Aggregations)",
+            "status": "ToDo",
+            "deadline": "2026-06-14"
+        },
+        {
+            "name": "Study Database Normalization (1NF, 2NF, 3NF, BCNF) and functional dependencies",
+            "status": "ToDo",
+            "deadline": "2026-06-21"
+        },
+        {
+            "name": "Review Storage, Indexing, and Database Security concepts",
+            "status": "ToDo",
+            "deadline": "2026-06-25"
+        },
+        {
+            "name": "Solve mock MCQ and written exams under a 90-minute time limit",
+            "status": "ToDo",
+            "deadline": "2026-06-28"
+        },
+        {
+            "name": "Conduct final comprehensive review of weak areas",
+            "status": "ToDo",
+            "deadline": "2026-06-30"
+        }
+    ]
+}
+```
+
+
+
+------------------------------------------------------------------------------------------------------------ Captured log call ------------------------------------------------------------------------------------------------------------
+WARNING  huggingface_hub.utils._http:_http.py:916 Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+============================================================================================================ warnings summary =============================================================================================================
+evaluation/deepeval/test_deepeval.py::test_rag_pipeline[CO2013__Prepare for Database Systems Final Exam]
+  /usr/local/lib/python3.12/site-packages/deepeval/utils.py:194: DeprecationWarning: There is no current event loop
+    loop = asyncio.get_event_loop()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+
+==============================================================================
+RAG EVALUATION RESULTS — SCORES
+==============================================================================
+                              test_case  faithfulness  answer_relevancy  contextual_relevancy status
+Prepare for Database Systems Final Exam           1.0               1.0              0.478261 Failed
+       Complete Database Lab Assignment           1.0               1.0              0.777778 Passed
+          Master Database Normalization           1.0               1.0              0.600000 Passed
+
+Pass rate              : 2/3 (66.7 %)
+Avg faithfulness          : 1.0000
+Avg answer_relevancy      : 1.0000
+Avg contextual_relevancy  : 0.6187
+==============================================================================
+
+──────────────────────────────────────────────────────────────────────────────
+RAG EVALUATION RESULTS — REASONS
+──────────────────────────────────────────────────────────────────────────────
+
+▶ Prepare for Database Systems Final Exam  [FAILED]
+  Faithfulness         (1.0000): The score is 1.00 because the actual output is perfectly aligned with the retrieval context, showing absolutely no contradictions! Great job keeping the information accurate and faithful.
+  Answer Relevancy     (1.0000): The score is 1.00 because the output is perfectly aligned with the input, addressing all the databa

@@ -49,6 +49,7 @@ numpy==2.3.3
 onnxruntime==1.24.4
 openai==2.8.1
 packaging==25.0
+pandas==3.0.3
 pgvector==0.4.2
 pillow==11.3.0
 pluggy==1.6.0
@@ -63,6 +64,7 @@ PyMuPDF==1.27.2.2
 pymupdf-layout==1.27.2.2
 pymupdf4llm==1.27.2.2
 pypdf==6.8.0
+deepeval==4.0.4
 pytest==8.4.2
 pytest-django==4.11.1
 pytest-html==4.2.0

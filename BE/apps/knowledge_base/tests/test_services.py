@@ -5,8 +5,9 @@ Covers RAGFileProcessService (chunking) and RAGContextService (graceful degradat
 LLM calls are mocked.
 """
 
+import json
 import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, MagicMock, call
 from django.test import override_settings
 
 from apps.knowledge_base.services import RAGFileProcessService, RAGContextService, SplitLevel
@@ -77,6 +78,109 @@ class TestStructureSplitOversized:
             "some text", split_size=100, split_into=None
         )
         assert result == []
+
+
+# ===========================================================================
+# RAGFileProcessService — Phase 2 LLM Semantic Chunking
+# ===========================================================================
+
+
+def _make_llm_client(response_content: str) -> MagicMock:
+    """Build a minimal mock OpenAI client that returns *response_content* as the
+    message content of the first choice."""
+    mock_choice = MagicMock()
+    mock_choice.message.content = response_content
+
+    mock_response = MagicMock()
+    mock_response.choices = [mock_choice]
+
+    mock_client = MagicMock()
+    mock_client.chat.completions.create.return_value = mock_response
+    return mock_client
+
+
+class TestPhase2LLMSemanticChunking:
+
+    def test_returns_parsed_json_list(self):
+        """Happy path: LLM returns a valid JSON array, method returns a Python list."""
+        chunks = ["Chunk A", "Chunk B"]
+        client = _make_llm_client(json.dumps(chunks))
+
+        result = RAGFileProcessService.phase2_llm_semantic_chunking(
+            client, "model-name", "Some text block."
+        )
+
+        assert result == chunks
+
+    def test_without_document_context_prompt_has_no_context_section(self):
+        """When document_context is None/omitted, the prompt must NOT contain the
+        'Document Context' preamble — backward-compatibility check."""
+        client = _make_llm_client(json.dumps(["chunk"]))
+
+        RAGFileProcessService.phase2_llm_semantic_chunking(
+            client, "model-name", "text block"
+        )
+
+        sent_prompt = client.chat.completions.create.call_args[1]["messages"][0]["content"]
+        assert "Summarized context from document is not available" in sent_prompt
+
+    def test_with_document_context_injected_into_prompt(self):
+        """When document_context is supplied it must appear verbatim inside the
+        prompt that is sent to the LLM."""
+        context = "This document is about machine learning pipelines."
+        client = _make_llm_client(json.dumps(["Enriched chunk"]))
+
+        RAGFileProcessService.phase2_llm_semantic_chunking(
+            client, "model-name", "text block", context
+        )
+
+        sent_prompt = client.chat.completions.create.call_args[1]["messages"][0]["content"]
+        assert context in sent_prompt
+        assert "Summarized Document Context" in sent_prompt
+
+    def test_document_context_empty_string_treated_as_absent(self):
+        """An empty-string context is falsy and should NOT inject the preamble."""
+        client = _make_llm_client(json.dumps(["chunk"]))
+
+        RAGFileProcessService.phase2_llm_semantic_chunking(
+            client, "model-name", "text block", ""
+        )
+
+        sent_prompt = client.chat.completions.create.call_args[1]["messages"][0]["content"]
+        assert "Summarized context from document is not available" in sent_prompt
+
+    def test_llm_called_with_correct_model_and_temperature(self):
+        """Ensure the LLM is invoked with the supplied model name and temperature=0.1."""
+        client = _make_llm_client(json.dumps(["chunk"]))
+
+        RAGFileProcessService.phase2_llm_semantic_chunking(
+            client, "gpt-4o", "text block"
+        )
+
+        call_kwargs = client.chat.completions.create.call_args[1]
+        assert call_kwargs["model"] == "gpt-4o"
+        assert call_kwargs["temperature"] == 0.1
+
+    def test_phase1_chunk_appears_in_prompt(self):
+        """The raw text block must be embedded in the prompt sent to the LLM."""
+        client = _make_llm_client(json.dumps(["result"]))
+        text_block = "unique-sentinel-text-block-12345"
+
+        RAGFileProcessService.phase2_llm_semantic_chunking(
+            client, "model", text_block
+        )
+
+        sent_prompt = client.chat.completions.create.call_args[1]["messages"][0]["content"]
+        assert text_block in sent_prompt
+
+    def test_json_decode_error_is_reraised(self):
+        """If the LLM returns malformed JSON the JSONDecodeError must propagate."""
+        client = _make_llm_client("not valid json")
+
+        with pytest.raises(json.JSONDecodeError):
+            RAGFileProcessService.phase2_llm_semantic_chunking(
+                client, "model", "text block"
+            )
 
 
 # ===========================================================================
