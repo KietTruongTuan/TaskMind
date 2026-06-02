@@ -863,9 +863,10 @@ class GoalBreakDownService:
         final_desc = ai_result.get("description", description)
         response_message = ai_result.get("message", "")
         options = ai_result.get("options", [])
+        is_general_knowledge = ai_result.get("is_general_knowledge", False)
 
         return GoalBreakDownService._build_final_result(
-            response_message, options, name, final_desc, deadline, tag, tasks
+            response_message, options, name, final_desc, deadline, tag, tasks, is_general_knowledge
         )
 
     @staticmethod
@@ -976,7 +977,7 @@ class GoalBreakDownService:
         return task
 
     @staticmethod
-    def _build_final_result(response_message, options, name, final_desc, deadline, tag, tasks):
+    def _build_final_result(response_message, options, name, final_desc, deadline, tag, tasks, is_general_knowledge=False):
         sanitized_tasks = [GoalBreakDownService._sanitize_task_status(t) for t in tasks]
 
         return {
@@ -990,4 +991,5 @@ class GoalBreakDownService:
             "completeCount": 0,
             "taskCount": len(sanitized_tasks),
             "tasks": sanitized_tasks,
+            "isGeneralKnowledge": is_general_knowledge,
         }
