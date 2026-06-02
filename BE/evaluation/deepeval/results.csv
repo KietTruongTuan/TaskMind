@@ -1,0 +1,4 @@
+test_case,faithfulness,answer_relevancy,contextual_relevancy,status
+Prepare for Database Systems Final Exam,1.0,1.0,0.4782608695652174,Failed
+Complete Database Lab Assignment,1.0,1.0,0.7777777777777778,Passed
+Master Database Normalization,1.0,1.0,0.6,Passed

@@ -13,8 +13,8 @@ from deepeval.models import DeepEvalBaseLLM
 from deepeval.metrics import (
     AnswerRelevancyMetric,
     FaithfulnessMetric,
-    ContextualPrecisionMetric,
-    ContextualRecallMetric,
+    # ContextualPrecisionMetric,
+    # ContextualRecallMetric,
     ContextualRelevancyMetric,
 )
 
@@ -34,7 +34,7 @@ class JudgeLLM(DeepEvalBaseLLM):
 
     def __init__(self):
         self.model_name: str = (
-            os.environ.get("RAG_LLM_MODEL_NAME") or "gemini-flash-latest"
+            os.environ.get("RAG_LLM_MODEL_NAME") or "gemini-flash-lite-latest"
         )
         api_key: str = os.environ.get("RAG_LLM_API_KEY") or os.environ.get("API_KEY", "")
         base_url: str = (
