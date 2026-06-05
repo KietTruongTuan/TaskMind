@@ -30,6 +30,8 @@ describe("AddForm", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    window.HTMLElement.prototype.hasPointerCapture = jest.fn();
+    window.HTMLElement.prototype.releasePointerCapture = jest.fn();
   });
 
   it("should call aiService and move to next step", async () => {

@@ -8,6 +8,8 @@ import {
   MOCK_GOAL_RESPONSE_DATA,
 } from "@/app/constants";
 import { ChatRole } from "@/app/enum/chat-role.enum";
+import { GoalAddReviewDetailView } from "@/app/enum/step.enum";
+import { ToastProvider } from "@/app/contexts/toast-context/toast-context";
 
 jest.mock("@/app/contexts/goal-context/goal-context", () => ({
   useGoalContext: jest.fn(),
@@ -36,7 +38,11 @@ describe("GoalChat", () => {
   });
 
   it("should render Thinking when draftGoal is null", () => {
-    render(<GoalChat />);
+    render(
+      <ToastProvider>
+        <GoalChat view={GoalAddReviewDetailView.Both} />
+      </ToastProvider>,
+    );
     expect(screen.getByText("Thinking")).toBeInTheDocument();
   });
 
@@ -51,7 +57,11 @@ describe("GoalChat", () => {
       isDraftGoalFromChat: true,
     });
 
-    render(<GoalChat />);
+    render(
+      <ToastProvider>
+        <GoalChat view={GoalAddReviewDetailView.Both} />
+      </ToastProvider>,
+    );
     expect(screen.getByText("Test message")).toBeInTheDocument();
   });
 
@@ -67,7 +77,11 @@ describe("GoalChat", () => {
       isDraftGoalFromChat: true,
     });
 
-    render(<GoalChat />);
+    render(
+      <ToastProvider>
+        <GoalChat view={GoalAddReviewDetailView.Both} />
+      </ToastProvider>,
+    );
     expect(screen.getByText("Option 1")).toBeInTheDocument();
     expect(screen.getByText("Option 2")).toBeInTheDocument();
   });
@@ -90,7 +104,11 @@ describe("GoalChat", () => {
       message: "Assistant response",
     });
 
-    render(<GoalChat />);
+    render(
+      <ToastProvider>
+        <GoalChat view={GoalAddReviewDetailView.Both} />
+      </ToastProvider>,
+    );
 
     const input = screen.getByTestId("goal-chat-input");
     const sendBtn = screen.getByTestId("goal-chat-send");
@@ -147,7 +165,11 @@ describe("GoalChat", () => {
       message: "AI Response",
     });
 
-    render(<GoalChat />);
+    render(
+      <ToastProvider>
+        <GoalChat view={GoalAddReviewDetailView.Both} />
+      </ToastProvider>,
+    );
 
     const option = screen.getByText("Option Clicked");
     await user.click(option);

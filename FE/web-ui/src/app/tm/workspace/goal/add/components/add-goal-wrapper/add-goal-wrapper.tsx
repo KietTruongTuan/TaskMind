@@ -59,7 +59,7 @@ export function AddGoalWrapper({ userProfile }: { userProfile: UserProfile }) {
       setHasShownWarning(true);
       setToastType(ToastType.Warning);
       showToast(
-        <Flex direction="column" gap="2">
+        <Flex direction="column" gap="2" data-testid="warning-toast">
           <Flex>
             <Text size="2" weight="regular">
               <Strong>Warning:</Strong> This plan was generated using
@@ -75,6 +75,7 @@ export function AddGoalWrapper({ userProfile }: { userProfile: UserProfile }) {
                 handleBack();
                 hideToast();
               }}
+              data-testid="warning-toast-back-btn"
             >
               Back
             </CustomButton>
@@ -84,6 +85,7 @@ export function AddGoalWrapper({ userProfile }: { userProfile: UserProfile }) {
               onClick={() => {
                 hideToast();
               }}
+              data-testid="warning-toast-continue-btn"
             >
               Got it!
             </CustomButton>

@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { AddGoalWrapper } from "./add-goal-wrapper";
 import { useGoalContext } from "@/app/contexts/goal-context/goal-context";
 import { AddStep } from "@/app/enum/step.enum";
@@ -48,6 +48,8 @@ describe("AddGoalWrapper", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockUseMediaQuery.mockReturnValue(false);
+    window.HTMLElement.prototype.hasPointerCapture = jest.fn();
+    window.HTMLElement.prototype.releasePointerCapture = jest.fn();
   });
 
   it("should render GoalAdd by default", () => {
@@ -120,6 +122,94 @@ describe("AddGoalWrapper", () => {
     expect(
       screen.getByText("Goal Review Component - Test Goal"),
     ).toBeInTheDocument();
+  });
+
+  it("should display warning toast when draftGoal.isGeneralKnowledge is true", async () => {
+    const mockGoalWithGeneralKnowledge = {
+      ...MOCK_GOAL_RESPONSE_DATA,
+      isGeneralKnowledge: true,
+    };
+    (useGoalContext as jest.Mock).mockReturnValue({
+      draftGoal: mockGoalWithGeneralKnowledge,
+      setAbortController: jest.fn(),
+    });
+
+    render(
+      <ThemeProvider>
+        <ToastProvider>
+          <RouteLoadingProvider>
+            <AddGoalWrapper userProfile={MOCK_USER} />
+          </RouteLoadingProvider>
+        </ToastProvider>
+      </ThemeProvider>,
+    );
+
+    const nextButton = screen.getByTestId("go-to-review-btn");
+    await userEvent.click(nextButton);
+
+    expect(screen.getByTestId("warning-toast")).toBeInTheDocument();
+  });
+
+  it("should return to FillInformation step when back button on warning toast is clicked", async () => {
+    const mockGoalWithGeneralKnowledge = {
+      ...MOCK_GOAL_RESPONSE_DATA,
+      isGeneralKnowledge: true,
+    };
+    (useGoalContext as jest.Mock).mockReturnValue({
+      draftGoal: mockGoalWithGeneralKnowledge,
+      setAbortController: jest.fn(),
+      clearDraftGoal: jest.fn(),
+    });
+
+    render(
+      <ThemeProvider>
+        <ToastProvider>
+          <RouteLoadingProvider>
+            <AddGoalWrapper userProfile={MOCK_USER} />
+          </RouteLoadingProvider>
+        </ToastProvider>
+      </ThemeProvider>,
+    );
+
+    const nextButton = screen.getByTestId("go-to-review-btn");
+    await userEvent.click(nextButton);
+
+    const backButton = screen.getByTestId("warning-toast-back-btn");
+    await userEvent.click(backButton);
+
+    expect(await screen.findByTestId("goal-add")).toBeInTheDocument();
+  });
+  
+  it("should close the warning toast when continue button on warning toast is clicked", async () => {
+    const mockGoalWithGeneralKnowledge = {
+      ...MOCK_GOAL_RESPONSE_DATA,
+      isGeneralKnowledge: true,
+    };
+    (useGoalContext as jest.Mock).mockReturnValue({
+      draftGoal: mockGoalWithGeneralKnowledge,
+      setAbortController: jest.fn(),
+      clearDraftGoal: jest.fn(),
+    });
+
+    render(
+      <ThemeProvider>
+        <ToastProvider>
+          <RouteLoadingProvider>
+            <AddGoalWrapper userProfile={MOCK_USER} />
+          </RouteLoadingProvider>
+        </ToastProvider>
+      </ThemeProvider>,
+    );
+
+    const nextButton = screen.getByTestId("go-to-review-btn");
+    await userEvent.click(nextButton);
+
+    const continueButton = screen.getByTestId("warning-toast-continue-btn");
+    await userEvent.click(continueButton);
+
+    await waitFor(() => {
+      expect(screen.queryByTestId("warning-toast")).not.toBeInTheDocument();
+    });
   });
 
   it("should display the Both menu item on desktop and switch to Both view", async () => {
