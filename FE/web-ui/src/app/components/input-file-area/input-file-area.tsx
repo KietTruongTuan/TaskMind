@@ -6,6 +6,7 @@ import { useState, useRef, SetStateAction, Dispatch } from "react";
 import styles from "./input-file-area.module.scss";
 import { FileType } from "@/app/enum/file-type.enum";
 import { useToast } from "@/app/contexts/toast-context/toast-context";
+import { ToastType } from "@/app/enum/toast-type.enum";
 
 export function InputFileArea({
   handleUpload,
@@ -22,7 +23,7 @@ export function InputFileArea({
 }) {
   const [isDragging, setIsDragging] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const { setIsSuccess, showToast } = useToast();
+  const { setToastType, showToast } = useToast();
   const checkFileType = (files: File[]) => {
     const invalidFile = files.find((file) => {
       const ext = file.name.split(".").pop()?.toLowerCase() as FileType;
@@ -31,7 +32,7 @@ export function InputFileArea({
 
     if (invalidFile) {
       setIsDialogOpen?.(false);
-      setIsSuccess(false);
+      setToastType(ToastType.Error);
       showToast("File type is not allowed");
       return false;
     }

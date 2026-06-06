@@ -18,6 +18,8 @@ import { useGoalContext } from "@/app/contexts/goal-context/goal-context";
 import { ChatRole } from "@/app/enum/chat-role.enum";
 import { ApiError } from "@/app/constants";
 import { GoalAddReviewDetailView } from "@/app/enum/step.enum";
+import { useToast } from "@/app/contexts/toast-context/toast-context";
+import { ToastType } from "@/app/enum/toast-type.enum";
 
 interface UIChatMessage extends ChatMessage {
   options?: string[];
@@ -31,6 +33,7 @@ export function GoalChat({ view }: { view: GoalAddReviewDetailView }) {
     clearDraftGoal,
     isDraftGoalFromChat,
   } = useGoalContext();
+  const { showToast, setToastType } = useToast();
   const [messages, setMessages] = useState<UIChatMessage[]>([]);
   const [historyMessages, setHistoryMessages] = useState<ChatMessage[]>([]);
   const [inputValue, setInputValue] = useState("");
@@ -108,14 +111,11 @@ export function GoalChat({ view }: { view: GoalAddReviewDetailView }) {
       );
     } catch (err) {
       const error = err as ApiError;
-      setMessages((prev) => [
-        ...prev,
-        { role: ChatRole.Assistant, content: error.message },
-      ]);
-      setHistoryMessages((prev) => [
-        ...prev,
-        { role: ChatRole.Assistant, content: JSON.stringify(error) },
-      ]);
+      setToastType(ToastType.Error);
+      showToast(
+        "AI Error: " +
+          (error.message || "Failed to generate. Please try again."),
+      );
       setDraftGoal(oldDraftGoal, true);
     } finally {
       setIsTyping(false);

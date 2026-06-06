@@ -16,6 +16,7 @@ import { EllipsisVertical, Trash2 } from "lucide-react";
 import { ApiError, knowledgeBaseService } from "@/app/constants";
 import { useToast } from "@/app/contexts/toast-context/toast-context";
 import { AlertDialogPopUp } from "@/app/components/alert-dialog-pop-up/alert-dialog-pop-up";
+import { ToastType } from "@/app/enum/toast-type.enum";
 
 const RCTCheckboxGroupRoot = CheckboxGroup.Root as React.FC<
   React.ComponentProps<typeof CheckboxGroup.Root> & {
@@ -30,12 +31,12 @@ export function DocumentList({
 }) {
   const router = useRouter();
   const [selectedDocuments, setSelectedDocuments] = useState<number[]>([]);
-  const { setIsSuccess, showToast } = useToast();
+  const { setToastType, showToast } = useToast();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const onDelete = async () => {
     if (selectedDocuments.length === 0) {
-      setIsSuccess(false);
+      setToastType(ToastType.Error);
       showToast("No document selected");
       setIsDropdownOpen(false);
       return;
@@ -46,7 +47,7 @@ export function DocumentList({
       setSelectedDocuments([]);
     } catch (err) {
       const error = err as ApiError;
-      setIsSuccess(false);
+      setToastType(ToastType.Error);
       showToast(error.message);
     } finally {
       setIsDropdownOpen(false);

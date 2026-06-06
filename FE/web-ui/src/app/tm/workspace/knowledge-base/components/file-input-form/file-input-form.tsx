@@ -5,12 +5,13 @@ import { InputFileArea } from "@/app/components/input-file-area/input-file-area"
 import { ApiError, knowledgeBaseService } from "@/app/constants";
 import { useToast } from "@/app/contexts/toast-context/toast-context";
 import { FileType } from "@/app/enum/file-type.enum";
+import { ToastType } from "@/app/enum/toast-type.enum";
 import { Flex } from "@radix-ui/themes";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export function FileInputForm() {
-  const { setIsSuccess, showToast } = useToast();
+  const { setToastType, showToast } = useToast();
   const [isUploading, setIsUploading] = useState(false);
   const router = useRouter();
 
@@ -22,11 +23,11 @@ export function FileInputForm() {
     try {
       setIsUploading(true);
       const res = await knowledgeBaseService.upload(formData);
-      setIsSuccess(true);
+      setToastType(ToastType.Success);
       router.refresh();
       showToast("Your file is successfully uploaded");
     } catch (err) {
-      setIsSuccess(false);
+      setToastType(ToastType.Error);
       const error = err as ApiError;
       showToast(error.message);
     } finally {
@@ -35,7 +36,7 @@ export function FileInputForm() {
   };
   const isValidInput = (files: File[]) => {
     if (files.length > 5) {
-      setIsSuccess(false);
+      setToastType(ToastType.Error);
       showToast("You can only upload 5 files at a time");
       return false;
     }

@@ -8,11 +8,12 @@ import { SkeletonLoading } from "../skeleton-loading/skeleton-loading";
 import { useRouteLoadingContext } from "@/app/contexts/route-loading-context/route-loading-context";
 import { WebUrl } from "@/app/enum/web-url.enum";
 import { useToast } from "@/app/contexts/toast-context/toast-context";
+import { ToastType } from "@/app/enum/toast-type.enum";
 
 export function AvatarMenu() {
   const { route, setIsRouteLoading } = useRouteLoadingContext();
   const { user, loading } = useTokenRefresherContext();
-  const { setIsSuccess, showToast } = useToast();
+  const { setToastType, showToast } = useToast();
   const username = user ? user.username.charAt(0).toUpperCase() : "";
 
   const onLogOut = async () => {
@@ -21,7 +22,7 @@ export function AvatarMenu() {
       await authenticationService.logout();
       route(WebUrl.Authentication);
     } catch (err) {
-      setIsSuccess(false);
+      setToastType(ToastType.Error);
       const error = err as ApiError;
       showToast(error.message);
     } finally {

@@ -20,6 +20,7 @@ import { ButtonType } from "@/app/enum/button-type.enum";
 import { NewTaskListItem } from "../new-task-list-item/new-task-list-item";
 import { useRouter } from "next/navigation";
 import { Dispatch, SetStateAction } from "react";
+import { ToastType } from "@/app/enum/toast-type.enum";
 
 export function TaskList({
   tasks,
@@ -38,7 +39,7 @@ export function TaskList({
     Task[] | DraftTask[]
   >(tasks || []);
   const [isAddingTask, setIsAddingTask] = useState(false);
-  const { showToast, setIsSuccess } = useToast();
+  const { showToast, setToastType } = useToast();
   const { draftGoal, setDraftGoal } = useGoalContext();
   const router = useRouter();
 
@@ -57,7 +58,7 @@ export function TaskList({
       await taskService.remove(id);
       router.refresh();
     } catch (err) {
-      setIsSuccess(false);
+      setToastType(ToastType.Error);
       const error = err as ApiError;
       showToast(error.message);
       setLocalTasks(oldTasks);
@@ -104,7 +105,7 @@ export function TaskList({
         );
         router.refresh();
       } catch (err) {
-        setIsSuccess(false);
+        setToastType(ToastType.Error);
         const error = err as ApiError;
         showToast(error.message);
         setLocalTasks(oldTasks);

@@ -6,6 +6,7 @@ import { FileType } from "@/app/enum/file-type.enum";
 import styles from "./input-file-dialog.module.scss";
 import { Dispatch, SetStateAction, useState } from "react";
 import { useToast } from "@/app/contexts/toast-context/toast-context";
+import { ToastType } from "@/app/enum/toast-type.enum";
 
 export function InputFileDialog({
   files,
@@ -15,7 +16,7 @@ export function InputFileDialog({
   setFiles: Dispatch<SetStateAction<File[]>>;
 }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const { setIsSuccess, showToast } = useToast();
+  const { setToastType, showToast } = useToast();
 
   const onUploadFiles = (files: File[]) => {
     setFiles((prev) => [...prev, ...files]);
@@ -23,7 +24,7 @@ export function InputFileDialog({
   };
   const isValidInput = (newFiles: File[]) => {
     if (files.length + newFiles.length > 5) {
-      setIsSuccess(false);
+      setToastType(ToastType.Error);
       setIsDialogOpen(false);
       showToast("You can only upload 5 files");
       return false;

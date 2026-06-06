@@ -23,6 +23,7 @@ import { WebUrl } from "@/app/enum/web-url.enum";
 import { useRouteLoadingContext } from "@/app/contexts/route-loading-context/route-loading-context";
 import { useGoalContext } from "@/app/contexts/goal-context/goal-context";
 import { buildUrl } from "@/app/tm/utils";
+import { ToastType } from "@/app/enum/toast-type.enum";
 
 export function GoalCard({
   id,
@@ -59,7 +60,7 @@ export function GoalCard({
   const progress: number = Math.round(
     taskCount === 0 ? 0 : (completedCount * 100) / taskCount,
   );
-  const { showToast, setIsSuccess } = useToast();
+  const { showToast, setToastType } = useToast();
   const cardContent: StatusCardProps[] = [
     {
       label: "Progress",
@@ -134,7 +135,7 @@ export function GoalCard({
         setDraftGoal({ ...draftGoal, ...updateData } as CreateGoalResponseBody);
       }
     } catch (error) {
-      setIsSuccess(false);
+      setToastType(ToastType.Error);
       showToast(`Failed to update ${field}`);
       setDetail({ ...detail, [field]: originalValue });
       setEditingField(null);
@@ -148,7 +149,7 @@ export function GoalCard({
         await goalService.remove(id);
         route(WebUrl.GoalList);
       } catch (err) {
-        setIsSuccess(false);
+        setToastType(ToastType.Error);
         const error = err as ApiError;
         showToast(error.message);
       } finally {

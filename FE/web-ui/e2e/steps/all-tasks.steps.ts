@@ -32,35 +32,28 @@ When(
     await card.waitFor({ state: 'visible', timeout: 45000 });
     await card.scrollIntoViewIfNeeded();
 
-    // Target the column by its data-testid to avoid matching status badge text
     const targetColumn = page.getByTestId(`${columnId}-column`);
     await targetColumn.waitFor({ state: 'visible', timeout: 45000 });
 
-    // Get bounding boxes
     const cardBox = await card.boundingBox();
     if (!cardBox) throw new Error(`Cannot get bounding box for card "${taskName}"`);
     const columnBox = await targetColumn.boundingBox();
     if (!columnBox) throw new Error(`Cannot get bounding box for column "${targetColumnLabel}"`);
 
-    // Drag from the top quarter of the card (task name text area) to avoid
-    // the disabled StatusDropDown <button> child that sits in the centre
     const sourceX = cardBox.x + cardBox.width / 2;
     const sourceY = cardBox.y + cardBox.height * 0.25;
     const targetX = columnBox.x + columnBox.width / 2;
-    const targetY = columnBox.y + columnBox.height / 2;
+    const targetY = columnBox.y + (columnBox.height > 100 ? 50 : columnBox.height / 2);
 
-    // Position mouse and wait before pressing — gives dnd-kit time to mount
     await page.mouse.move(sourceX, sourceY);
     await page.waitForTimeout(100);
 
     await page.mouse.down();
     await page.waitForTimeout(100);
 
-    // Small horizontal jolt so PointerSensor's activation distance is exceeded
     await page.mouse.move(sourceX + 5, sourceY, { steps: 5 });
     await page.waitForTimeout(200);
 
-    // Glide to the target column centre in small steps
     const steps = 20;
     for (let i = 1; i <= steps; i++) {
       const x = sourceX + 5 + ((targetX - sourceX - 5) * i) / steps;
@@ -69,9 +62,11 @@ When(
       await page.waitForTimeout(30);
     }
 
-    await page.mouse.up();
+    await page.waitForTimeout(300);
+    await page.mouse.move(targetX, targetY + 5, { steps: 2 });
+    await page.waitForTimeout(300);
 
-    // Wait for taskService.update() and Next.js router.refresh() to complete
+    await page.mouse.up();
     await page.waitForLoadState('networkidle', { timeout: 30000 });
   }
 );

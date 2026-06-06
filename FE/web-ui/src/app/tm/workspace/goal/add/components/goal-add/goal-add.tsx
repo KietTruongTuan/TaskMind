@@ -21,6 +21,7 @@ import {
 } from "@/app/constants";
 import { useGoalContext } from "@/app/contexts/goal-context/goal-context";
 import { useToast } from "@/app/contexts/toast-context/toast-context";
+import { ToastType } from "@/app/enum/toast-type.enum";
 
 export function GoalAdd({
   setStep,
@@ -46,7 +47,7 @@ export function GoalAdd({
   } = methods;
   const { setDraftGoal, setCreateRequest, setAbortController } =
     useGoalContext();
-  const { showToast, setIsSuccess } = useToast();
+  const { showToast, setToastType } = useToast();
 
   const onSubmit = async () => {
     try {
@@ -89,11 +90,11 @@ export function GoalAdd({
       });
     } catch (err) {
       if (axios.isCancel(err)) {
-        setIsSuccess(false);
+        setToastType(ToastType.Error);
         showToast("Request canceled");
       } else {
         setStep(AddStep.FillInformation);
-        setIsSuccess(false);
+        setToastType(ToastType.Error);
         const error = err as ApiError;
         showToast(error.message);
       }
@@ -105,7 +106,7 @@ export function GoalAdd({
       await authenticationService.toggleLocalKnowledgeBase();
     } catch (err) {
       setEnableLocalKb((prev) => !prev);
-      setIsSuccess(false);
+      setToastType(ToastType.Error);
       const error = err as ApiError;
       showToast(error.message);
     }
@@ -117,7 +118,7 @@ export function GoalAdd({
       await authenticationService.toggleGlobalKnowledgeBase();
     } catch (err) {
       setEnableGlobalKb((prev) => !prev);
-      setIsSuccess(false);
+      setToastType(ToastType.Error);
       const error = err as ApiError;
       showToast(error.message);
     }
