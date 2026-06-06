@@ -1,6 +1,7 @@
 "use client";
 
-import { PieChart } from "@mui/x-charts";
+import { useState } from "react";
+import { HighlightItemData, PieChart } from "@mui/x-charts";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { CardNoPadding } from "@/app/components/card-no-padding/card-no-padding";
 import { Flex, Text, Box } from "@radix-ui/themes";
@@ -36,6 +37,13 @@ export function PieChartCard({
     },
   });
 
+  const [hoveredItem, setHoveredItem] = useState<HighlightItemData | null>(
+    null,
+  );
+  const [clickedItem, setClickedItem] = useState<HighlightItemData | null>(
+    null,
+  );
+
   return (
     <CardNoPadding py="5" px="5" data-testid="pie-chart" isPrimary>
       <Flex direction="column" width="100%" gap="7">
@@ -65,6 +73,8 @@ export function PieChartCard({
                 className={styles.pieChart}
                 width={200}
                 height={200}
+                highlightedItem={hoveredItem || clickedItem}
+                onHighlightChange={(item) => setHoveredItem(item)}
                 series={[
                   {
                     data: chartData,
@@ -77,10 +87,13 @@ export function PieChartCard({
                     innerRadius: 20,
                     paddingAngle: 5,
                     cornerRadius: 4,
-                    valueFormatter: (v) => `${v.value}`,  
-                  },  
+                    valueFormatter: (v) => `${v.value}`,
+                  },
                 ]}
-                onItemClick={(e, item) => {
+                onItemClick={(_, item) => {
+                  setClickedItem((prev) =>
+                    prev?.dataIndex === item.dataIndex ? null : item,
+                  );
                   if (onStatusClick) {
                     onStatusClick(chartData[item.dataIndex].id);
                   }

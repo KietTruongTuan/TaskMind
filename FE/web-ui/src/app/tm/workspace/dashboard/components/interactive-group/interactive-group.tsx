@@ -11,6 +11,7 @@ import { ContributionGraph } from "../contribution-graph/contribution-graph";
 import { GoalCard } from "@/app/components/goal-card/goal-card";
 import {
   GoalListItemResponseBody,
+  StatusDisplay,
   Task,
   TaskProductivityResponseBody,
 } from "@/app/constants";
@@ -35,7 +36,9 @@ export function InteractiveGroup({
 
   const tasksDueSoon: Task[] = tasks
     .filter((task) => {
-      const matchStatus = statusFilter ? task.status === statusFilter : true;
+      const matchStatus = statusFilter
+        ? task.status === statusFilter
+        : task.status === Status.InProgress || task.status === Status.ToDo;
       const matchDate = dateFilter
         ? new Date(task.deadline).toDateString() ===
           new Date(dateFilter).toDateString()
@@ -45,11 +48,13 @@ export function InteractiveGroup({
     .sort(
       (a, b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime(),
     )
-    .slice(0, 2);
+    .slice(0, 4);
 
   const recentGoals: GoalCardPropsData[] = goals
     .filter((goal) => {
-      const matchStatus = statusFilter ? goal.status === statusFilter : true;
+      const matchStatus = statusFilter
+        ? goal.status === statusFilter
+        : goal.status === Status.InProgress;
       const matchDate = dateFilter
         ? new Date(goal.deadline).toDateString() ===
           new Date(dateFilter).toDateString()
@@ -59,7 +64,7 @@ export function InteractiveGroup({
     .sort(
       (a, b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime(),
     )
-    .slice(0, 4);
+    .slice(0, 2);
 
   return (
     <Grid columns={{ initial: "1", md: "2fr 1fr" }} gap="5">
@@ -86,12 +91,16 @@ export function InteractiveGroup({
           gridColumn={{ initial: "1", md: "2" }}
         >
           <RecentGoalList
-            header="Due soon"
-            subHeader="Tasks Nearing Deadline"
-            nullMessage="No due soon tasks available"
-            icon={Clock}
-            data={tasksDueSoon}
-            cardTypeComponent={KanbanItem}
+            header={
+              statusFilter === undefined
+                ? "Recent Goals"
+                : `${StatusDisplay[statusFilter].title} goals`
+            }
+            subHeader="Track the progress of current goals"
+            nullMessage="No recent goals available"
+            icon={TrendingUp}
+            data={recentGoals}
+            cardTypeComponent={GoalCard}
           />
         </Box>
         <Box
@@ -113,13 +122,18 @@ export function InteractiveGroup({
           />
         </Box>
       </Grid>
+
       <RecentGoalList
-        header="Recent Goals"
-        subHeader="Track the progress of current goals"
-        nullMessage="No recent goals available"
-        icon={TrendingUp}
-        data={recentGoals}
-        cardTypeComponent={GoalCard}
+        header={
+          statusFilter === undefined
+            ? "Due soon"
+            : `${StatusDisplay[statusFilter].title} tasks`
+        }
+        subHeader="Tasks Nearing Deadline"
+        nullMessage="No due soon tasks available"
+        icon={Clock}
+        data={tasksDueSoon}
+        cardTypeComponent={KanbanItem}
       />
     </Grid>
   );
